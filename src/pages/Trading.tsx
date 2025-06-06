@@ -24,69 +24,69 @@ const Trading = () => {
   ];
 
   return (
-    <div className="space-y-4 md:space-y-6">
-      <div>
+    <div className="space-y-4 md:space-y-6 p-2 md:p-0">
+      <div className="text-center md:text-left">
         <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Trading Avancé</h1>
-        <p className="text-gray-400 text-sm md:text-base">
+        <p className="text-gray-400 text-sm md:text-base px-2 md:px-0">
           Interface de trading professionnelle avec outils d'analyse
         </p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1 gap-1 h-auto p-1' : 'grid-cols-4'} bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1`}>
+        <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2 gap-1 h-auto p-1' : 'grid-cols-4'} bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1`}>
           <TabsTrigger 
             value="spot"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
           >
-            {isMobile ? "💱 Spot" : "Trading Spot"}
+            {isMobile ? "Spot" : "Trading Spot"}
           </TabsTrigger>
           <TabsTrigger 
             value="futures"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
           >
-            {isMobile ? "⚡ Futures" : "Futures"}
+            Futures
           </TabsTrigger>
           <TabsTrigger 
             value="orders"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
           >
-            {isMobile ? "📋 Ordres" : "Mes Ordres"}
+            {isMobile ? "Ordres" : "Mes Ordres"}
           </TabsTrigger>
           <TabsTrigger 
             value="portfolio"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
           >
-            {isMobile ? "💼 Portfolio" : "Portfolio"}
+            Portfolio
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="spot" className="mt-4 md:mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-            {/* Market Data */}
-            <div className="lg:col-span-2 space-y-4">
+          <div className={`${isMobile ? 'space-y-4' : 'grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6'}`}>
+            {/* Market Data - Full width on mobile */}
+            <div className={`${isMobile ? 'order-2' : 'lg:col-span-2'} space-y-4`}>
               <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-white flex items-center gap-2 text-lg">
                     <BarChart3 className="h-5 w-5" />
                     Marchés Actifs
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {mockPairs.map((pair, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
                             <Coins className="h-4 w-4 text-white" />
                           </div>
-                          <div>
-                            <div className="text-white font-medium text-sm md:text-base">{pair.pair}</div>
+                          <div className="min-w-0">
+                            <div className="text-white font-medium text-sm md:text-base truncate">{pair.pair}</div>
                             <div className="text-gray-400 text-xs">Vol: {pair.volume}</div>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="text-white font-mono text-sm md:text-base">${pair.price}</div>
-                          <div className={`text-xs flex items-center gap-1 ${pair.isUp ? 'text-green-400' : 'text-red-400'}`}>
+                        <div className="text-right flex-shrink-0">
+                          <div className="text-white font-mono text-sm">${pair.price}</div>
+                          <div className={`text-xs flex items-center gap-1 justify-end ${pair.isUp ? 'text-green-400' : 'text-red-400'}`}>
                             {pair.isUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                             {pair.change}
                           </div>
@@ -97,39 +97,41 @@ const Trading = () => {
                 </CardContent>
               </Card>
 
-              {/* Chart Placeholder */}
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <LineChart className="h-5 w-5" />
-                    Graphique de Prix
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 bg-slate-800/50 rounded-lg flex items-center justify-center">
-                    <div className="text-center text-gray-400">
-                      <LineChart className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p>Graphique de trading en temps réel</p>
-                      <p className="text-xs">Intégration TradingView à venir</p>
+              {/* Chart - Hidden on mobile or simplified */}
+              {!isMobile && (
+                <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <LineChart className="h-5 w-5" />
+                      Graphique de Prix
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-64 bg-slate-800/50 rounded-lg flex items-center justify-center">
+                      <div className="text-center text-gray-400">
+                        <LineChart className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                        <p>Graphique de trading en temps réel</p>
+                        <p className="text-xs">Intégration TradingView à venir</p>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
-            {/* Trading Panel */}
-            <div className="space-y-4">
+            {/* Trading Panel - Priority on mobile */}
+            <div className={`${isMobile ? 'order-1' : ''} space-y-4`}>
               <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white">Passer un Ordre</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-white text-lg">Passer un Ordre</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Tabs defaultValue="buy" className="w-full">
                     <TabsList className="grid w-full grid-cols-2 bg-white/10">
-                      <TabsTrigger value="buy" className="text-white data-[state=active]:bg-green-600">
+                      <TabsTrigger value="buy" className="text-white data-[state=active]:bg-green-600 text-sm py-2">
                         Acheter
                       </TabsTrigger>
-                      <TabsTrigger value="sell" className="text-white data-[state=active]:bg-red-600">
+                      <TabsTrigger value="sell" className="text-white data-[state=active]:bg-red-600 text-sm py-2">
                         Vendre
                       </TabsTrigger>
                     </TabsList>
@@ -139,7 +141,7 @@ const Trading = () => {
                         <input 
                           type="number" 
                           placeholder="2456.78"
-                          className="w-full p-2 bg-slate-800 border border-slate-600 rounded text-white text-sm"
+                          className="w-full p-3 bg-slate-800 border border-slate-600 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                         />
                       </div>
                       <div className="space-y-2">
@@ -147,7 +149,7 @@ const Trading = () => {
                         <input 
                           type="number" 
                           placeholder="0.5"
-                          className="w-full p-2 bg-slate-800 border border-slate-600 rounded text-white text-sm"
+                          className="w-full p-3 bg-slate-800 border border-slate-600 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                         />
                       </div>
                       <div className="space-y-2">
@@ -155,11 +157,11 @@ const Trading = () => {
                         <input 
                           type="number" 
                           placeholder="1228.39"
-                          className="w-full p-2 bg-slate-800 border border-slate-600 rounded text-white text-sm"
+                          className="w-full p-3 bg-slate-800 border border-slate-600 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                           readOnly
                         />
                       </div>
-                      <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+                      <Button className={`w-full bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'h-12 text-base' : ''}`}>
                         Acheter ETH
                       </Button>
                     </TabsContent>
@@ -169,7 +171,7 @@ const Trading = () => {
                         <input 
                           type="number" 
                           placeholder="2456.78"
-                          className="w-full p-2 bg-slate-800 border border-slate-600 rounded text-white text-sm"
+                          className="w-full p-3 bg-slate-800 border border-slate-600 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                         />
                       </div>
                       <div className="space-y-2">
@@ -177,7 +179,7 @@ const Trading = () => {
                         <input 
                           type="number" 
                           placeholder="0.5"
-                          className="w-full p-2 bg-slate-800 border border-slate-600 rounded text-white text-sm"
+                          className="w-full p-3 bg-slate-800 border border-slate-600 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                         />
                       </div>
                       <div className="space-y-2">
@@ -185,11 +187,11 @@ const Trading = () => {
                         <input 
                           type="number" 
                           placeholder="1228.39"
-                          className="w-full p-2 bg-slate-800 border border-slate-600 rounded text-white text-sm"
+                          className="w-full p-3 bg-slate-800 border border-slate-600 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                           readOnly
                         />
                       </div>
-                      <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
+                      <Button className={`w-full bg-red-600 hover:bg-red-700 text-white ${isMobile ? 'h-12 text-base' : ''}`}>
                         Vendre ETH
                       </Button>
                     </TabsContent>
@@ -198,21 +200,21 @@ const Trading = () => {
               </Card>
 
               <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <CardTitle className="text-white text-lg">Soldes</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-300 text-sm">ETH</span>
-                    <span className="text-white font-mono">2.456789</span>
+                    <span className="text-white font-mono text-sm">2.456789</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-300 text-sm">USDC</span>
-                    <span className="text-white font-mono">5,431.22</span>
+                    <span className="text-white font-mono text-sm">5,431.22</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-300 text-sm">MATIC</span>
-                    <span className="text-white font-mono">12,500.00</span>
+                    <span className="text-white font-mono text-sm">12,500.00</span>
                   </div>
                 </CardContent>
               </Card>
@@ -223,13 +225,13 @@ const Trading = () => {
         <TabsContent value="futures" className="mt-4 md:mt-6">
           <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
             <CardContent className="pt-6">
-              <div className="text-center py-12">
-                <TrendingUp className="h-16 w-16 mx-auto text-gray-500 mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">Trading Futures</h3>
-                <p className="text-gray-400 mb-4">
+              <div className="text-center py-8 md:py-12 px-4">
+                <TrendingUp className="h-12 md:h-16 w-12 md:w-16 mx-auto text-gray-500 mb-4" />
+                <h3 className="text-lg md:text-xl font-semibold text-white mb-2">Trading Futures</h3>
+                <p className="text-gray-400 mb-4 text-sm md:text-base">
                   Le trading de futures sera disponible prochainement
                 </p>
-                <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                <Button variant="outline" className={`border-white/20 text-white hover:bg-white/10 ${isMobile ? 'w-full h-12' : ''}`}>
                   Être notifié du lancement
                 </Button>
               </div>
@@ -240,24 +242,24 @@ const Trading = () => {
         <TabsContent value="orders" className="mt-4 md:mt-6">
           <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-white">Historique des Ordres</CardTitle>
+              <CardTitle className="text-white text-lg md:text-xl">Historique des Ordres</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {mockOrders.map((order, index) => (
-                  <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white/5 rounded-lg gap-2">
+                  <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white/5 rounded-lg gap-3">
                     <div className="flex items-center gap-3">
-                      <div className={`px-2 py-1 rounded text-xs ${
+                      <div className={`px-3 py-1 rounded text-xs font-medium ${
                         order.type === 'Achat' ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400'
                       }`}>
                         {order.type}
                       </div>
                       <div>
-                        <div className="text-white text-sm">{order.amount}</div>
+                        <div className="text-white text-sm font-medium">{order.amount}</div>
                         <div className="text-gray-400 text-xs">${order.price}</div>
                       </div>
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-xs ${
+                    <div className={`px-3 py-2 rounded-full text-xs font-medium self-start sm:self-center ${
                       order.status === 'Complété' ? 'bg-green-600/20 text-green-400' :
                       order.status === 'En cours' ? 'bg-yellow-600/20 text-yellow-400' :
                       'bg-red-600/20 text-red-400'
@@ -274,11 +276,11 @@ const Trading = () => {
         <TabsContent value="portfolio" className="mt-4 md:mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <CardTitle className="text-white text-lg">Valeur Totale</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl md:text-3xl font-bold text-white mb-2">$12,486.32</div>
+                <div className="text-xl md:text-3xl font-bold text-white mb-2">$12,486.32</div>
                 <div className="flex items-center gap-2 text-green-400 text-sm">
                   <TrendingUp className="h-4 w-4" />
                   +5.23% (24h)
@@ -287,21 +289,21 @@ const Trading = () => {
             </Card>
 
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <CardTitle className="text-white text-lg">P&L Total</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl md:text-3xl font-bold text-green-400 mb-2">+$1,234.56</div>
+                <div className="text-xl md:text-3xl font-bold text-green-400 mb-2">+$1,234.56</div>
                 <div className="text-gray-400 text-sm">Depuis le début</div>
               </CardContent>
             </Card>
 
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <CardTitle className="text-white text-lg">Trades Actifs</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl md:text-3xl font-bold text-white mb-2">3</div>
+                <div className="text-xl md:text-3xl font-bold text-white mb-2">3</div>
                 <div className="text-gray-400 text-sm">Positions ouvertes</div>
               </CardContent>
             </Card>

@@ -90,11 +90,11 @@ const Governance = () => {
   };
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-4 md:space-y-6 p-2 md:p-0">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+        <div className="text-center sm:text-left">
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Gouvernance DAO</h1>
-          <p className="text-gray-400 text-sm md:text-base">
+          <p className="text-gray-400 text-sm md:text-base px-2 sm:px-0">
             Participez aux décisions importantes de l'écosystème
           </p>
         </div>
@@ -104,14 +104,14 @@ const Governance = () => {
         </Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      {/* Stats - Responsive Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         {governanceStats.map((stat, index) => (
           <Card key={index} className="bg-white/5 border-white/10 backdrop-blur-sm">
-            <CardContent className="p-4 md:p-6">
+            <CardContent className="p-3 md:p-6">
               <div className="text-center">
-                <p className="text-sm text-gray-400 mb-2">{stat.label}</p>
-                <p className="text-xl md:text-2xl font-bold text-white mb-1">{stat.value}</p>
+                <p className="text-xs md:text-sm text-gray-400 mb-1 md:mb-2">{stat.label}</p>
+                <p className="text-lg md:text-2xl font-bold text-white mb-1">{stat.value}</p>
                 <p className="text-xs text-green-400">{stat.change}</p>
               </div>
             </CardContent>
@@ -120,30 +120,30 @@ const Governance = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1 gap-1 h-auto p-1' : 'grid-cols-4'} bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1`}>
+        <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2 gap-1 h-auto p-1' : 'grid-cols-4'} bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1`}>
           <TabsTrigger 
             value="proposals"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
           >
-            {isMobile ? "📋 Propositions" : "Propositions"}
+            {isMobile ? "Propositions" : "Propositions"}
           </TabsTrigger>
           <TabsTrigger 
             value="voting"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
           >
-            {isMobile ? "🗳️ Mes Votes" : "Mes Votes"}
+            {isMobile ? "Mes Votes" : "Mes Votes"}
           </TabsTrigger>
           <TabsTrigger 
             value="delegates"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
           >
-            {isMobile ? "👥 Délégués" : "Délégués"}
+            {isMobile ? "Délégués" : "Délégués"}
           </TabsTrigger>
           <TabsTrigger 
             value="analytics"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
           >
-            {isMobile ? "📊 Analytics" : "Analytics"}
+            Analytics
           </TabsTrigger>
         </TabsList>
 
@@ -151,24 +151,32 @@ const Governance = () => {
           <div className="space-y-4 md:space-y-6">
             {mockProposals.map((proposal) => (
               <Card key={proposal.id} className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <CardTitle className="text-white text-lg">{proposal.title}</CardTitle>
-                        <Badge className={getStatusColor(proposal.status)}>
-                          {getStatusText(proposal.status)}
-                        </Badge>
-                      </div>
-                      <p className="text-gray-400 text-sm mb-3">{proposal.description}</p>
-                      <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
-                        <span>#{proposal.id}</span>
-                        <span>{proposal.category}</span>
-                        <span>Par {proposal.proposer}</span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {proposal.timeLeft}
-                        </span>
+                <CardHeader className="pb-3">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                          <CardTitle className="text-white text-base md:text-lg line-clamp-2">{proposal.title}</CardTitle>
+                          <div className="flex gap-2 flex-shrink-0">
+                            <Badge className={getStatusColor(proposal.status)}>
+                              {getStatusText(proposal.status)}
+                            </Badge>
+                            {proposal.category && (
+                              <Badge variant="outline" className="text-xs text-gray-300 border-gray-600">
+                                {proposal.category}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-gray-400 text-sm mb-3 line-clamp-3">{proposal.description}</p>
+                        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                          <span>#{proposal.id}</span>
+                          <span className="truncate">Par {proposal.proposer}</span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {proposal.timeLeft}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -186,14 +194,14 @@ const Governance = () => {
                         value={(proposal.votesFor / proposal.totalVotes) * 100} 
                         className="h-2"
                       />
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-400" />
-                          <span className="text-white">{proposal.votesFor.toLocaleString()} Pour</span>
+                          <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
+                          <span className="text-white truncate">{proposal.votesFor.toLocaleString()} Pour</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <XCircle className="h-4 w-4 text-red-400" />
-                          <span className="text-white">{proposal.votesAgainst.toLocaleString()} Contre</span>
+                          <XCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
+                          <span className="text-white truncate">{proposal.votesAgainst.toLocaleString()} Contre</span>
                         </div>
                       </div>
                       <div className="text-xs text-gray-500">
@@ -216,7 +224,7 @@ const Governance = () => {
                         </Button>
                         <Button variant="outline" className={`flex-1 sm:flex-none border-white/20 text-white hover:bg-white/10 ${isMobile ? 'h-12' : ''}`}>
                           <MessageSquare className="h-4 w-4 mr-2" />
-                          Discuter
+                          {isMobile ? "Discuter" : "Discuter"}
                         </Button>
                       </div>
                     )}
@@ -230,33 +238,33 @@ const Governance = () => {
         <TabsContent value="voting" className="mt-4 md:mt-6">
           <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-white">Mon Historique de Vote</CardTitle>
+              <CardTitle className="text-white text-lg md:text-xl">Mon Historique de Vote</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                   <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-white">12</div>
-                    <div className="text-sm text-gray-400">Votes Effectués</div>
+                    <div className="text-xl md:text-2xl font-bold text-white">12</div>
+                    <div className="text-xs md:text-sm text-gray-400">Votes Effectués</div>
                   </div>
                   <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-white">250K</div>
-                    <div className="text-sm text-gray-400">Tokens Utilisés</div>
+                    <div className="text-xl md:text-2xl font-bold text-white">250K</div>
+                    <div className="text-xs md:text-sm text-gray-400">Tokens Utilisés</div>
                   </div>
                   <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-white">85%</div>
-                    <div className="text-sm text-gray-400">Taux de Participation</div>
+                    <div className="text-xl md:text-2xl font-bold text-white">85%</div>
+                    <div className="text-xs md:text-sm text-gray-400">Taux de Participation</div>
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   {mockProposals.slice(0, 2).map((proposal) => (
-                    <div key={proposal.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                      <div>
-                        <div className="text-white font-medium mb-1">{proposal.title}</div>
+                    <div key={proposal.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/5 rounded-lg gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-white font-medium mb-1 line-clamp-2">{proposal.title}</div>
                         <div className="text-gray-400 text-sm">Vote: Pour • 25,000 tokens</div>
                       </div>
-                      <Badge className={getStatusColor(proposal.status)}>
+                      <Badge className={`${getStatusColor(proposal.status)} flex-shrink-0`}>
                         {getStatusText(proposal.status)}
                       </Badge>
                     </div>
@@ -270,14 +278,14 @@ const Governance = () => {
         <TabsContent value="delegates" className="mt-4 md:mt-6">
           <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-white">Délégation de Vote</CardTitle>
+              <CardTitle className="text-white text-lg md:text-xl">Délégation de Vote</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                <div className="text-center py-8">
-                  <Users className="h-16 w-16 mx-auto text-gray-500 mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">Délégation de Vote</h3>
-                  <p className="text-gray-400 mb-4">
+                <div className="text-center py-8 px-4">
+                  <Users className={`${isMobile ? 'h-12 w-12' : 'h-16 w-16'} mx-auto text-gray-500 mb-4`} />
+                  <h3 className="text-lg md:text-xl font-semibold text-white mb-2">Délégation de Vote</h3>
+                  <p className="text-gray-400 mb-4 text-sm md:text-base">
                     Déléguez vos tokens de vote à des membres expérimentés de la communauté
                   </p>
                   <Button className={`bg-blue-600 hover:bg-blue-700 ${isMobile ? 'w-full h-12' : ''}`}>
@@ -293,17 +301,17 @@ const Governance = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-white flex items-center gap-2 text-lg">
                   <TrendingUp className="h-5 w-5" />
                   Tendances de Participation
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 bg-slate-800/50 rounded-lg flex items-center justify-center">
+                <div className={`${isMobile ? 'h-48' : 'h-64'} bg-slate-800/50 rounded-lg flex items-center justify-center`}>
                   <div className="text-center text-gray-400">
-                    <TrendingUp className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>Graphique de participation</p>
-                    <p className="text-xs">Données en temps réel</p>
+                    <TrendingUp className={`${isMobile ? 'h-8 w-8' : 'h-12 w-12'} mx-auto mb-2 opacity-50`} />
+                    <p className={`${isMobile ? 'text-xs' : 'text-sm'}`}>Graphique de participation</p>
+                    <p className="text-xs opacity-75">Données en temps réel</p>
                   </div>
                 </div>
               </CardContent>
@@ -311,28 +319,28 @@ const Governance = () => {
 
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-white flex items-center gap-2 text-lg">
                   <Scale className="h-5 w-5" />
                   Distribution des Votes
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-white">Propositions Économiques</span>
-                    <span className="text-blue-400">45%</span>
+                    <span className="text-white text-sm">Propositions Économiques</span>
+                    <span className="text-blue-400 font-mono">45%</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-white">Mises à jour Techniques</span>
-                    <span className="text-purple-400">30%</span>
+                    <span className="text-white text-sm">Mises à jour Techniques</span>
+                    <span className="text-purple-400 font-mono">30%</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-white">Partenariats</span>
-                    <span className="text-green-400">15%</span>
+                    <span className="text-white text-sm">Partenariats</span>
+                    <span className="text-green-400 font-mono">15%</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-white">Autres</span>
-                    <span className="text-orange-400">10%</span>
+                    <span className="text-white text-sm">Autres</span>
+                    <span className="text-orange-400 font-mono">10%</span>
                   </div>
                 </div>
               </CardContent>

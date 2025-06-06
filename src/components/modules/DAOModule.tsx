@@ -1,399 +1,338 @@
 
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Users, Vote, Clock, CheckCircle, XCircle, PlusCircle, ArrowRight } from "lucide-react";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
+import { 
+  Users, 
+  Vote, 
+  TrendingUp, 
+  Calendar, 
+  MessageSquare, 
+  Plus,
+  CheckCircle,
+  XCircle,
+  Clock
+} from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Link } from "react-router-dom";
-
-type ProposalFormData = {
-  title: string;
-  description: string;
-  proposal_type: string;
-  voting_ends_at: string;
-};
 
 export default function DAOModule() {
-  const [activeTab, setActiveTab] = useState("proposals");
-  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState("overview");
   const isMobile = useIsMobile();
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<ProposalFormData>();
 
-  const { data: proposals, isLoading } = useQuery({
-    queryKey: ['dao-proposals'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('dao_proposals')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    },
-  });
+  const stats = [
+    { title: "Membres", value: "2,547", change: "+12%", icon: Users },
+    { title: "Propositions", value: "23", change: "+3", icon: Vote },
+    { title: "Trésorerie", value: "$1.2M", change: "+8%", icon: TrendingUp },
+    { title: "Votes Actifs", value: "5", change: "En cours", icon: Calendar }
+  ];
 
-  const createProposalMutation = useMutation({
-    mutationFn: async (data: ProposalFormData) => {
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) throw new Error("Vous devez être connecté pour créer une proposition");
-      
-      const { data: proposal, error } = await supabase
-        .from("dao_proposals")
-        .insert({
-          proposer_id: userData.user.id,
-          title: data.title,
-          description: data.description,
-          proposal_type: data.proposal_type,
-          voting_ends_at: new Date(data.voting_ends_at).toISOString(),
-        })
-        .select()
-        .single();
-        
-      if (error) throw error;
-      return proposal;
+  const recentProposals = [
+    {
+      id: 1,
+      title: "Allocation budget marketing Q2",
+      status: "active",
+      votes: { for: 1250, against: 340 },
+      timeLeft: "2j 14h",
+      quorum: 70
     },
-    onSuccess: () => {
-      toast.success("Proposition créée avec succès!");
-      queryClient.invalidateQueries({ queryKey: ["dao-proposals"] });
-      reset();
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "Erreur lors de la création de la proposition");
-    },
-  });
+    {
+      id: 2,
+      title: "Partenariat protocole X",
+      status: "passed",
+      votes: { for: 2100, against: 450 },
+      timeLeft: "Terminé",
+      quorum: 85
+    }
+  ];
 
-  const voteOnProposalMutation = useMutation({
-    mutationFn: async ({ proposalId, voteChoice }: { proposalId: string; voteChoice: boolean }) => {
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) throw new Error("Vous devez être connecté pour voter");
-      
-      const { data: vote, error } = await supabase
-        .from("dao_votes")
-        .insert({
-          proposal_id: proposalId,
-          voter_id: userData.user.id,
-          vote_choice: voteChoice,
-          vote_power: 1, // Simplified voting power
-        })
-        .select()
-        .single();
-        
-      if (error) throw error;
-      return vote;
-    },
-    onSuccess: () => {
-      toast.success("Vote enregistré avec succès!");
-      queryClient.invalidateQueries({ queryKey: ["dao-proposals"] });
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "Erreur lors du vote");
-    },
-  });
-
-  const onSubmit = (data: ProposalFormData) => {
-    createProposalMutation.mutate(data);
-  };
-
-  const handleVote = (proposalId: string, voteChoice: boolean) => {
-    voteOnProposalMutation.mutate({ proposalId, voteChoice });
-  };
-
-  const getStatusBadge = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
-        return <Badge className="bg-green-600/20 text-green-400 border-green-600/30">Actif</Badge>;
-      case 'passed':
-        return <Badge className="bg-blue-600/20 text-blue-400 border-blue-600/30">Adopté</Badge>;
-      case 'rejected':
-        return <Badge className="bg-red-600/20 text-red-400 border-red-600/30">Rejeté</Badge>;
-      default:
-        return <Badge variant="outline">Inconnu</Badge>;
+      case "active": return "bg-blue-600/20 text-blue-400";
+      case "passed": return "bg-green-600/20 text-green-400";
+      case "rejected": return "bg-red-600/20 text-red-400";
+      default: return "bg-gray-600/20 text-gray-400";
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  };
-
-  const calculateVoteProgress = (votesFor: number, votesAgainst: number) => {
-    const total = votesFor + votesAgainst;
-    if (total === 0) return 0;
-    return (votesFor / total) * 100;
-  };
-
   return (
-    <div className="space-y-4 md:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">DAO Gouvernance</h1>
-          <p className="text-gray-400 text-sm md:text-base">
-            Participez à la gouvernance décentralisée de Veegox
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Link to="/governance">
-            <Button variant="outline" className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10">
-              <Vote className="h-4 w-4 mr-2" />
-              Gouvernance Avancée
-            </Button>
-          </Link>
-        </div>
+    <div className="space-y-4 md:space-y-6 p-2 md:p-0">
+      <div className="text-center md:text-left">
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">DAO Gouvernance</h1>
+        <p className="text-gray-400 text-sm md:text-base px-2 md:px-0">
+          Participez à la gouvernance décentralisée et votez sur les propositions
+        </p>
+      </div>
+
+      {/* Stats Cards - Responsive Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+        {stats.map((stat, index) => {
+          const IconComponent = stat.icon;
+          return (
+            <Card key={index} className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <CardContent className="p-3 md:p-6">
+                <div className="flex items-center justify-between mb-2 md:mb-3">
+                  <IconComponent className="h-5 w-5 md:h-6 md:w-6 text-blue-400" />
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    stat.change.startsWith('+') ? 'bg-green-600/20 text-green-400' : 'bg-blue-600/20 text-blue-400'
+                  }`}>
+                    {stat.change}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-xs md:text-sm text-gray-400 mb-1">{stat.title}</p>
+                  <p className="text-lg md:text-2xl font-bold text-white">{stat.value}</p>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1 gap-1 h-auto p-1' : 'grid-cols-3'} bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1`}>
+        <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2 gap-1 h-auto p-1' : 'grid-cols-4'} bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1`}>
+          <TabsTrigger 
+            value="overview"
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
+          >
+            {isMobile ? "Vue d'ensemble" : "Vue d'ensemble"}
+          </TabsTrigger>
           <TabsTrigger 
             value="proposals"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
           >
-            {isMobile ? "📊 Propositions" : "Propositions"}
+            Propositions
           </TabsTrigger>
           <TabsTrigger 
-            value="create"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+            value="treasury"
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
           >
-            {isMobile ? "➕ Créer" : "Créer une Proposition"}
+            {isMobile ? "Trésorerie" : "Trésorerie"}
           </TabsTrigger>
           <TabsTrigger 
-            value="stats"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+            value="members"
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
           >
-            {isMobile ? "📈 Stats" : "Statistiques"}
+            Membres
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="proposals" className="mt-4 md:mt-6">
-          <div className="space-y-4">
-            {isLoading ? (
-              <div className="text-center py-8 text-gray-400">Chargement des propositions...</div>
-            ) : proposals && proposals.length > 0 ? (
-              proposals.map((proposal) => (
-                <Card key={proposal.id} className="bg-white/5 border-white/10 backdrop-blur-sm">
-                  <CardHeader className="pb-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <CardTitle className="text-white text-lg">{proposal.title}</CardTitle>
-                      <div className="flex items-center gap-2">
-                        {getStatusBadge(proposal.status)}
-                        <Badge variant="outline" className="text-gray-300 border-gray-600">
-                          {proposal.proposal_type}
-                        </Badge>
+        <TabsContent value="overview" className="mt-4 md:mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            {/* Recent Proposals */}
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-white flex items-center justify-between text-lg">
+                  <span>Propositions Récentes</span>
+                  <Button size="sm" className={`bg-blue-600 hover:bg-blue-700 ${isMobile ? 'h-8 text-xs' : ''}`}>
+                    <Plus className="h-4 w-4 mr-1" />
+                    {isMobile ? "Nouvelle" : "Nouvelle"}
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 md:space-y-4">
+                {recentProposals.map((proposal) => (
+                  <div key={proposal.id} className="p-3 md:p-4 bg-white/5 rounded-lg space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-white font-medium text-sm md:text-base line-clamp-2 mb-2">
+                          {proposal.title}
+                        </h3>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge className={getStatusColor(proposal.status)}>
+                            {proposal.status === 'active' ? 'Actif' : 'Adopté'}
+                          </Badge>
+                          <span className="text-xs text-gray-400 flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {proposal.timeLeft}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-gray-300 text-sm">{proposal.description}</p>
                     
                     <div className="space-y-2">
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-400">Votes Pour/Contre</span>
+                      <div className="flex justify-between text-xs md:text-sm">
+                        <span className="text-gray-400">Quorum: {proposal.quorum}%</span>
                         <span className="text-white">
-                          {proposal.votes_for || 0} / {proposal.votes_against || 0}
+                          {Math.round((proposal.votes.for / (proposal.votes.for + proposal.votes.against)) * 100)}% Pour
                         </span>
                       </div>
                       <Progress 
-                        value={calculateVoteProgress(proposal.votes_for || 0, proposal.votes_against || 0)} 
-                        className="h-2 bg-gray-700"
+                        value={(proposal.votes.for / (proposal.votes.for + proposal.votes.against)) * 100} 
+                        className="h-2"
                       />
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-4 text-xs text-gray-400">
+                      <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>Fin: {formatDate(proposal.voting_ends_at)}</span>
+                          <CheckCircle className="h-3 w-3 text-green-400" />
+                          <span className="text-white">{proposal.votes.for} Pour</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          <span>{(proposal.votes_for || 0) + (proposal.votes_against || 0)} votes</span>
+                          <XCircle className="h-3 w-3 text-red-400" />
+                          <span className="text-white">{proposal.votes.against} Contre</span>
                         </div>
                       </div>
-
-                      {proposal.status === 'active' && (
-                        <div className="flex gap-2 w-full sm:w-auto">
-                          <Button
-                            onClick={() => handleVote(proposal.id, true)}
-                            disabled={voteOnProposalMutation.isPending}
-                            className={`flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'h-10' : ''}`}
-                            size={isMobile ? "default" : "sm"}
-                          >
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            Pour
-                          </Button>
-                          <Button
-                            onClick={() => handleVote(proposal.id, false)}
-                            disabled={voteOnProposalMutation.isPending}
-                            className={`flex-1 sm:flex-none bg-red-600 hover:bg-red-700 text-white ${isMobile ? 'h-10' : ''}`}
-                            size={isMobile ? "default" : "sm"}
-                          >
-                            <XCircle className="h-4 w-4 mr-1" />
-                            Contre
-                          </Button>
-                        </div>
-                      )}
                     </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardContent className="pt-6">
-                  <div className="text-center py-8">
-                    <Vote className="h-16 w-16 mx-auto text-gray-500 mb-4" />
-                    <h3 className="text-xl font-semibold text-white mb-2">Aucune proposition</h3>
-                    <p className="text-gray-400 mb-4">
-                      Soyez le premier à créer une proposition pour la communauté
-                    </p>
-                    <Button 
-                      onClick={() => setActiveTab("create")}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      <PlusCircle className="h-4 w-4 mr-2" />
-                      Créer une proposition
+
+                    {proposal.status === 'active' && (
+                      <div className="flex gap-2 pt-2">
+                        <Button size="sm" className={`flex-1 bg-green-600 hover:bg-green-700 ${isMobile ? 'h-8 text-xs' : ''}`}>
+                          Pour
+                        </Button>
+                        <Button size="sm" className={`flex-1 bg-red-600 hover:bg-red-700 ${isMobile ? 'h-8 text-xs' : ''}`}>
+                          Contre
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Community Activity */}
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white text-lg">Activité de la Communauté</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                        <MessageSquare className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white text-sm font-medium">Discussion Forum</p>
+                        <p className="text-gray-400 text-xs">45 nouveaux messages</p>
+                      </div>
+                    </div>
+                    <Button size="sm" variant="outline" className={`border-white/20 text-white hover:bg-white/10 ${isMobile ? 'text-xs px-2' : ''}`}>
+                      Voir
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+
+                  <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+                        <Vote className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white text-sm font-medium">Votes en Cours</p>
+                        <p className="text-gray-400 text-xs">5 propositions actives</p>
+                      </div>
+                    </div>
+                    <Button size="sm" variant="outline" className={`border-white/20 text-white hover:bg-white/10 ${isMobile ? 'text-xs px-2' : ''}`}>
+                      Voter
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <Users className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white text-sm font-medium">Nouveaux Membres</p>
+                        <p className="text-gray-400 text-xs">+127 cette semaine</p>
+                      </div>
+                    </div>
+                    <Button size="sm" variant="outline" className={`border-white/20 text-white hover:bg-white/10 ${isMobile ? 'text-xs px-2' : ''}`}>
+                      Inviter
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
 
-        <TabsContent value="create" className="mt-4 md:mt-6">
+        <TabsContent value="proposals" className="mt-4 md:mt-6">
           <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-white">Créer une Nouvelle Proposition</CardTitle>
-              <CardDescription className="text-gray-400">
-                Soumettez une proposition à la communauté pour vote
-              </CardDescription>
+              <CardTitle className="text-white flex items-center justify-between text-lg md:text-xl">
+                <span>Toutes les Propositions</span>
+                <Button className={`bg-blue-600 hover:bg-blue-700 ${isMobile ? 'h-10 text-sm' : ''}`}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nouvelle Proposition
+                </Button>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2 space-y-2">
-                    <label htmlFor="title" className="text-sm font-medium text-white">
-                      Titre de la proposition *
-                    </label>
-                    <Input
-                      id="title"
-                      placeholder="Titre court et descriptif"
-                      {...register("title", { required: "Un titre est requis" })}
-                      className={`bg-slate-800 border-slate-600 text-white ${isMobile ? 'h-12' : ''}`}
-                    />
-                    {errors.title && <p className="text-xs text-red-400">{errors.title.message}</p>}
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="proposal_type" className="text-sm font-medium text-white">
-                      Type de proposition *
-                    </label>
-                    <select
-                      id="proposal_type"
-                      {...register("proposal_type", { required: "Un type est requis" })}
-                      className={`w-full bg-slate-800 border-slate-600 text-white rounded-md px-3 py-2 ${isMobile ? 'h-12' : ''}`}
-                    >
-                      <option value="">Sélectionner un type</option>
-                      <option value="governance">Gouvernance</option>
-                      <option value="treasury">Trésorerie</option>
-                      <option value="protocol">Protocole</option>
-                      <option value="partnership">Partenariat</option>
-                    </select>
-                    {errors.proposal_type && <p className="text-xs text-red-400">{errors.proposal_type.message}</p>}
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="voting_ends_at" className="text-sm font-medium text-white">
-                      Date de fin du vote *
-                    </label>
-                    <Input
-                      id="voting_ends_at"
-                      type="datetime-local"
-                      {...register("voting_ends_at", { required: "Une date de fin est requise" })}
-                      className={`bg-slate-800 border-slate-600 text-white ${isMobile ? 'h-12' : ''}`}
-                    />
-                    {errors.voting_ends_at && <p className="text-xs text-red-400">{errors.voting_ends_at.message}</p>}
-                  </div>
-
-                  <div className="md:col-span-2 space-y-2">
-                    <label htmlFor="description" className="text-sm font-medium text-white">
-                      Description détaillée *
-                    </label>
-                    <Textarea
-                      id="description"
-                      placeholder="Décrivez votre proposition en détail..."
-                      rows={6}
-                      {...register("description", { required: "Une description est requise" })}
-                      className="bg-slate-800 border-slate-600 text-white resize-none"
-                    />
-                    {errors.description && <p className="text-xs text-red-400">{errors.description.message}</p>}
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 pt-6">
-                  <Button 
-                    type="submit" 
-                    disabled={createProposalMutation.isPending}
-                    className={`flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 ${isMobile ? 'h-12' : ''}`}
-                  >
-                    {createProposalMutation.isPending ? "Création..." : "Créer la proposition"}
-                  </Button>
-                </div>
-              </form>
+              <div className="text-center py-8 md:py-12">
+                <Vote className={`${isMobile ? 'h-12 w-12' : 'h-16 w-16'} mx-auto text-gray-500 mb-4`} />
+                <h3 className="text-lg md:text-xl font-semibold text-white mb-2">Liste des Propositions</h3>
+                <p className="text-gray-400 text-sm md:text-base">
+                  Consultez toutes les propositions passées et actuelles
+                </p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="stats" className="mt-4 md:mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <TabsContent value="treasury" className="mt-4 md:mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-white text-lg">Propositions Totales</CardTitle>
+                <CardTitle className="text-white text-lg">Actifs de la Trésorerie</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl md:text-3xl font-bold text-white mb-2">
-                  {proposals?.length || 0}
-                </div>
-                <div className="text-gray-400 text-sm">Toutes les propositions</div>
+              <CardContent className="space-y-3">
+                {[
+                  { token: "ETH", amount: "150.5", value: "$370,000", percentage: "60%" },
+                  { token: "USDC", amount: "250,000", value: "$250,000", percentage: "40%" },
+                ].map((asset, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                    <div>
+                      <div className="text-white font-medium text-sm">{asset.token}</div>
+                      <div className="text-gray-400 text-xs">{asset.amount} tokens</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-white font-mono text-sm">{asset.value}</div>
+                      <div className="text-gray-400 text-xs">{asset.percentage}</div>
+                    </div>
+                  </div>
+                ))}
               </CardContent>
             </Card>
 
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-white text-lg">Propositions Actives</CardTitle>
+                <CardTitle className="text-white text-lg">Dépenses Récentes</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl md:text-3xl font-bold text-green-400 mb-2">
-                  {proposals?.filter(p => p.status === 'active').length || 0}
-                </div>
-                <div className="text-gray-400 text-sm">En cours de vote</div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white text-lg">Taux d'Adoption</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-2">
-                  {proposals && proposals.length > 0 
-                    ? Math.round((proposals.filter(p => p.status === 'passed').length / proposals.length) * 100)
-                    : 0}%
-                </div>
-                <div className="text-gray-400 text-sm">Propositions adoptées</div>
+              <CardContent className="space-y-3">
+                {[
+                  { description: "Marketing Q1", amount: "$25,000", date: "15 Mars" },
+                  { description: "Développement", amount: "$50,000", date: "10 Mars" },
+                  { description: "Audit Sécurité", amount: "$15,000", date: "5 Mars" },
+                ].map((expense, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                    <div>
+                      <div className="text-white text-sm font-medium">{expense.description}</div>
+                      <div className="text-gray-400 text-xs">{expense.date}</div>
+                    </div>
+                    <div className="text-white font-mono text-sm">{expense.amount}</div>
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="members" className="mt-4 md:mt-6">
+          <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-white text-lg md:text-xl">Membres de la DAO</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 md:py-12">
+                <Users className={`${isMobile ? 'h-12 w-12' : 'h-16 w-16'} mx-auto text-gray-500 mb-4`} />
+                <h3 className="text-lg md:text-xl font-semibold text-white mb-2">Communauté DAO</h3>
+                <p className="text-gray-400 text-sm md:text-base">
+                  Explorez les membres actifs et leurs contributions
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
