@@ -125,62 +125,6 @@ const CreditModule = () => {
     },
   });
 
-  const { data: creditScore, isLoading: isLoadingScore } = useQuery({
-    queryKey: ['credit-score'],
-    queryFn: async (): Promise<CreditScore | null> => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
-
-      const { data } = await supabase
-        .from('credit_scores')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (!data) return null;
-
-      return {
-        score: data.score || 0,
-        last_calculated: data.last_calculated || '',
-        factors: data.factors as Record<string, any> || null
-      };
-    },
-  });
-
-  const { data: loans } = useQuery({
-    queryKey: ['user-loans'],
-    queryFn: async (): Promise<Loan[]> => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('loans')
-        .select('*')
-        .eq('borrower_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: userWallet } = useQuery({
-    queryKey: ['user-primary-wallet'],
-    queryFn: async (): Promise<Wallet | null> => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
-
-      const { data } = await supabase
-        .from('wallets')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('is_primary', true)
-        .maybeSingle();
-
-      return data;
-    },
-  });
-
   const handleSubmitLoan = () => {
     loanMutation.mutate(loanData);
   };

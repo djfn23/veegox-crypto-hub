@@ -98,7 +98,7 @@ export const ERC20StakingPool = () => {
             <div>
               <p className="text-gray-400 text-sm">Récompenses</p>
               <p className="text-white font-bold">
-                <AnimatedNumber value={totalRewards} decimals={2} /> {tokenInfo?.symbol}
+                {totalRewards.toFixed(2)} {tokenInfo?.symbol}
               </p>
             </div>
           </div>
