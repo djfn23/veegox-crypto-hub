@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { Wallet, Plus, Star, Trash2 } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface WalletData {
   id: string;
@@ -23,6 +24,7 @@ interface WalletData {
 export const WalletManager = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const [newWalletAddress, setNewWalletAddress] = useState('');
   const [newWalletNickname, setNewWalletNickname] = useState('');
 
@@ -138,9 +140,9 @@ export const WalletManager = () => {
 
   if (!user) {
     return (
-      <Card>
+      <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
         <CardContent className="pt-6">
-          <p className="text-center text-gray-500">
+          <p className="text-center text-gray-400">
             Connectez-vous pour gérer vos wallets
           </p>
         </CardContent>
@@ -149,37 +151,43 @@ export const WalletManager = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-4 md:space-y-6">
+      <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Wallet className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-white text-lg md:text-xl">
+            <Wallet className="h-4 w-4 md:h-5 md:w-5" />
             Ajouter un Wallet
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="wallet-address">Adresse du Wallet</Label>
+            <Label htmlFor="wallet-address" className="text-white text-sm">
+              Adresse du Wallet
+            </Label>
             <Input
               id="wallet-address"
               placeholder="0x..."
               value={newWalletAddress}
               onChange={(e) => setNewWalletAddress(e.target.value)}
+              className={`bg-slate-800 border-slate-600 text-white ${isMobile ? 'h-12 text-base' : ''}`}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="wallet-nickname">Surnom (optionnel)</Label>
+            <Label htmlFor="wallet-nickname" className="text-white text-sm">
+              Surnom (optionnel)
+            </Label>
             <Input
               id="wallet-nickname"
               placeholder="Mon wallet principal"
               value={newWalletNickname}
               onChange={(e) => setNewWalletNickname(e.target.value)}
+              className={`bg-slate-800 border-slate-600 text-white ${isMobile ? 'h-12 text-base' : ''}`}
             />
           </div>
           <Button 
             onClick={handleAddWallet}
             disabled={addWalletMutation.isPending}
-            className="w-full"
+            className={`w-full bg-blue-600 hover:bg-blue-700 ${isMobile ? 'h-12 text-base' : ''}`}
           >
             <Plus className="h-4 w-4 mr-2" />
             Ajouter le Wallet
@@ -187,47 +195,50 @@ export const WalletManager = () => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>Mes Wallets ({wallets?.length || 0})</CardTitle>
+          <CardTitle className="text-white text-lg md:text-xl">
+            Mes Wallets ({wallets?.length || 0})
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p>Chargement...</p>
+            <p className="text-gray-400">Chargement...</p>
           ) : wallets?.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">
+            <p className="text-gray-400 text-center py-6">
               Aucun wallet ajouté
             </p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 md:space-y-4">
               {wallets?.map((wallet) => (
                 <div
                   key={wallet.id}
-                  className="flex items-center justify-between p-3 border rounded-lg"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 border border-white/10 rounded-lg space-y-3 sm:space-y-0"
                 >
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-mono text-sm text-white">
                         {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
                       </span>
                       {wallet.is_primary && (
-                        <Badge variant="default" className="text-xs">
+                        <Badge variant="default" className="text-xs bg-blue-600">
                           <Star className="h-3 w-3 mr-1" />
                           Principal
                         </Badge>
                       )}
                     </div>
                     {wallet.nickname && (
-                      <p className="text-sm text-gray-500">{wallet.nickname}</p>
+                      <p className="text-sm text-gray-400 mt-1">{wallet.nickname}</p>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
                     {!wallet.is_primary && (
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => setPrimaryMutation.mutate(wallet.id)}
                         disabled={setPrimaryMutation.isPending}
+                        className={`text-white border-white/20 hover:bg-white/10 ${isMobile ? 'w-full h-10' : ''}`}
                       >
                         Définir principal
                       </Button>
@@ -237,9 +248,10 @@ export const WalletManager = () => {
                       variant="outline"
                       onClick={() => deleteWalletMutation.mutate(wallet.id)}
                       disabled={deleteWalletMutation.isPending}
-                      className="text-red-500 hover:text-red-700"
+                      className={`text-red-400 border-red-400/20 hover:bg-red-400/10 ${isMobile ? 'w-full h-10' : ''}`}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Supprimer
                     </Button>
                   </div>
                 </div>
