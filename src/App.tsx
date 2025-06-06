@@ -17,6 +17,12 @@ import ExchangeModule from "./components/modules/exchange/ExchangeModule";
 import AIRecommendationsModule from "./components/modules/ai/AIRecommendationsModule";
 import SocialModule from "./components/modules/social/SocialModule";
 import CampaignDetails from "./components/modules/crowdfunding/CampaignDetails";
+import Wallet from "./pages/Wallet";
+import Notifications from "./pages/Notifications";
+import Help from "./pages/Help";
+import Legal from "./pages/Legal";
+import About from "./pages/About";
+import Security from "./pages/Security";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,6 +52,12 @@ const App = () => (
           <Route path="/exchange" element={<ExchangeModule />} />
           <Route path="/ai-recommendations" element={<AIRecommendationsModule />} />
           <Route path="/social" element={<SocialModule />} />
+          <Route path="/wallet" element={<Wallet />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/legal" element={<Legal />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/security" element={<Security />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
