@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import AIRecommendationsModule from "./components/modules/ai/AIRecommendationsMo
 import SocialModule from "./components/modules/social/SocialModule";
 import CampaignDetails from "./components/modules/crowdfunding/CampaignDetails";
 import Wallet from "./pages/Wallet";
+import Contract from "./pages/Contract";
 import Notifications from "./pages/Notifications";
 import Help from "./pages/Help";
 import Legal from "./pages/Legal";
@@ -68,6 +68,7 @@ const App = () => (
               <Route path="/ai-recommendations" element={<AIRecommendationsModule />} />
               <Route path="/social" element={<SocialModule />} />
               <Route path="/wallet" element={<Wallet />} />
+              <Route path="/contract" element={<Contract />} />
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/help" element={<Help />} />
               <Route path="/legal" element={<Legal />} />

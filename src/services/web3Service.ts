@@ -40,7 +40,7 @@ export class Web3Service {
     return this.callWeb3Function('getCreditScoreData', [address, chainId]);
   }
 
-  static async getTokenInfo(tokenAddress: string, chainId: number = 1) {
+  static async getTokenInfo(tokenAddress: string, chainId: number = 137) {
     return this.callWeb3Function('getTokenInfo', [tokenAddress, chainId]);
   }
 
@@ -66,5 +66,18 @@ export class Web3Service {
 
   static async validateContract(address: string, chainId: number = 1) {
     return this.callWeb3Function('validateContract', [address, chainId]);
+  }
+
+  // Nouvelles fonctions spécifiques pour votre ERC20Template
+  static async callContractFunction(contractAddress: string, functionName: string, params: any[] = [], chainId: number = 137) {
+    return this.callWeb3Function('callContractFunction', [contractAddress, functionName, params, chainId]);
+  }
+
+  static async getTokenBalance(tokenAddress: string, userAddress: string, chainId: number = 137) {
+    return this.callWeb3Function('getTokenBalance', [tokenAddress, userAddress, chainId]);
+  }
+
+  static async checkAllowance(tokenAddress: string, ownerAddress: string, spenderAddress: string, chainId: number = 137) {
+    return this.callWeb3Function('checkAllowance', [tokenAddress, ownerAddress, spenderAddress, chainId]);
   }
 }

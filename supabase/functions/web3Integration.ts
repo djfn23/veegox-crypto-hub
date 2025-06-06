@@ -463,6 +463,105 @@ serve(async (req) => {
           address,
           chainId
         };
+      },
+
+      // Nouvelle fonction pour appeler des méthodes de contrat spécifiques
+      callContractFunction: async (contractAddress, functionName, functionParams, chainId) => {
+        const network = getNetworkFromChainId(chainId);
+        const url = `https://${network}.g.alchemy.com/v2/${alchemyApiKey}`;
+        
+        // Mappage des signatures de fonctions communes
+        const functionSignatures = {
+          'name': '0x06fdde03',
+          'symbol': '0x95d89b41',
+          'decimals': '0x313ce567',
+          'totalSupply': '0x18160ddd',
+          'balanceOf': '0x70a08231',
+          'owner': '0x8da5cb5b',
+          'taxFee': '0x6d1b229d',
+          'taxAddress': '0x9c8c3f7b',
+          'isAirdrop': '0x7a34d8b2',
+          'blackList': '0xb2b99ec9',
+          'noTaxable': '0x8c4c6a4b',
+          'isAntibotGlobalExemption': '0x1234567a',
+          'isAntiwhaleGlobalExemption': '0x1234567b',
+          'getOwner': '0x893d20e8',
+          'allowance': '0xdd62ed3e'
+        };
+
+        let data = functionSignatures[functionName] || '0x';
+        
+        // Encoder les paramètres pour les fonctions qui en ont besoin
+        if (functionParams && functionParams.length > 0) {
+          if (functionName === 'balanceOf' || functionName === 'blackList' || functionName === 'noTaxable') {
+            // Encoder l'adresse (32 bytes avec padding)
+            const address = functionParams[0].replace('0x', '').toLowerCase();
+            data += address.padStart(64, '0');
+          } else if (functionName === 'allowance') {
+            // Encoder deux adresses
+            const owner = functionParams[0].replace('0x', '').toLowerCase();
+            const spender = functionParams[1].replace('0x', '').toLowerCase();
+            data += owner.padStart(64, '0') + spender.padStart(64, '0');
+          }
+        }
+
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            method: "eth_call",
+            params: [
+              {
+                to: contractAddress,
+                data: data
+              },
+              "latest"
+            ]
+          })
+        });
+
+        const result = await response.json();
+        
+        if (result.result && result.result !== "0x") {
+          // Décoder le résultat selon le type de fonction
+          if (functionName === 'name' || functionName === 'symbol') {
+            // Décoder string
+            const hexString = result.result.substring(2);
+            if (hexString.length >= 128) {
+              const offset = parseInt(hexString.substring(0, 64), 16) * 2;
+              const length = parseInt(hexString.substring(64, 128), 16) * 2;
+              const stringHex = hexString.substring(128, 128 + length);
+              return hexToAscii(stringHex);
+            }
+            return "";
+          } else if (functionName === 'decimals' || functionName === 'taxFee') {
+            // Décoder uint8/uint256
+            return parseInt(result.result, 16);
+          } else if (functionName === 'totalSupply' || functionName === 'balanceOf') {
+            // Décoder uint256 (garder en string pour éviter les problèmes de précision)
+            return result.result;
+          } else if (functionName === 'isAirdrop' || functionName === 'blackList' || functionName === 'noTaxable') {
+            // Décoder bool
+            return parseInt(result.result, 16) === 1;
+          } else if (functionName === 'owner' || functionName === 'taxAddress' || functionName === 'getOwner') {
+            // Décoder address
+            return '0x' + result.result.substring(26);
+          }
+        }
+        
+        return result.result || null;
+      },
+
+      // Fonction pour obtenir le solde d'un token spécifique
+      getTokenBalance: async (tokenAddress, userAddress, chainId) => {
+        return await functions.callContractFunction(tokenAddress, 'balanceOf', [userAddress], chainId);
+      },
+
+      // Fonction pour vérifier l'allowance
+      checkAllowance: async (tokenAddress, ownerAddress, spenderAddress, chainId) => {
+        return await functions.callContractFunction(tokenAddress, 'allowance', [ownerAddress, spenderAddress], chainId);
       }
     };
 
