@@ -5,11 +5,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowDown } from "lucide-react";
 import { LiquidityPool, Wallet } from "../credit/types";
 import { supabase } from "@/integrations/supabase/client";
+import TokenSelector from "./TokenSelector";
+import AmountInput from "./AmountInput";
+import ExchangeRateDisplay from "./ExchangeRateDisplay";
+import SwapButton from "./SwapButton";
 
 interface SwapInterfaceProps {
   pools: LiquidityPool[];
@@ -177,33 +179,24 @@ export default function SwapInterface({ pools, userWallet }: SwapInterfaceProps)
             </div>
             
             <div className="flex space-x-2">
-              <Select onValueChange={(value) => setValue('tokenIn', value)}>
-                <SelectTrigger className="w-1/3">
-                  <SelectValue placeholder="Token" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableTokens.map(token => (
-                    <SelectItem key={token} value={token}>
-                      {token}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <TokenSelector
+                tokens={availableTokens}
+                placeholder="Token"
+                onValueChange={(value) => setValue('tokenIn', value)}
+                className="w-1/3"
+              />
               
-              <Input
-                id="amountIn"
+              <AmountInput
                 placeholder="0.0"
-                type="number"
-                step="0.000001"
-                className="w-2/3"
-                {...register("amountIn", { 
+                register={register("amountIn", { 
                   required: "Montant requis",
                   min: { value: 0.000001, message: "Montant trop petit" },
                   valueAsNumber: true,
                 })}
+                error={errors.amountIn}
+                className="w-2/3"
               />
             </div>
-            {errors.amountIn && <p className="text-xs text-red-500">{errors.amountIn.message}</p>}
           </div>
           
           <div className="flex justify-center">
@@ -221,51 +214,40 @@ export default function SwapInterface({ pools, userWallet }: SwapInterfaceProps)
           <div className="space-y-2">
             <label htmlFor="tokenOut" className="text-sm font-medium">Vers</label>
             <div className="flex space-x-2">
-              <Select onValueChange={(value) => setValue('tokenOut', value)}>
-                <SelectTrigger className="w-1/3" disabled={!tokenIn}>
-                  <SelectValue placeholder="Token" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableOutputTokens.map(token => (
-                    <SelectItem key={token} value={token}>
-                      {token}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <TokenSelector
+                tokens={availableOutputTokens}
+                placeholder="Token"
+                disabled={!tokenIn}
+                onValueChange={(value) => setValue('tokenOut', value)}
+                className="w-1/3"
+              />
               
-              <Input
+              <AmountInput
                 placeholder="0.0"
-                type="number"
-                className="w-2/3"
-                value={amountOut !== null ? amountOut.toFixed(6) : ''}
                 disabled
+                value={amountOut !== null ? amountOut.toFixed(6) : ''}
+                className="w-2/3"
               />
             </div>
           </div>
           
-          {amountOut !== null && tokenIn && tokenOut && (
-            <div className="text-xs text-muted-foreground">
-              <div className="flex justify-between">
-                <span>Taux d'échange:</span>
-                <span>1 {tokenIn} ≈ {(amountOut / parseFloat(amountIn || "1")).toFixed(6)} {tokenOut}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Frais:</span>
-                <span>0.3%</span>
-              </div>
-            </div>
-          )}
+          <ExchangeRateDisplay
+            amountOut={amountOut}
+            tokenIn={tokenIn}
+            tokenOut={tokenOut}
+            amountIn={amountIn}
+          />
         </form>
       </CardContent>
       <CardFooter>
-        <Button 
-          className="w-full" 
+        <SwapButton
+          userWallet={userWallet}
+          tokenIn={tokenIn}
+          tokenOut={tokenOut}
+          amountIn={amountIn}
+          isPending={swapMutation.isPending}
           onClick={handleSubmit(onSubmit)}
-          disabled={!tokenIn || !tokenOut || !amountIn || parseFloat(amountIn) <= 0 || swapMutation.isPending || !userWallet}
-        >
-          {!userWallet ? "Connectez votre portefeuille" : swapMutation.isPending ? "Traitement..." : "Échanger"}
-        </Button>
+        />
       </CardFooter>
     </Card>
   );
