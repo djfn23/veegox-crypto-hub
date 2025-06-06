@@ -5,7 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { AppLayout } from "@/components/layout/AppLayout";
+import { EnhancedAppLayout } from "@/components/layout/EnhancedAppLayout";
+import { PerformanceMetrics } from "@/components/ui/performance-metrics";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import TokenManager from "./components/modules/TokenManager";
@@ -30,10 +31,19 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: 1,
+      retry: (failureCount, error) => {
+        // Don't retry on 4xx errors
+        if (error && typeof error === 'object' && 'status' in error) {
+          const status = (error as any).status;
+          if (status >= 400 && status < 500) return false;
+        }
+        return failureCount < 3;
+      },
       staleTime: 5 * 60 * 1000, // 5 minutes
-    }
-  }
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    },
+  },
 });
 
 const App = () => (
@@ -43,7 +53,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AppLayout>
+          <EnhancedAppLayout>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/tokens" element={<TokenManager />} />
@@ -65,8 +75,9 @@ const App = () => (
               <Route path="/security" element={<Security />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </AppLayout>
+          </EnhancedAppLayout>
         </BrowserRouter>
+        <PerformanceMetrics />
       </TooltipProvider>
     </QueryClientProvider>
   </ErrorBoundary>

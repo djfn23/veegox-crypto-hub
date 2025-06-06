@@ -95,6 +95,29 @@
   body {
     @apply bg-background text-foreground font-sans;
   }
+
+  /* Improved scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/20 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-white/30;
+  }
+
+  /* Text selection */
+  ::selection {
+    @apply bg-primary/20 text-primary-foreground;
+  }
 }
 
 @layer utilities {
@@ -106,7 +129,7 @@
     font-family: 'Inter', sans-serif;
   }
   
-  /* Animations */
+  /* Enhanced animations */
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
   }
@@ -124,7 +147,21 @@
     animation: gradient 8s ease infinite;
   }
 
-  /* Hover effects */
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  .animate-bounce-gentle {
+    animation: bounceGentle 2s infinite;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Enhanced hover effects */
   .hover-scale {
     @apply transition-transform duration-200;
   }
@@ -141,7 +178,15 @@
     @apply shadow-lg shadow-primary/25;
   }
 
-  /* Card styles */
+  .hover-lift {
+    @apply transition-all duration-300;
+  }
+
+  .hover-lift:hover {
+    @apply -translate-y-1 shadow-xl;
+  }
+
+  /* Enhanced card styles */
   .card-glass {
     @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-xl;
   }
@@ -149,14 +194,67 @@
   .card-gradient {
     @apply bg-gradient-to-br from-primary/20 to-secondary/30 border border-white/10 shadow-lg;
   }
+
+  .card-interactive {
+    @apply hover-scale hover-glow cursor-pointer;
+  }
+
+  /* Text utilities */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent;
+  }
+
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  /* Focus states */
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* Loading states */
+  .loading-dots {
+    @apply after:content-[''] after:inline-block after:animate-pulse;
+  }
+
+  .loading-spinner {
+    @apply animate-spin rounded-full border-2 border-gray-600 border-t-primary;
+  }
+
+  /* Responsive grid utilities */
+  .grid-responsive {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
+  }
+
+  .grid-responsive-large {
+    @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6;
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -189,5 +287,93 @@
   }
   100% {
     background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes bounceGentle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Dark mode specific styles */
+.dark {
+  /* Enhanced glassmorphism effects */
+  .card-glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  /* Better text contrast */
+  .text-muted {
+    @apply text-gray-400;
+  }
+
+  .text-subtle {
+    @apply text-gray-500;
+  }
+}
+
+/* Light mode specific styles */
+.light {
+  .card-glass {
+    @apply bg-black/5 backdrop-blur-xl border border-black/10;
+  }
+
+  .text-muted {
+    @apply text-gray-600;
+  }
+
+  .text-subtle {
+    @apply text-gray-500;
+  }
+}
+
+/* Custom focus styles for better accessibility */
+[role="button"]:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  @apply focus-visible-ring;
+}
+
+/* Improved motion for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card-glass {
+    @apply border-2;
+  }
+  
+  .text-muted {
+    @apply text-foreground;
   }
 }
