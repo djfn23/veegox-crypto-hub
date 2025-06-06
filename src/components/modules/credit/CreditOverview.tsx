@@ -23,11 +23,11 @@ const CreditOverview = () => {
 
   if (!isAuthenticated) {
     return (
-      <Card>
+      <Card className="mx-4 lg:mx-0">
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
-            <h3 className="text-xl font-semibold text-white">Authentification requise</h3>
-            <p className="text-gray-400">
+            <h3 className="text-lg md:text-xl font-semibold text-white">Authentification requise</h3>
+            <p className="text-gray-400 text-sm md:text-base leading-relaxed px-4">
               Connectez-vous pour accéder au module de crédit et gérer vos prêts DeFi.
             </p>
           </div>
@@ -37,21 +37,25 @@ const CreditOverview = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid lg:grid-cols-3 gap-6">
-        <CreditScoreCard 
-          creditScore={creditScore}
-          userWallet={userWallet}
-          isLoadingScore={isLoadingScore}
-        />
+    <div className="space-y-6 px-4 lg:px-0">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-1">
+          <CreditScoreCard 
+            creditScore={creditScore}
+            userWallet={userWallet}
+            isLoadingScore={isLoadingScore}
+          />
+        </div>
         
-        <LoanCalculator 
-          loanData={loanData}
-          setLoanData={setLoanData}
-          creditScore={creditScore}
-          onSubmitLoan={handleSubmitLoan}
-          isSubmitting={loanMutation.isPending}
-        />
+        <div className="xl:col-span-2">
+          <LoanCalculator 
+            loanData={loanData}
+            setLoanData={setLoanData}
+            creditScore={creditScore}
+            onSubmitLoan={handleSubmitLoan}
+            isSubmitting={loanMutation.isPending}
+          />
+        </div>
       </div>
       
       <WalletManager />
