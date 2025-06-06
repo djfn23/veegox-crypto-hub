@@ -2,7 +2,8 @@
 import { StatsCard } from "@/components/ui/stats-card";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { TrendingUp, Wallet as WalletIcon, Eye, ArrowUpDown } from "lucide-react";
-import { useWalletBalance } from "@/hooks/useWalletData";
+import { useWalletAssets, useTokenPrices } from "@/hooks/useTokenData";
+import { useTransactionHistory } from "@/hooks/useWalletData";
 
 interface WalletData {
   id: string;
@@ -15,36 +16,61 @@ interface WalletData {
 
 interface WalletOverviewProps {
   wallets: WalletData[];
-  assetsCount: number;
 }
 
-const WalletOverview = ({ wallets, assetsCount }: WalletOverviewProps) => {
+const WalletOverview = ({ wallets }: WalletOverviewProps) => {
   const connectedWallets = wallets.filter(w => w.connected);
-  const primaryWallet = connectedWallets[0]; // Premier wallet connecté comme principal
+  const primaryWallet = connectedWallets[0];
   
-  const { data: balanceData, isLoading: isLoadingBalance } = useWalletBalance(
+  const { assets, isLoading } = useWalletAssets(
     primaryWallet?.address || null,
     primaryWallet?.chainId || 1
   );
 
-  // Calculer la valeur totale basée sur les données réelles
+  const { data: transactionsData } = useTransactionHistory(
+    primaryWallet?.address || null,
+    primaryWallet?.chainId || 1
+  );
+
+  const tokenAddresses = assets.tokens?.map((token: any) => token.address) || [];
+  const { data: pricesData } = useTokenPrices(tokenAddresses, primaryWallet?.chainId || 1);
+
+  // Calculer la valeur totale du portfolio
   const calculateTotalValue = () => {
-    if (isLoadingBalance || !balanceData?.result) {
-      return 0;
-    }
+    if (isLoading || !assets) return 0;
     
-    const ethBalance = balanceData.result.balance || 0;
-    const ethPrice = 2500; // Prix ETH approximatif - dans une vraie app, on récupérerait le prix via une API
-    return ethBalance * ethPrice;
+    let total = 0;
+    
+    // ETH balance
+    const ethPrice = pricesData?.result?.find((p: any) => p.symbol === 'ETH')?.price || 2500;
+    total += assets.ethBalance * ethPrice;
+    
+    // Token balances
+    assets.tokens?.forEach((token: any) => {
+      const priceInfo = pricesData?.result?.find((p: any) => p.address === token.address);
+      if (priceInfo?.price) {
+        total += parseFloat(token.balance) * priceInfo.price;
+      }
+    });
+    
+    return total;
   };
 
   const totalValue = calculateTotalValue();
+  const assetsCount = (assets.tokens?.length || 0) + (assets.nfts?.length || 0) + (assets.ethBalance > 0 ? 1 : 0);
+  
+  // Calculer les transactions des dernières 24h
+  const last24hTx = transactionsData?.result?.filter((tx: any) => {
+    const txDate = new Date(tx.metadata?.blockTimestamp);
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    return txDate > yesterday;
+  }).length || 0;
 
   return (
     <div className="grid md:grid-cols-4 gap-6 mb-8">
       <StatsCard
         title="Valeur Totale"
-        value={isLoadingBalance ? 
+        value={isLoading ? 
           "Chargement..." : 
           <AnimatedNumber value={totalValue} prefix="$" suffix="" className="text-3xl font-bold text-white" />
         }
@@ -71,7 +97,7 @@ const WalletOverview = ({ wallets, assetsCount }: WalletOverviewProps) => {
       <StatsCard
         title="Transactions"
         value="24h"
-        change="+12"
+        change={`+${last24hTx}`}
         changeType="positive"
         icon={<ArrowUpDown className="h-6 w-6 text-pink-400" />}
       />

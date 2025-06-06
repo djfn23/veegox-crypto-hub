@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CreditScore, Wallet } from "./types";
 import { getScoreColor, getScoreLabel } from "./utils";
+import { useCreditScoreData } from "@/hooks/useWalletData";
 
 interface CreditScoreCardProps {
   creditScore: CreditScore | null;
@@ -22,6 +23,12 @@ const CreditScoreCard = ({ creditScore, userWallet, isLoadingScore }: CreditScor
   const [isRecalculating, setIsRecalculating] = useState(false);
   const queryClient = useQueryClient();
 
+  // Utiliser les vraies données Alchemy pour le calcul du score
+  const { data: walletData } = useCreditScoreData(
+    userWallet?.address || null,
+    userWallet ? 1 : undefined
+  );
+
   const calculateScoreMutation = useMutation({
     mutationFn: async (address: string) => {
       setIsRecalculating(true);
@@ -30,49 +37,38 @@ const CreditScoreCard = ({ creditScore, userWallet, isLoadingScore }: CreditScor
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error("Utilisateur non connecté");
 
-        const response = await fetch("https://zjsfulbimcvoaqflfbir.supabase.co/functions/v1/web3Integration", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-          },
-          body: JSON.stringify({
+        // Utiliser les vraies données blockchain via Alchemy
+        const response = await supabase.functions.invoke('web3Integration', {
+          body: {
             action: "getCreditScoreData",
             params: [address, 1]
-          })
+          }
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Erreur lors de la récupération des données blockchain");
+        if (response.error) {
+          throw new Error(response.error.message || "Erreur lors de la récupération des données blockchain");
         }
 
-        const calculateResponse = await fetch("https://zjsfulbimcvoaqflfbir.supabase.co/functions/v1/calculateCreditScore", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-          },
-          body: JSON.stringify({
+        const calculateResponse = await supabase.functions.invoke('calculateCreditScore', {
+          body: {
             user_id: user.id,
-            wallet_address: address
-          })
+            wallet_address: address,
+            blockchain_data: response.data.result
+          }
         });
 
-        if (!calculateResponse.ok) {
-          const errorData = await calculateResponse.json();
-          throw new Error(errorData.error || "Erreur lors du calcul du score");
+        if (calculateResponse.error) {
+          throw new Error(calculateResponse.error.message || "Erreur lors du calcul du score");
         }
 
-        const scoreData = await calculateResponse.json();
-        return scoreData.result;
+        return calculateResponse.data.result;
       } finally {
         setIsRecalculating(false);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credit-score'] });
-      toast.success("Score de crédit calculé avec succès");
+      toast.success("Score de crédit calculé avec succès avec les données blockchain réelles!");
     },
     onError: (error: any) => {
       toast.error(error.message || "Erreur lors du calcul du score");
@@ -116,25 +112,38 @@ const CreditScoreCard = ({ creditScore, userWallet, isLoadingScore }: CreditScor
               Dernière mise à jour: {new Date(creditScore.last_calculated || '').toLocaleDateString()}
             </div>
 
-            {creditScore.factors && (
+            {walletData?.result && (
               <div className="mt-4 space-y-3">
                 <div className="text-sm font-medium text-white flex items-center">
                   <Brain className="h-4 w-4 mr-2 text-purple-400" />
-                  Analyse IA Avancée
+                  Analyse IA Avancée (Données Alchemy)
                 </div>
-                {Object.entries(creditScore.factors as Record<string, any>).map(([key, value]) => (
-                  <div key={key} className="flex justify-between items-center">
-                    <span className="text-xs text-gray-400">
-                      {key === 'transaction_count' ? 'Transactions' : 
-                       key === 'wallet_age_days' ? 'Âge du portefeuille (jours)' : 
-                       key === 'balance_stability' ? 'Stabilité du solde' : 
-                       key === 'defi_activity' ? 'Activité DeFi' : 
-                       key === 'loan_history' ? 'Historique de prêt' : 
-                       key}
-                    </span>
-                    <span className="text-xs text-white">{value}</span>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Solde ETH:</span>
+                    <span className="text-white">{walletData.result.balance?.toFixed(4)} ETH</span>
                   </div>
-                ))}
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Âge (jours):</span>
+                    <span className="text-white">{walletData.result.walletAgeDays}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Transactions:</span>
+                    <span className="text-white">{walletData.result.transactionCount}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Contacts uniques:</span>
+                    <span className="text-white">{walletData.result.uniqueContacts}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Volume total:</span>
+                    <span className="text-white">{walletData.result.totalValue?.toFixed(2)} ETH</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Activité 30j:</span>
+                    <span className="text-white">{walletData.result.lastMonthActivityCount}</span>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -146,7 +155,7 @@ const CreditScoreCard = ({ creditScore, userWallet, isLoadingScore }: CreditScor
                 onClick={() => userWallet && calculateScoreMutation.mutate(userWallet.address)}
                 className="w-full border-slate-600 text-white hover:bg-slate-800"
               >
-                {isRecalculating ? "Calcul IA en cours..." : "Recalculer avec IA"}
+                {isRecalculating ? "Calcul IA en cours..." : "Recalculer avec données Alchemy"}
               </Button>
             </div>
           </div>
@@ -178,7 +187,7 @@ const CreditScoreCard = ({ creditScore, userWallet, isLoadingScore }: CreditScor
                   onClick={() => calculateScoreMutation.mutate(userWallet.address)}
                   className="border-slate-600 text-white hover:bg-slate-800"
                 >
-                  {isRecalculating ? "Analyse IA..." : "Lancer l'analyse IA"}
+                  {isRecalculating ? "Analyse IA..." : "Lancer l'analyse IA avec Alchemy"}
                 </Button>
               </div>
             ) : (

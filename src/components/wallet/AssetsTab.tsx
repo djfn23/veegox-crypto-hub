@@ -1,24 +1,58 @@
 
+import { useState } from "react";
 import { GlassCard } from "@/components/ui/glass-card";
 import { GradientButton } from "@/components/ui/gradient-button";
-import { AnimatedNumber } from "@/components/ui/animated-number";
-import { Upload, Download } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Upload, Download, Coins, Image } from "lucide-react";
+import { TokenGrid } from "./TokenGrid";
+import { NFTGrid } from "./NFTGrid";
+import { useWalletAssets, useTokenPrices } from "@/hooks/useTokenData";
 
-interface Asset {
-  symbol: string;
+interface WalletData {
+  id: string;
   name: string;
-  balance: number;
-  value: number;
-  change: string;
-  changeType: "positive" | "negative" | "neutral";
-  color: string;
+  address: string;
+  connected: boolean;
+  icon: string;
+  chainId: number;
 }
 
 interface AssetsTabProps {
-  assets: Asset[];
+  wallets: WalletData[];
 }
 
-const AssetsTab = ({ assets }: AssetsTabProps) => {
+const AssetsTab = ({ wallets }: AssetsTabProps) => {
+  const primaryWallet = wallets.find(w => w.connected);
+  const { assets, isLoading } = useWalletAssets(
+    primaryWallet?.address || null,
+    primaryWallet?.chainId || 1
+  );
+
+  const tokenAddresses = assets.tokens.map((token: any) => token.address);
+  const { data: pricesData } = useTokenPrices(tokenAddresses, primaryWallet?.chainId || 1);
+
+  // Enrichir les tokens avec les prix
+  const enrichedTokens = assets.tokens.map((token: any) => {
+    const priceInfo = pricesData?.result?.find((p: any) => p.address === token.address);
+    return {
+      ...token,
+      price: priceInfo?.price || 0,
+      change24h: priceInfo?.change24h || 0,
+      value: priceInfo?.price ? parseFloat(token.balance) * priceInfo.price : 0,
+    };
+  });
+
+  if (!primaryWallet) {
+    return (
+      <GlassCard className="p-6">
+        <div className="text-center py-10">
+          <Coins className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-400">Connectez un wallet pour voir vos actifs</p>
+        </div>
+      </GlassCard>
+    );
+  }
+
   return (
     <GlassCard className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -34,35 +68,43 @@ const AssetsTab = ({ assets }: AssetsTabProps) => {
           </GradientButton>
         </div>
       </div>
-      
-      <div className="space-y-4">
-        {assets.map((asset) => (
-          <GlassCard key={asset.symbol} className="p-4 hover:scale-[1.01] transition-all duration-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className={`w-12 h-12 bg-gradient-to-r ${asset.color} rounded-full flex items-center justify-center shadow-lg`}>
-                  <span className="text-white font-bold text-lg">{asset.symbol.slice(0, 2)}</span>
-                </div>
-                <div>
-                  <div className="text-white font-semibold text-lg">{asset.name}</div>
-                  <div className="text-gray-400 text-sm">{asset.balance} {asset.symbol}</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-white font-semibold text-lg">
-                  <AnimatedNumber value={asset.value} prefix="$" />
-                </div>
-                <div className={`text-sm font-medium ${
-                  asset.changeType === 'positive' ? 'text-green-400' : 
-                  asset.changeType === 'negative' ? 'text-red-400' : 'text-gray-400'
-                }`}>
-                  {asset.change}
-                </div>
-              </div>
-            </div>
-          </GlassCard>
-        ))}
-      </div>
+
+      <Tabs defaultValue="tokens" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1">
+          <TabsTrigger value="tokens" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg">
+            <Coins className="h-4 w-4 mr-2" />
+            Tokens ({enrichedTokens.length + (assets.ethBalance > 0 ? 1 : 0)})
+          </TabsTrigger>
+          <TabsTrigger value="nfts" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg">
+            <Image className="h-4 w-4 mr-2" />
+            NFTs ({assets.nfts.length})
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="tokens" className="mt-6">
+          <TokenGrid 
+            tokens={[
+              // ETH balance
+              ...(assets.ethBalance > 0 ? [{
+                address: 'native',
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+                balance: assets.ethBalance.toString(),
+                price: pricesData?.result?.find((p: any) => p.symbol === 'ETH')?.price || 2500,
+                change24h: pricesData?.result?.find((p: any) => p.symbol === 'ETH')?.change24h || 0,
+                value: assets.ethBalance * (pricesData?.result?.find((p: any) => p.symbol === 'ETH')?.price || 2500),
+              }] : []),
+              ...enrichedTokens
+            ]}
+            isLoading={isLoading}
+          />
+        </TabsContent>
+
+        <TabsContent value="nfts" className="mt-6">
+          <NFTGrid nfts={assets.nfts} isLoading={isLoading} />
+        </TabsContent>
+      </Tabs>
     </GlassCard>
   );
 };

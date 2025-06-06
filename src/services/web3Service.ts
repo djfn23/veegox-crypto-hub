@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Web3ServiceResponse<T = any> {
@@ -43,5 +42,29 @@ export class Web3Service {
 
   static async getTokenInfo(tokenAddress: string, chainId: number = 1) {
     return this.callWeb3Function('getTokenInfo', [tokenAddress, chainId]);
+  }
+
+  static async getTokenBalances(address: string, chainId: number = 1) {
+    return this.callWeb3Function('getTokenBalances', [address, chainId]);
+  }
+
+  static async getNFTsForWallet(address: string, chainId: number = 1) {
+    return this.callWeb3Function('getNFTsForWallet', [address, chainId]);
+  }
+
+  static async getTokenPrices(tokenAddresses: string[], chainId: number = 1) {
+    return this.callWeb3Function('getTokenPrices', [tokenAddresses, chainId]);
+  }
+
+  static async getGasPrice(chainId: number = 1) {
+    return this.callWeb3Function('getGasPrice', [chainId]);
+  }
+
+  static async getBlockNumber(chainId: number = 1) {
+    return this.callWeb3Function('getBlockNumber', [chainId]);
+  }
+
+  static async validateContract(address: string, chainId: number = 1) {
+    return this.callWeb3Function('validateContract', [address, chainId]);
   }
 }

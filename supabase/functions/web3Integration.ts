@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.3.0/mod.ts";
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -281,6 +280,188 @@ serve(async (req) => {
           name,
           symbol,
           decimals
+        };
+      },
+
+      // Obtenir les balances de tous les tokens ERC20 d'un wallet
+      getTokenBalances: async (address, chainId) => {
+        const network = getNetworkFromChainId(chainId);
+        const url = `https://${network}.g.alchemy.com/v2/${alchemyApiKey}`;
+        
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            method: "alchemy_getTokenBalances",
+            params: [address, "erc20"]
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.result?.tokenBalances) {
+          // Filtrer les tokens avec un balance > 0 et obtenir leurs métadonnées
+          const tokensWithBalance = data.result.tokenBalances.filter(
+            token => token.tokenBalance !== "0x0"
+          );
+          
+          // Obtenir les métadonnées pour chaque token
+          const enrichedTokens = await Promise.all(
+            tokensWithBalance.map(async token => {
+              try {
+                const metadata = await functions.getTokenInfo(token.contractAddress, chainId);
+                return {
+                  address: token.contractAddress,
+                  balance: parseInt(token.tokenBalance, 16) / Math.pow(10, metadata.result?.decimals || 18),
+                  ...metadata.result
+                };
+              } catch (error) {
+                console.error(`Erreur lors de la récupération des métadonnées pour ${token.contractAddress}:`, error);
+                return {
+                  address: token.contractAddress,
+                  balance: parseInt(token.tokenBalance, 16) / Math.pow(10, 18),
+                  name: "Token inconnu",
+                  symbol: "UNKNOWN",
+                  decimals: 18
+                };
+              }
+            })
+          );
+          
+          return enrichedTokens;
+        }
+        
+        return [];
+      },
+
+      // Obtenir les NFTs d'un wallet
+      getNFTsForWallet: async (address, chainId) => {
+        const network = getNetworkFromChainId(chainId);
+        const url = `https://${network}.g.alchemy.com/v2/${alchemyApiKey}`;
+        
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            method: "alchemy_getNFTs",
+            params: [
+              address,
+              {
+                pageSize: 100,
+                withMetadata: true
+              }
+            ]
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.result?.ownedNfts) {
+          return data.result.ownedNfts.map(nft => ({
+            tokenId: nft.id.tokenId,
+            name: nft.metadata?.name || `Token #${nft.id.tokenId}`,
+            description: nft.metadata?.description,
+            image: nft.metadata?.image,
+            collection: {
+              name: nft.contract.name || "Collection inconnue",
+              address: nft.contract.address
+            },
+            metadata: nft.metadata
+          }));
+        }
+        
+        return [];
+      },
+
+      // Obtenir les prix des tokens (simulation - dans une vraie app, utiliser CoinGecko ou similaire)
+      getTokenPrices: async (tokenAddresses, chainId) => {
+        // Pour la démo, on retourne des prix simulés
+        // Dans une vraie application, intégrer CoinGecko API ou similaire
+        const mockPrices = [
+          { address: 'native', symbol: 'ETH', price: 2500, change24h: 3.2 },
+          { address: '0xA0b86a33E6441949F9d7C8D4b33B03E2b31f2E3D', symbol: 'USDC', price: 1.00, change24h: 0.1 },
+          { address: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', symbol: 'UNI', price: 7.50, change24h: -2.1 },
+        ];
+        
+        return tokenAddresses.map(address => {
+          const mockPrice = mockPrices.find(p => p.address === address) || 
+                           { address, symbol: 'UNKNOWN', price: 0, change24h: 0 };
+          return mockPrice;
+        });
+      },
+
+      // Obtenir le prix du gas actuel
+      getGasPrice: async (chainId) => {
+        const network = getNetworkFromChainId(chainId);
+        const url = `https://${network}.g.alchemy.com/v2/${alchemyApiKey}`;
+        
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            method: "eth_gasPrice",
+            params: []
+          })
+        });
+
+        const data = await response.json();
+        return {
+          gasPrice: parseInt(data.result, 16),
+          gasPriceGwei: parseInt(data.result, 16) / 1e9
+        };
+      },
+
+      // Obtenir le numéro de bloc actuel
+      getBlockNumber: async (chainId) => {
+        const network = getNetworkFromChainId(chainId);
+        const url = `https://${network}.g.alchemy.com/v2/${alchemyApiKey}`;
+        
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            method: "eth_blockNumber",
+            params: []
+          })
+        });
+
+        const data = await response.json();
+        return {
+          blockNumber: parseInt(data.result, 16)
+        };
+      },
+
+      // Valider qu'une adresse est un contrat valide
+      validateContract: async (address, chainId) => {
+        const network = getNetworkFromChainId(chainId);
+        const url = `https://${network}.g.alchemy.com/v2/${alchemyApiKey}`;
+        
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            method: "eth_getCode",
+            params: [address, "latest"]
+          })
+        });
+
+        const data = await response.json();
+        const isContract = data.result && data.result !== "0x";
+        
+        return {
+          isContract,
+          address,
+          chainId
         };
       }
     };
