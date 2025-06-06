@@ -5,12 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoanData, CreditScore, Loan, Wallet } from "@/components/modules/credit/types";
 import { calculateLTV } from "@/components/modules/credit/utils";
+import { useAuth } from "./useAuth";
 
 export const useCreditScore = () => {
+  const { user } = useAuth();
+  
   return useQuery({
-    queryKey: ['credit-score'],
+    queryKey: ['credit-score', user?.id],
     queryFn: async (): Promise<CreditScore | null> => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
 
       const { data } = await supabase
@@ -27,14 +29,16 @@ export const useCreditScore = () => {
         factors: data.factors as Record<string, any> || null
       };
     },
+    enabled: !!user,
   });
 };
 
 export const useUserLoans = () => {
+  const { user } = useAuth();
+  
   return useQuery({
-    queryKey: ['user-loans'],
+    queryKey: ['user-loans', user?.id],
     queryFn: async (): Promise<Loan[]> => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
       const { data, error } = await supabase
@@ -44,16 +48,18 @@ export const useUserLoans = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
+    enabled: !!user,
   });
 };
 
 export const useUserWallet = () => {
+  const { user } = useAuth();
+  
   return useQuery({
-    queryKey: ['user-primary-wallet'],
+    queryKey: ['user-primary-wallet', user?.id],
     queryFn: async (): Promise<Wallet | null> => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
 
       const { data } = await supabase
@@ -65,15 +71,16 @@ export const useUserWallet = () => {
 
       return data;
     },
+    enabled: !!user,
   });
 };
 
 export const useLoanSubmission = () => {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (loanData: LoanData) => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
 
       // Get the current credit score for interest rate calculation
@@ -98,7 +105,7 @@ export const useLoanSubmission = () => {
           interest_rate: interestRate,
           ltv_ratio: ltv,
           liquidation_threshold: 75,
-          chain_id: 1,
+          chain_id: 137,
           due_date: new Date(Date.now() + parseInt(loanData.duration) * 24 * 60 * 60 * 1000).toISOString()
         })
         .select()
@@ -141,4 +148,30 @@ export const useCreditModuleState = () => {
     setLoanData,
     resetLoanData
   };
+};
+
+// New hook for calculating credit score
+export const useCreditScoreCalculation = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (walletAddress: string) => {
+      if (!user) throw new Error("Non authentifié");
+
+      const { data, error } = await supabase.functions.invoke('calculateCreditScore', {
+        body: { walletAddress, userId: user.id }
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['credit-score'] });
+      toast.success("Score de crédit calculé avec succès !");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erreur lors du calcul du score");
+    },
+  });
 };
