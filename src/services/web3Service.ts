@@ -1,0 +1,47 @@
+
+import { supabase } from "@/integrations/supabase/client";
+
+export interface Web3ServiceResponse<T = any> {
+  result?: T;
+  error?: string;
+}
+
+export class Web3Service {
+  static async callWeb3Function(action: string, params: any[]): Promise<Web3ServiceResponse> {
+    try {
+      const { data, error } = await supabase.functions.invoke('web3Integration', {
+        body: { action, params }
+      });
+
+      if (error) {
+        console.error('Web3 function error:', error);
+        return { error: error.message || 'Erreur lors de l\'appel à la fonction Web3' };
+      }
+
+      return data;
+    } catch (error: any) {
+      console.error('Web3 service error:', error);
+      return { error: error.message || 'Erreur de service Web3' };
+    }
+  }
+
+  static async getWalletBalance(address: string, chainId: number = 1) {
+    return this.callWeb3Function('getWalletBalance', [address, chainId]);
+  }
+
+  static async getTransactionHistory(address: string, chainId: number = 1) {
+    return this.callWeb3Function('getTransactionHistory', [address, chainId]);
+  }
+
+  static async getWalletAge(address: string, chainId: number = 1) {
+    return this.callWeb3Function('getWalletAge', [address, chainId]);
+  }
+
+  static async getCreditScoreData(address: string, chainId: number = 1) {
+    return this.callWeb3Function('getCreditScoreData', [address, chainId]);
+  }
+
+  static async getTokenInfo(tokenAddress: string, chainId: number = 1) {
+    return this.callWeb3Function('getTokenInfo', [tokenAddress, chainId]);
+  }
+}

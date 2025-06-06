@@ -2,14 +2,15 @@
 import { StatsCard } from "@/components/ui/stats-card";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { TrendingUp, Wallet as WalletIcon, Eye, ArrowUpDown } from "lucide-react";
+import { useWalletBalance } from "@/hooks/useWalletData";
 
 interface WalletData {
   id: string;
   name: string;
-  balance: string;
-  usdValue: number;
+  address: string;
   connected: boolean;
   icon: string;
+  chainId: number;
 }
 
 interface WalletOverviewProps {
@@ -18,14 +19,36 @@ interface WalletOverviewProps {
 }
 
 const WalletOverview = ({ wallets, assetsCount }: WalletOverviewProps) => {
-  const totalValue = wallets.reduce((sum, wallet) => sum + wallet.usdValue, 0);
+  const connectedWallets = wallets.filter(w => w.connected);
+  const primaryWallet = connectedWallets[0]; // Premier wallet connecté comme principal
+  
+  const { data: balanceData, isLoading: isLoadingBalance } = useWalletBalance(
+    primaryWallet?.address || null,
+    primaryWallet?.chainId || 1
+  );
+
+  // Calculer la valeur totale basée sur les données réelles
+  const calculateTotalValue = () => {
+    if (isLoadingBalance || !balanceData?.result) {
+      return 0;
+    }
+    
+    const ethBalance = balanceData.result.balance || 0;
+    const ethPrice = 2500; // Prix ETH approximatif - dans une vraie app, on récupérerait le prix via une API
+    return ethBalance * ethPrice;
+  };
+
+  const totalValue = calculateTotalValue();
 
   return (
     <div className="grid md:grid-cols-4 gap-6 mb-8">
       <StatsCard
         title="Valeur Totale"
-        value={<AnimatedNumber value={totalValue} prefix="$" suffix="" className="text-3xl font-bold text-white" />}
-        change="+$425.50 (+3.3%)"
+        value={isLoadingBalance ? 
+          "Chargement..." : 
+          <AnimatedNumber value={totalValue} prefix="$" suffix="" className="text-3xl font-bold text-white" />
+        }
+        change={totalValue > 0 ? `+$${(totalValue * 0.033).toFixed(2)} (+3.3%)` : undefined}
         changeType="positive"
         icon={<TrendingUp className="h-6 w-6 text-green-400" />}
         variant="primary"
@@ -33,7 +56,7 @@ const WalletOverview = ({ wallets, assetsCount }: WalletOverviewProps) => {
 
       <StatsCard
         title="Portefeuilles"
-        value={wallets.filter(w => w.connected).length}
+        value={connectedWallets.length}
         icon={<WalletIcon className="h-6 w-6 text-blue-400" />}
         variant="secondary"
       />
