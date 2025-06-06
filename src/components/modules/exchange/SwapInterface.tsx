@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -98,7 +98,7 @@ export default function SwapInterface({ pools, userWallet }: SwapInterfaceProps)
   };
 
   // Mise à jour automatique de l'estimation
-  React.useEffect(() => {
+  useEffect(() => {
     if (tokenIn && tokenOut && amountIn && parseFloat(amountIn) > 0) {
       findBestPool();
     } else {
