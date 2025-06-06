@@ -76,28 +76,28 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:w-64",
         sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
-        <GlassCard className="h-full p-4 border-r border-white/10">
+        <GlassCard className="h-full p-4 md:p-4 border-r border-white/10">
           <div className="flex items-center justify-between mb-6 lg:mb-8">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg lg:text-xl">V</span>
+              <div className="w-10 h-10 lg:w-10 lg:h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-xl lg:text-xl">V</span>
               </div>
-              <span className="text-white font-bold text-lg lg:text-xl">Veegox</span>
+              <span className="text-white font-bold text-xl lg:text-xl">Veegox</span>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden text-white hover:text-gray-300 p-1"
+              className="lg:hidden text-white hover:text-gray-300 p-2 -mr-2 rounded-lg hover:bg-white/10 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
-              <X className="h-5 w-5" />
+              <X className="h-6 w-6" />
             </button>
           </div>
 
-          <nav className="space-y-2 overflow-y-auto max-h-[calc(100vh-120px)]">
+          <nav className="space-y-2 overflow-y-auto max-h-[calc(100vh-140px)] pb-4">
             <div className="pb-4">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">
                 Principal
               </p>
               {navigation.map((item) => {
@@ -107,22 +107,22 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                     key={item.name}
                     to={item.href}
                     className={cn(
-                      "flex items-center space-x-3 px-3 py-3 lg:py-2 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] lg:min-h-auto",
+                      "flex items-center space-x-3 px-3 py-4 lg:py-3 rounded-xl text-sm font-medium transition-all duration-200 min-h-[52px] lg:min-h-[44px] touch-manipulation",
                       isActive 
-                        ? "bg-white/20 text-white shadow-lg" 
-                        : "text-gray-300 hover:bg-white/10 hover:text-white"
+                        ? "bg-white/20 text-white shadow-lg border border-white/10" 
+                        : "text-gray-300 hover:bg-white/10 hover:text-white active:bg-white/15"
                     )}
                     onClick={() => isMobile && setSidebarOpen(false)}
                   >
                     <item.icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="truncate">{item.name}</span>
+                    <span className="truncate text-sm">{item.name}</span>
                   </Link>
                 )
               })}
             </div>
 
             <div className="pt-4 border-t border-white/10">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">
                 Autres
               </p>
               {secondaryNavigation.map((item) => {
@@ -132,15 +132,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                     key={item.name}
                     to={item.href}
                     className={cn(
-                      "flex items-center space-x-3 px-3 py-3 lg:py-2 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] lg:min-h-auto",
+                      "flex items-center space-x-3 px-3 py-4 lg:py-3 rounded-xl text-sm font-medium transition-all duration-200 min-h-[52px] lg:min-h-[44px] touch-manipulation",
                       isActive 
-                        ? "bg-white/20 text-white shadow-lg" 
-                        : "text-gray-300 hover:bg-white/10 hover:text-white"
+                        ? "bg-white/20 text-white shadow-lg border border-white/10" 
+                        : "text-gray-300 hover:bg-white/10 hover:text-white active:bg-white/15"
                     )}
                     onClick={() => isMobile && setSidebarOpen(false)}
                   >
                     <item.icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="truncate">{item.name}</span>
+                    <span className="truncate text-sm">{item.name}</span>
                   </Link>
                 )
               })}
@@ -155,7 +155,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/10 bg-black/20 backdrop-blur-sm sticky top-0 z-30">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="text-white hover:text-gray-300 p-2 -ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="text-white hover:text-gray-300 p-2 -ml-2 rounded-lg hover:bg-white/10 transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center touch-manipulation"
           >
             <Menu className="h-6 w-6" />
           </button>
@@ -163,14 +163,16 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">V</span>
             </div>
-            <span className="text-white font-bold">Veegox</span>
+            <span className="text-white font-bold text-lg">Veegox</span>
           </div>
-          <div className="w-10 h-10" /> {/* Spacer for centering */}
+          <div className="w-12 h-12" /> {/* Spacer for centering */}
         </div>
 
-        {/* Page content */}
-        <main className="p-4 lg:p-6 min-h-screen">
-          {children}
+        {/* Page content with improved spacing */}
+        <main className="p-4 lg:p-6 xl:p-8 min-h-screen">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>
