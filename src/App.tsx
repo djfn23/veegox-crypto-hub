@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +27,10 @@ import Help from "./pages/Help";
 import Legal from "./pages/Legal";
 import About from "./pages/About";
 import Security from "./pages/Security";
+import CreateCampaign from "./pages/CreateCampaign";
+import Trading from "./pages/Trading";
+import Analytics from "./pages/Analytics";
+import Governance from "./pages/Governance";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,11 +65,15 @@ const App = () => (
               <Route path="/credit" element={<CreditModule />} />
               <Route path="/staking" element={<StakingModule />} />
               <Route path="/dao" element={<DAOModule />} />
+              <Route path="/governance" element={<Governance />} />
               <Route path="/profile" element={<ProfileSettings />} />
               <Route path="/crowdfunding" element={<CrowdfundingModule />} />
               <Route path="/crowdfunding/:id" element={<CampaignDetails />} />
+              <Route path="/create-campaign" element={<CreateCampaign />} />
               <Route path="/market-analysis" element={<MarketAnalysisModule />} />
               <Route path="/exchange" element={<ExchangeModule />} />
+              <Route path="/trading" element={<Trading />} />
+              <Route path="/analytics" element={<Analytics />} />
               <Route path="/ai-recommendations" element={<AIRecommendationsModule />} />
               <Route path="/social" element={<SocialModule />} />
               <Route path="/wallet" element={<Wallet />} />

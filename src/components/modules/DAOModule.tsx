@@ -1,488 +1,401 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Users, Vote, Clock, CheckCircle, XCircle, PlusCircle, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { 
-  Vote, 
-  Plus, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Users,
-  TrendingUp,
-  AlertCircle
-} from "lucide-react";
+import { useForm } from "react-hook-form";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Link } from "react-router-dom";
 
-const DAOModule = () => {
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [proposalData, setProposalData] = useState({
-    title: "",
-    description: "",
-    proposal_type: "",
-    voting_duration: "7"
-  });
+type ProposalFormData = {
+  title: string;
+  description: string;
+  proposal_type: string;
+  voting_ends_at: string;
+};
 
+export default function DAOModule() {
+  const [activeTab, setActiveTab] = useState("proposals");
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<ProposalFormData>();
 
-  const { data: proposals } = useQuery({
+  const { data: proposals, isLoading } = useQuery({
     queryKey: ['dao-proposals'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('dao_proposals')
-        .select(`
-          *,
-          profiles!dao_proposals_proposer_id_fkey (
-            full_name,
-            username
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
-
+      
       if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: userVotes } = useQuery({
-    queryKey: ['user-votes'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('dao_votes')
-        .select('proposal_id, vote_choice')
-        .eq('voter_id', user.id);
-
-      if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
   const createProposalMutation = useMutation({
-    mutationFn: async (proposalData: any) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Non authentifié");
-
-      const votingEndsAt = new Date();
-      votingEndsAt.setDate(votingEndsAt.getDate() + parseInt(proposalData.voting_duration));
-
-      const { data, error } = await supabase
-        .from('dao_proposals')
+    mutationFn: async (data: ProposalFormData) => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) throw new Error("Vous devez être connecté pour créer une proposition");
+      
+      const { data: proposal, error } = await supabase
+        .from("dao_proposals")
         .insert({
-          proposer_id: user.id,
-          title: proposalData.title,
-          description: proposalData.description,
-          proposal_type: proposalData.proposal_type,
-          voting_ends_at: votingEndsAt.toISOString()
+          proposer_id: userData.user.id,
+          title: data.title,
+          description: data.description,
+          proposal_type: data.proposal_type,
+          voting_ends_at: new Date(data.voting_ends_at).toISOString(),
         })
         .select()
         .single();
-
+        
       if (error) throw error;
-      return data;
+      return proposal;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dao-proposals'] });
-      toast.success("Proposition créée avec succès !");
-      setShowCreateForm(false);
-      setProposalData({
-        title: "",
-        description: "",
-        proposal_type: "",
-        voting_duration: "7"
-      });
+      toast.success("Proposition créée avec succès!");
+      queryClient.invalidateQueries({ queryKey: ["dao-proposals"] });
+      reset();
     },
     onError: (error: any) => {
       toast.error(error.message || "Erreur lors de la création de la proposition");
     },
   });
 
-  const voteMutation = useMutation({
-    mutationFn: async ({ proposalId, choice }: { proposalId: string; choice: boolean }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Non authentifié");
-
-      // Simuler le vote power basé sur les tokens détenus
-      const votePower = 100; // À remplacer par la vraie logique
-
-      const { data, error } = await supabase
-        .from('dao_votes')
+  const voteOnProposalMutation = useMutation({
+    mutationFn: async ({ proposalId, voteChoice }: { proposalId: string; voteChoice: boolean }) => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) throw new Error("Vous devez être connecté pour voter");
+      
+      const { data: vote, error } = await supabase
+        .from("dao_votes")
         .insert({
           proposal_id: proposalId,
-          voter_id: user.id,
-          vote_choice: choice,
-          vote_power: votePower
+          voter_id: userData.user.id,
+          vote_choice: voteChoice,
+          vote_power: 1, // Simplified voting power
         })
         .select()
         .single();
-
+        
       if (error) throw error;
-
-      // Au lieu d'utiliser une RPC, nous allons faire une requête vers l'Edge Function
-      const response = await fetch("https://zjsfulbimcvoaqflfbir.supabase.co/functions/v1/updateProposalVotes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${supabase.auth.getSession().then(res => res.data.session?.access_token)}`
-        },
-        body: JSON.stringify({
-          proposal_id: proposalId,
-          vote_power: votePower,
-          is_for: choice
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Erreur lors de la mise à jour des votes");
-      }
-
-      return data;
+      return vote;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dao-proposals'] });
-      queryClient.invalidateQueries({ queryKey: ['user-votes'] });
-      toast.success("Vote enregistré avec succès !");
+      toast.success("Vote enregistré avec succès!");
+      queryClient.invalidateQueries({ queryKey: ["dao-proposals"] });
     },
     onError: (error: any) => {
       toast.error(error.message || "Erreur lors du vote");
     },
   });
 
-  const getProposalStatus = (proposal: any) => {
-    const now = new Date();
-    const votingEnds = new Date(proposal.voting_ends_at);
-    
-    if (now > votingEnds) {
-      const totalVotes = (proposal.votes_for || 0) + (proposal.votes_against || 0);
-      if (totalVotes >= (proposal.quorum_required || 50)) {
-        return proposal.votes_for > proposal.votes_against ? 'passed' : 'rejected';
-      }
-      return 'rejected';
-    }
-    return 'active';
+  const onSubmit = (data: ProposalFormData) => {
+    createProposalMutation.mutate(data);
   };
 
-  const getStatusColor = (status: string) => {
+  const handleVote = (proposalId: string, voteChoice: boolean) => {
+    voteOnProposalMutation.mutate({ proposalId, voteChoice });
+  };
+
+  const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-blue-500';
-      case 'passed': return 'bg-green-500';
-      case 'rejected': return 'bg-red-500';
-      case 'executed': return 'bg-purple-500';
-      default: return 'bg-gray-500';
+      case 'active':
+        return <Badge className="bg-green-600/20 text-green-400 border-green-600/30">Actif</Badge>;
+      case 'passed':
+        return <Badge className="bg-blue-600/20 text-blue-400 border-blue-600/30">Adopté</Badge>;
+      case 'rejected':
+        return <Badge className="bg-red-600/20 text-red-400 border-red-600/30">Rejeté</Badge>;
+      default:
+        return <Badge variant="outline">Inconnu</Badge>;
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'active': return 'En cours';
-      case 'passed': return 'Approuvée';
-      case 'rejected': return 'Rejetée';
-      case 'executed': return 'Exécutée';
-      default: return 'Inconnue';
-    }
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
   };
 
-  const calculateProgress = (proposal: any) => {
-    const totalVotes = (proposal.votes_for || 0) + (proposal.votes_against || 0);
-    const quorum = proposal.quorum_required || 50;
-    return Math.min((totalVotes / quorum) * 100, 100);
-  };
-
-  const hasUserVoted = (proposalId: string) => {
-    return userVotes?.some(vote => vote.proposal_id === proposalId);
-  };
-
-  const getUserVote = (proposalId: string) => {
-    return userVotes?.find(vote => vote.proposal_id === proposalId);
-  };
-
-  const daysUntilEnd = (endDate: string) => {
-    const now = new Date();
-    const end = new Date(endDate);
-    const diffTime = end.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return Math.max(0, diffDays);
+  const calculateVoteProgress = (votesFor: number, votesAgainst: number) => {
+    const total = votesFor + votesAgainst;
+    if (total === 0) return 0;
+    return (votesFor / total) * 100;
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-white mb-2">Module DAO</h2>
-          <p className="text-gray-400">Participez à la gouvernance décentralisée de Veegox</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-white">DAO Gouvernance</h1>
+          <p className="text-gray-400 text-sm md:text-base">
+            Participez à la gouvernance décentralisée de Veegox
+          </p>
         </div>
-        <Button
-          onClick={() => setShowCreateForm(true)}
-          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Nouvelle Proposition
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Link to="/governance">
+            <Button variant="outline" className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10">
+              <Vote className="h-4 w-4 mr-2" />
+              Gouvernance Avancée
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      {/* DAO Stats */}
-      <div className="grid md:grid-cols-4 gap-4">
-        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-          <CardContent className="p-6 text-center">
-            <Vote className="h-8 w-8 mx-auto mb-2 text-blue-500" />
-            <div className="text-2xl font-bold text-white">
-              {proposals?.length || 0}
-            </div>
-            <div className="text-sm text-gray-400">Propositions Totales</div>
-          </CardContent>
-        </Card>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1 gap-1 h-auto p-1' : 'grid-cols-3'} bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1`}>
+          <TabsTrigger 
+            value="proposals"
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+          >
+            {isMobile ? "📊 Propositions" : "Propositions"}
+          </TabsTrigger>
+          <TabsTrigger 
+            value="create"
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+          >
+            {isMobile ? "➕ Créer" : "Créer une Proposition"}
+          </TabsTrigger>
+          <TabsTrigger 
+            value="stats"
+            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
+          >
+            {isMobile ? "📈 Stats" : "Statistiques"}
+          </TabsTrigger>
+        </TabsList>
 
-        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-          <CardContent className="p-6 text-center">
-            <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
-            <div className="text-2xl font-bold text-white">
-              {proposals?.filter(p => getProposalStatus(p) === 'passed').length || 0}
-            </div>
-            <div className="text-sm text-gray-400">Approuvées</div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-          <CardContent className="p-6 text-center">
-            <Clock className="h-8 w-8 mx-auto mb-2 text-orange-500" />
-            <div className="text-2xl font-bold text-white">
-              {proposals?.filter(p => getProposalStatus(p) === 'active').length || 0}
-            </div>
-            <div className="text-sm text-gray-400">En Cours</div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-          <CardContent className="p-6 text-center">
-            <Users className="h-8 w-8 mx-auto mb-2 text-purple-500" />
-            <div className="text-2xl font-bold text-white">1,247</div>
-            <div className="text-sm text-gray-400">Votants Actifs</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Create Proposal Form */}
-      {showCreateForm && (
-        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white">Créer une Nouvelle Proposition</CardTitle>
-            <CardDescription className="text-gray-400">
-              Soumettez votre idée à la communauté pour vote
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="title" className="text-white">Titre de la Proposition</Label>
-                <Input
-                  id="title"
-                  placeholder="Amélioration du protocole..."
-                  value={proposalData.title}
-                  onChange={(e) => setProposalData({...proposalData, title: e.target.value})}
-                  className="bg-slate-800 border-slate-600 text-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-white">Type de Proposition</Label>
-                <Select 
-                  value={proposalData.proposal_type} 
-                  onValueChange={(value) => setProposalData({...proposalData, proposal_type: value})}
-                >
-                  <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
-                    <SelectValue placeholder="Sélectionner..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="protocol">Protocole</SelectItem>
-                    <SelectItem value="treasury">Trésorerie</SelectItem>
-                    <SelectItem value="governance">Gouvernance</SelectItem>
-                    <SelectItem value="partnership">Partenariat</SelectItem>
-                    <SelectItem value="other">Autre</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-white">Description Détaillée</Label>
-              <Textarea
-                id="description"
-                placeholder="Décrivez votre proposition en détail..."
-                rows={6}
-                value={proposalData.description}
-                onChange={(e) => setProposalData({...proposalData, description: e.target.value})}
-                className="bg-slate-800 border-slate-600 text-white"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-white">Durée de Vote (jours)</Label>
-              <Select 
-                value={proposalData.voting_duration} 
-                onValueChange={(value) => setProposalData({...proposalData, voting_duration: value})}
-              >
-                <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="3">3 jours</SelectItem>
-                  <SelectItem value="7">7 jours</SelectItem>
-                  <SelectItem value="14">14 jours</SelectItem>
-                  <SelectItem value="30">30 jours</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex justify-end space-x-2">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowCreateForm(false)}
-                className="border-slate-600 text-white hover:bg-slate-800"
-              >
-                Annuler
-              </Button>
-              <Button 
-                onClick={() => createProposalMutation.mutate(proposalData)}
-                disabled={!proposalData.title || !proposalData.description || createProposalMutation.isPending}
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-              >
-                {createProposalMutation.isPending ? "Création..." : "Créer la Proposition"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Proposals List */}
-      <div className="space-y-4">
-        {proposals && proposals.length > 0 ? (
-          proposals.map((proposal) => {
-            const status = getProposalStatus(proposal);
-            const userVote = getUserVote(proposal.id);
-            const progress = calculateProgress(proposal);
-            const daysLeft = daysUntilEnd(proposal.voting_ends_at);
-
-            return (
-              <Card key={proposal.id} className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Badge className={`${getStatusColor(status)} text-white`}>
-                          {getStatusLabel(status)}
-                        </Badge>
-                        <Badge variant="outline" className="border-slate-600 text-white">
+        <TabsContent value="proposals" className="mt-4 md:mt-6">
+          <div className="space-y-4">
+            {isLoading ? (
+              <div className="text-center py-8 text-gray-400">Chargement des propositions...</div>
+            ) : proposals && proposals.length > 0 ? (
+              proposals.map((proposal) => (
+                <Card key={proposal.id} className="bg-white/5 border-white/10 backdrop-blur-sm">
+                  <CardHeader className="pb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <CardTitle className="text-white text-lg">{proposal.title}</CardTitle>
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(proposal.status)}
+                        <Badge variant="outline" className="text-gray-300 border-gray-600">
                           {proposal.proposal_type}
                         </Badge>
-                        {status === 'active' && (
-                          <Badge variant="outline" className="border-orange-500 text-orange-500">
-                            <Clock className="h-3 w-3 mr-1" />
-                            {daysLeft} jour{daysLeft !== 1 ? 's' : ''} restant{daysLeft !== 1 ? 's' : ''}
-                          </Badge>
-                        )}
                       </div>
-                      <CardTitle className="text-white">{proposal.title}</CardTitle>
-                      <CardDescription className="text-gray-400 mt-2">
-                        Par {proposal.profiles?.full_name || proposal.profiles?.username || 'Utilisateur'} • 
-                        {new Date(proposal.created_at || '').toLocaleDateString()}
-                      </CardDescription>
                     </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  <p className="text-gray-300">{proposal.description}</p>
-
-                  {/* Voting Results */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Participation</span>
-                      <span className="text-white">
-                        {((proposal.votes_for || 0) + (proposal.votes_against || 0))} / {proposal.quorum_required || 50} votes
-                      </span>
-                    </div>
-                    <Progress value={progress} className="h-2" />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-green-500/20 rounded-lg">
-                      <div className="text-2xl font-bold text-green-500">
-                        {proposal.votes_for || 0}
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-gray-300 text-sm">{proposal.description}</p>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-400">Votes Pour/Contre</span>
+                        <span className="text-white">
+                          {proposal.votes_for || 0} / {proposal.votes_against || 0}
+                        </span>
                       </div>
-                      <div className="text-sm text-gray-400">Pour</div>
+                      <Progress 
+                        value={calculateVoteProgress(proposal.votes_for || 0, proposal.votes_against || 0)} 
+                        className="h-2 bg-gray-700"
+                      />
                     </div>
-                    <div className="text-center p-3 bg-red-500/20 rounded-lg">
-                      <div className="text-2xl font-bold text-red-500">
-                        {proposal.votes_against || 0}
+
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 text-xs text-gray-400">
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          <span>Fin: {formatDate(proposal.voting_ends_at)}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Users className="h-3 w-3" />
+                          <span>{(proposal.votes_for || 0) + (proposal.votes_against || 0)} votes</span>
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-400">Contre</div>
+
+                      {proposal.status === 'active' && (
+                        <div className="flex gap-2 w-full sm:w-auto">
+                          <Button
+                            onClick={() => handleVote(proposal.id, true)}
+                            disabled={voteOnProposalMutation.isPending}
+                            className={`flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'h-10' : ''}`}
+                            size={isMobile ? "default" : "sm"}
+                          >
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Pour
+                          </Button>
+                          <Button
+                            onClick={() => handleVote(proposal.id, false)}
+                            disabled={voteOnProposalMutation.isPending}
+                            className={`flex-1 sm:flex-none bg-red-600 hover:bg-red-700 text-white ${isMobile ? 'h-10' : ''}`}
+                            size={isMobile ? "default" : "sm"}
+                          >
+                            <XCircle className="h-4 w-4 mr-1" />
+                            Contre
+                          </Button>
+                        </div>
+                      )}
                     </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                <CardContent className="pt-6">
+                  <div className="text-center py-8">
+                    <Vote className="h-16 w-16 mx-auto text-gray-500 mb-4" />
+                    <h3 className="text-xl font-semibold text-white mb-2">Aucune proposition</h3>
+                    <p className="text-gray-400 mb-4">
+                      Soyez le premier à créer une proposition pour la communauté
+                    </p>
+                    <Button 
+                      onClick={() => setActiveTab("create")}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Créer une proposition
+                    </Button>
                   </div>
-
-                  {/* Voting Buttons */}
-                  {status === 'active' && !hasUserVoted(proposal.id) && (
-                    <div className="flex space-x-2">
-                      <Button
-                        onClick={() => voteMutation.mutate({ proposalId: proposal.id, choice: true })}
-                        disabled={voteMutation.isPending}
-                        className="flex-1 bg-green-500 hover:bg-green-600"
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Voter Pour
-                      </Button>
-                      <Button
-                        onClick={() => voteMutation.mutate({ proposalId: proposal.id, choice: false })}
-                        disabled={voteMutation.isPending}
-                        variant="outline"
-                        className="flex-1 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Voter Contre
-                      </Button>
-                    </div>
-                  )}
-
-                  {userVote && (
-                    <div className="flex items-center justify-center p-2 bg-slate-800/50 rounded-lg">
-                      <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                      <span className="text-white">
-                        Vous avez voté {userVote.vote_choice ? 'Pour' : 'Contre'}
-                      </span>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
-            );
-          })
-        ) : (
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="create" className="mt-4 md:mt-6">
           <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-            <CardContent className="p-8 text-center">
-              <Vote className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-medium text-white mb-2">Aucune proposition active</h3>
-              <p className="text-gray-400 mb-4">Soyez le premier à proposer une amélioration !</p>
-              <Button
-                onClick={() => setShowCreateForm(true)}
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Créer une proposition
-              </Button>
+            <CardHeader>
+              <CardTitle className="text-white">Créer une Nouvelle Proposition</CardTitle>
+              <CardDescription className="text-gray-400">
+                Soumettez une proposition à la communauté pour vote
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2 space-y-2">
+                    <label htmlFor="title" className="text-sm font-medium text-white">
+                      Titre de la proposition *
+                    </label>
+                    <Input
+                      id="title"
+                      placeholder="Titre court et descriptif"
+                      {...register("title", { required: "Un titre est requis" })}
+                      className={`bg-slate-800 border-slate-600 text-white ${isMobile ? 'h-12' : ''}`}
+                    />
+                    {errors.title && <p className="text-xs text-red-400">{errors.title.message}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="proposal_type" className="text-sm font-medium text-white">
+                      Type de proposition *
+                    </label>
+                    <select
+                      id="proposal_type"
+                      {...register("proposal_type", { required: "Un type est requis" })}
+                      className={`w-full bg-slate-800 border-slate-600 text-white rounded-md px-3 py-2 ${isMobile ? 'h-12' : ''}`}
+                    >
+                      <option value="">Sélectionner un type</option>
+                      <option value="governance">Gouvernance</option>
+                      <option value="treasury">Trésorerie</option>
+                      <option value="protocol">Protocole</option>
+                      <option value="partnership">Partenariat</option>
+                    </select>
+                    {errors.proposal_type && <p className="text-xs text-red-400">{errors.proposal_type.message}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="voting_ends_at" className="text-sm font-medium text-white">
+                      Date de fin du vote *
+                    </label>
+                    <Input
+                      id="voting_ends_at"
+                      type="datetime-local"
+                      {...register("voting_ends_at", { required: "Une date de fin est requise" })}
+                      className={`bg-slate-800 border-slate-600 text-white ${isMobile ? 'h-12' : ''}`}
+                    />
+                    {errors.voting_ends_at && <p className="text-xs text-red-400">{errors.voting_ends_at.message}</p>}
+                  </div>
+
+                  <div className="md:col-span-2 space-y-2">
+                    <label htmlFor="description" className="text-sm font-medium text-white">
+                      Description détaillée *
+                    </label>
+                    <Textarea
+                      id="description"
+                      placeholder="Décrivez votre proposition en détail..."
+                      rows={6}
+                      {...register("description", { required: "Une description est requise" })}
+                      className="bg-slate-800 border-slate-600 text-white resize-none"
+                    />
+                    {errors.description && <p className="text-xs text-red-400">{errors.description.message}</p>}
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                  <Button 
+                    type="submit" 
+                    disabled={createProposalMutation.isPending}
+                    className={`flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 ${isMobile ? 'h-12' : ''}`}
+                  >
+                    {createProposalMutation.isPending ? "Création..." : "Créer la proposition"}
+                  </Button>
+                </div>
+              </form>
             </CardContent>
           </Card>
-        )}
-      </div>
+        </TabsContent>
+
+        <TabsContent value="stats" className="mt-4 md:mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white text-lg">Propositions Totales</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl md:text-3xl font-bold text-white mb-2">
+                  {proposals?.length || 0}
+                </div>
+                <div className="text-gray-400 text-sm">Toutes les propositions</div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white text-lg">Propositions Actives</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl md:text-3xl font-bold text-green-400 mb-2">
+                  {proposals?.filter(p => p.status === 'active').length || 0}
+                </div>
+                <div className="text-gray-400 text-sm">En cours de vote</div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white text-lg">Taux d'Adoption</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-2">
+                  {proposals && proposals.length > 0 
+                    ? Math.round((proposals.filter(p => p.status === 'passed').length / proposals.length) * 100)
+                    : 0}%
+                </div>
+                <div className="text-gray-400 text-sm">Propositions adoptées</div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
-};
-
-export default DAOModule;
+}

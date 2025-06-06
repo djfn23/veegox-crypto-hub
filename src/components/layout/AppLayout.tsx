@@ -17,7 +17,13 @@ import {
   Info,
   Scale,
   Menu,
-  X
+  X,
+  BarChart3,
+  MessageSquare,
+  Vote,
+  Brain,
+  Search,
+  Plus
 } from "lucide-react"
 import { useState } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -32,9 +38,16 @@ const navigation = [
   { name: "Tokens", href: "/tokens", icon: Coins },
   { name: "Crédit", href: "/credit", icon: CreditCard },
   { name: "Staking", href: "/staking", icon: TrendingUp },
-  { name: "DAO", href: "/dao", icon: Users },
   { name: "Exchange", href: "/exchange", icon: TrendingUp },
+  { name: "Trading", href: "/trading", icon: BarChart3 },
+  { name: "DAO", href: "/dao", icon: Users },
+  { name: "Gouvernance", href: "/governance", icon: Vote },
   { name: "Crowdfunding", href: "/crowdfunding", icon: Users },
+  { name: "Créer Campagne", href: "/create-campaign", icon: Plus },
+  { name: "Analyse Marché", href: "/market-analysis", icon: Search },
+  { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "IA Recommandations", href: "/ai-recommendations", icon: Brain },
+  { name: "Social", href: "/social", icon: MessageSquare },
 ]
 
 const secondaryNavigation = [
