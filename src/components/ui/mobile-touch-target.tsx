@@ -38,13 +38,13 @@ const touchTargetVariants = cva(
 )
 
 export interface TouchTargetProps
-  extends React.HTMLAttributes<HTMLElement>,
+  extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof touchTargetVariants> {
   asChild?: boolean
   disabled?: boolean
 }
 
-const TouchTarget = React.forwardRef<HTMLElement, TouchTargetProps>(
+const TouchTarget = React.forwardRef<HTMLDivElement, TouchTargetProps>(
   ({ className, size, variant, shape, asChild = false, disabled = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "div"
     
@@ -54,7 +54,7 @@ const TouchTarget = React.forwardRef<HTMLElement, TouchTargetProps>(
           touchTargetVariants({ size, variant, shape, className }),
           disabled && "opacity-50 cursor-not-allowed pointer-events-none"
         )}
-        ref={ref}
+        ref={ref as any}
         {...props}
       />
     )

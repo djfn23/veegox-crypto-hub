@@ -38,7 +38,7 @@ interface MobileSectionProps extends React.HTMLAttributes<HTMLElement> {
   as?: "section" | "div" | "article" | "main"
 }
 
-export const MobileSection = React.forwardRef<HTMLElement, MobileSectionProps>(
+export const MobileSection = React.forwardRef<HTMLDivElement, MobileSectionProps>(
   ({ className, size = "default", as: Component = "section", ...props }, ref) => {
     const sizeClasses = {
       sm: "py-4 md:py-6",
@@ -48,7 +48,7 @@ export const MobileSection = React.forwardRef<HTMLElement, MobileSectionProps>(
     
     return (
       <Component
-        ref={ref}
+        ref={ref as any}
         className={cn(sizeClasses[size], className)}
         {...props}
       />
@@ -143,9 +143,7 @@ interface MobileHeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
 }
 
 export const MobileHeading = React.forwardRef<HTMLHeadingElement, MobileHeadingProps>(
-  ({ className, level, responsive = true, ...props }, ref) => {
-    const Component = `h${level}` as keyof JSX.IntrinsicElements
-    
+  ({ className, level, responsive = true, children, ...props }, ref) => {
     const classes = responsive ? {
       1: "mobile-h1",
       2: "mobile-h2", 
@@ -162,12 +160,16 @@ export const MobileHeading = React.forwardRef<HTMLHeadingElement, MobileHeadingP
       6: "text-xs font-medium"
     }
     
-    return (
-      <Component
-        ref={ref}
-        className={cn(classes[level], "text-white", className)}
-        {...props}
-      />
+    const Component = `h${level}` as keyof JSX.IntrinsicElements
+    
+    return React.createElement(
+      Component,
+      {
+        ref: ref as any,
+        className: cn(classes[level], "text-white", className),
+        ...props
+      },
+      children
     )
   }
 )
