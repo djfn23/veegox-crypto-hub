@@ -1,12 +1,13 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { GlassCard } from "@/components/ui/glass-card";
 import { GradientButton } from "@/components/ui/gradient-button";
-import { StatsCard } from "@/components/ui/stats-card";
-import { AnimatedNumber } from "@/components/ui/animated-number";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Wallet as WalletIcon, TrendingUp, TrendingDown, Clock, Send, ArrowUpDown, Eye, Copy, Plus, Download, Upload } from "lucide-react";
+import { WalletOverview } from "@/components/wallet/WalletOverview";
+import { AssetsTab } from "@/components/wallet/AssetsTab";
+import { TransactionsTab } from "@/components/wallet/TransactionsTab";
+import { WalletsTab } from "@/components/wallet/WalletsTab";
+import { Wallet as WalletIcon, Download, Plus } from "lucide-react";
 
 const Wallet = () => {
   const [selectedWallet, setSelectedWallet] = useState("metamask");
@@ -31,8 +32,6 @@ const Wallet = () => {
     { type: "stake", amount: "1.0 ETH", to: "Lido", time: "Il y a 2 jours", status: "confirmé", hash: "0xabc...123" }
   ];
 
-  const totalValue = wallets.reduce((sum, wallet) => sum + wallet.usdValue, 0);
-
   return (
     <div className="max-w-7xl mx-auto">
       <PageHeader
@@ -53,38 +52,7 @@ const Wallet = () => {
         }
       />
 
-      <div className="grid md:grid-cols-4 gap-6 mb-8">
-        <StatsCard
-          title="Valeur Totale"
-          value={<AnimatedNumber value={totalValue} prefix="$" suffix="" className="text-3xl font-bold text-white" />}
-          change="+$425.50 (+3.3%)"
-          changeType="positive"
-          icon={<TrendingUp className="h-6 w-6 text-green-400" />}
-          variant="primary"
-        />
-
-        <StatsCard
-          title="Portefeuilles"
-          value={wallets.filter(w => w.connected).length}
-          icon={<WalletIcon className="h-6 w-6 text-blue-400" />}
-          variant="secondary"
-        />
-
-        <StatsCard
-          title="Actifs"
-          value={assets.length}
-          icon={<Eye className="h-6 w-6 text-purple-400" />}
-          variant="accent"
-        />
-
-        <StatsCard
-          title="Transactions"
-          value="24h"
-          change="+12"
-          changeType="positive"
-          icon={<ArrowUpDown className="h-6 w-6 text-pink-400" />}
-        />
-      </div>
+      <WalletOverview wallets={wallets} assetsCount={assets.length} />
 
       <Tabs defaultValue="assets" className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1">
@@ -100,138 +68,15 @@ const Wallet = () => {
         </TabsList>
 
         <TabsContent value="assets" className="mt-6">
-          <GlassCard className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-white">Mes Actifs</h3>
-              <div className="flex space-x-2">
-                <GradientButton variant="ghost" size="sm">
-                  <Upload className="h-4 w-4" />
-                  Déposer
-                </GradientButton>
-                <GradientButton variant="ghost" size="sm">
-                  <Download className="h-4 w-4" />
-                  Retirer
-                </GradientButton>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              {assets.map((asset) => (
-                <GlassCard key={asset.symbol} className="p-4 hover:scale-[1.01] transition-all duration-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className={`w-12 h-12 bg-gradient-to-r ${asset.color} rounded-full flex items-center justify-center shadow-lg`}>
-                        <span className="text-white font-bold text-lg">{asset.symbol.slice(0, 2)}</span>
-                      </div>
-                      <div>
-                        <div className="text-white font-semibold text-lg">{asset.name}</div>
-                        <div className="text-gray-400 text-sm">{asset.balance} {asset.symbol}</div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-white font-semibold text-lg">
-                        <AnimatedNumber value={asset.value} prefix="$" />
-                      </div>
-                      <div className={`text-sm font-medium ${
-                        asset.changeType === 'positive' ? 'text-green-400' : 
-                        asset.changeType === 'negative' ? 'text-red-400' : 'text-gray-400'
-                      }`}>
-                        {asset.change}
-                      </div>
-                    </div>
-                  </div>
-                </GlassCard>
-              ))}
-            </div>
-          </GlassCard>
+          <AssetsTab assets={assets} />
         </TabsContent>
 
         <TabsContent value="transactions" className="mt-6">
-          <GlassCard className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-white">Historique des Transactions</h3>
-              <GradientButton variant="ghost" size="sm">
-                <Copy className="h-4 w-4" />
-                Exporter CSV
-              </GradientButton>
-            </div>
-            
-            <div className="space-y-4">
-              {transactions.map((tx, index) => (
-                <GlassCard key={index} className="p-4 hover:bg-white/10 transition-all duration-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        {tx.type === 'send' && <Send className="h-5 w-5 text-red-400" />}
-                        {tx.type === 'receive' && <TrendingDown className="h-5 w-5 text-green-400" />}
-                        {tx.type === 'swap' && <ArrowUpDown className="h-5 w-5 text-blue-400" />}
-                        {tx.type === 'stake' && <Clock className="h-5 w-5 text-purple-400" />}
-                      </div>
-                      <div>
-                        <div className="text-white font-semibold capitalize">{tx.type}</div>
-                        <div className="text-gray-400 text-sm">{tx.time}</div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-white font-medium">{tx.amount}</div>
-                      <Badge variant="secondary" className="mt-1 bg-green-500/20 text-green-400 border-green-500/30">
-                        {tx.status}
-                      </Badge>
-                    </div>
-                  </div>
-                </GlassCard>
-              ))}
-            </div>
-          </GlassCard>
+          <TransactionsTab transactions={transactions} />
         </TabsContent>
 
         <TabsContent value="wallets" className="mt-6">
-          <GlassCard className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-white">Gestion des Portefeuilles</h3>
-              <GradientButton variant="primary" size="sm">
-                <Plus className="h-4 w-4" />
-                Nouveau Wallet
-              </GradientButton>
-            </div>
-            
-            <div className="space-y-4">
-              {wallets.map((wallet) => (
-                <GlassCard key={wallet.id} className="p-4 hover:scale-[1.01] transition-all duration-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                        <span className="text-2xl">{wallet.icon}</span>
-                      </div>
-                      <div>
-                        <div className="text-white font-semibold text-lg">{wallet.name}</div>
-                        <div className="text-gray-400 text-sm">{wallet.balance}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <div className="text-white font-semibold">
-                          <AnimatedNumber value={wallet.usdValue} prefix="$" />
-                        </div>
-                        <Badge 
-                          variant={wallet.connected ? "default" : "secondary"}
-                          className={wallet.connected ? "bg-green-500/20 text-green-400 border-green-500/30" : ""}
-                        >
-                          {wallet.connected ? "Connecté" : "Déconnecté"}
-                        </Badge>
-                      </div>
-                      <GradientButton 
-                        variant={wallet.connected ? "outline" : "primary"}
-                        size="sm"
-                      >
-                        {wallet.connected ? "Déconnecter" : "Connecter"}
-                      </GradientButton>
-                    </div>
-                  </div>
-                </GlassCard>
-              ))}
-            </div>
-          </GlassCard>
+          <WalletsTab wallets={wallets} />
         </TabsContent>
       </Tabs>
     </div>
