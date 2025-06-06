@@ -89,7 +89,7 @@ const CreditModule = () => {
 
   // Mutation pour calculer/recalculer le score de crédit
   const calculateScoreMutation = useMutation({
-    mutationFn: async (address) => {
+    mutationFn: async (address: string) => {
       setIsRecalculating(true);
       
       try {
@@ -216,18 +216,38 @@ const CreditModule = () => {
     },
   });
 
-  const statusColors = {
+  const statusColors: Record<string, string> = {
     pending: "bg-yellow-500",
     active: "bg-green-500",
     repaid: "bg-blue-500",
     defaulted: "bg-red-500"
   };
 
-  const statusLabels = {
+  const statusLabels: Record<string, string> = {
     pending: "En attente",
     active: "Actif",
     repaid: "Remboursé",
     defaulted: "Défaut"
+  };
+
+  const handleCollateralTokenChange = (value: string) => {
+    setLoanData({...loanData, collateral_token_address: value});
+  };
+
+  const handleCollateralAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoanData({...loanData, collateral_amount: e.target.value});
+  };
+
+  const handleLoanTokenChange = (value: string) => {
+    setLoanData({...loanData, loan_token_address: value});
+  };
+  
+  const handleLoanAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoanData({...loanData, loan_amount: e.target.value});
+  };
+
+  const handleWalletAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWalletAddress(e.target.value);
   };
 
   return (
@@ -325,7 +345,7 @@ const CreditModule = () => {
                       <Input
                         placeholder="Adresse de portefeuille"
                         value={walletAddress}
-                        onChange={(e) => setWalletAddress(e.target.value)}
+                        onChange={handleWalletAddressChange}
                         className="bg-slate-800 border-slate-600 text-white"
                       />
                       <Button
@@ -365,7 +385,7 @@ const CreditModule = () => {
                 <Label className="text-white">Token de Garantie</Label>
                 <Select 
                   value={loanData.collateral_token_address} 
-                  onValueChange={(value) => setLoanData({...loanData, collateral_token_address: value})}
+                  onValueChange={handleCollateralTokenChange}
                 >
                   <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
                     <SelectValue placeholder="Sélectionner..." />
@@ -383,7 +403,7 @@ const CreditModule = () => {
                   type="number"
                   placeholder="0.5"
                   value={loanData.collateral_amount}
-                  onChange={(e) => setLoanData({...loanData, collateral_amount: e.target.value})}
+                  onChange={handleCollateralAmountChange}
                   className="bg-slate-800 border-slate-600 text-white"
                 />
               </div>
@@ -394,7 +414,7 @@ const CreditModule = () => {
                 <Label className="text-white">Token de Prêt</Label>
                 <Select 
                   value={loanData.loan_token_address} 
-                  onValueChange={(value) => setLoanData({...loanData, loan_token_address: value})}
+                  onValueChange={handleLoanTokenChange}
                 >
                   <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
                     <SelectValue placeholder="Sélectionner..." />
@@ -412,7 +432,7 @@ const CreditModule = () => {
                   type="number"
                   placeholder="500"
                   value={loanData.loan_amount}
-                  onChange={(e) => setLoanData({...loanData, loan_amount: e.target.value})}
+                  onChange={handleLoanAmountChange}
                   className="bg-slate-800 border-slate-600 text-white"
                 />
               </div>
