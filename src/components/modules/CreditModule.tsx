@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -33,7 +32,13 @@ const CreditModule = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      return data;
+      if (!data) return null;
+
+      return {
+        score: data.score || 0,
+        last_calculated: data.last_calculated || '',
+        factors: data.factors as Record<string, any> || null
+      };
     },
   });
 
@@ -125,7 +130,10 @@ const CreditModule = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold text-white mb-2">Module Crédit</h2>
-        <p className="text-gray-400">Prêts décentralisés avec scoring de crédit intelligent</p>
+        <p className="text-gray-400">Prêts décentralisés avec scoring de crédit IA - Révolutionnant la DeFi traditionnelle</p>
+        <div className="mt-2 text-sm text-blue-400">
+          🚀 Avantage concurrentiel : IA intégrée vs solutions traditionnelles comme Aave
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { Shield } from "lucide-react";
+import { Shield, Brain, TrendingUp } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -83,9 +83,16 @@ const CreditScoreCard = ({ creditScore, userWallet, isLoadingScore }: CreditScor
     <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="text-white flex items-center">
-          <Shield className="h-5 w-5 mr-2" />
-          Score de Crédit
+          <div className="flex items-center mr-2">
+            <Shield className="h-5 w-5 mr-1" />
+            <Brain className="h-4 w-4 text-purple-400" />
+          </div>
+          Score de Crédit IA
         </CardTitle>
+        <div className="text-xs text-purple-400 flex items-center">
+          <TrendingUp className="h-3 w-3 mr-1" />
+          Avantage concurrentiel vs scoring traditionnel
+        </div>
       </CardHeader>
       <CardContent>
         {creditScore ? (
@@ -96,6 +103,9 @@ const CreditScoreCard = ({ creditScore, userWallet, isLoadingScore }: CreditScor
               </div>
               <div className="text-gray-400 text-sm">
                 {getScoreLabel(creditScore.score || 0)}
+              </div>
+              <div className="text-xs text-purple-400 mt-1">
+                🤖 Optimisé par IA vs méthodes traditionnelles
               </div>
             </div>
             <Progress 
@@ -108,7 +118,10 @@ const CreditScoreCard = ({ creditScore, userWallet, isLoadingScore }: CreditScor
 
             {creditScore.factors && (
               <div className="mt-4 space-y-3">
-                <div className="text-sm font-medium text-white">Facteurs de score</div>
+                <div className="text-sm font-medium text-white flex items-center">
+                  <Brain className="h-4 w-4 mr-2 text-purple-400" />
+                  Analyse IA Avancée
+                </div>
                 {Object.entries(creditScore.factors as Record<string, any>).map(([key, value]) => (
                   <div key={key} className="flex justify-between items-center">
                     <span className="text-xs text-gray-400">
@@ -133,14 +146,22 @@ const CreditScoreCard = ({ creditScore, userWallet, isLoadingScore }: CreditScor
                 onClick={() => userWallet && calculateScoreMutation.mutate(userWallet.address)}
                 className="w-full border-slate-600 text-white hover:bg-slate-800"
               >
-                {isRecalculating ? "Calcul en cours..." : "Recalculer mon score"}
+                {isRecalculating ? "Calcul IA en cours..." : "Recalculer avec IA"}
               </Button>
             </div>
           </div>
         ) : (
           <div className="text-center py-4">
-            <Shield className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <p className="text-gray-400 mb-4">Score non calculé</p>
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <Shield className="h-12 w-12 text-gray-400" />
+                <Brain className="h-6 w-6 text-purple-400 absolute -top-1 -right-1" />
+              </div>
+            </div>
+            <p className="text-gray-400 mb-2">Score IA non calculé</p>
+            <p className="text-xs text-purple-400 mb-4">
+              🚀 Technologie exclusive : Scoring par IA vs concurrents traditionnels
+            </p>
             
             {userWallet ? (
               <div className="space-y-4">
@@ -157,7 +178,7 @@ const CreditScoreCard = ({ creditScore, userWallet, isLoadingScore }: CreditScor
                   onClick={() => calculateScoreMutation.mutate(userWallet.address)}
                   className="border-slate-600 text-white hover:bg-slate-800"
                 >
-                  {isRecalculating ? "Calcul en cours..." : "Calculer mon score"}
+                  {isRecalculating ? "Analyse IA..." : "Lancer l'analyse IA"}
                 </Button>
               </div>
             ) : (
@@ -176,7 +197,7 @@ const CreditScoreCard = ({ creditScore, userWallet, isLoadingScore }: CreditScor
                     onClick={() => calculateScoreMutation.mutate(walletAddress)}
                     className="border-slate-600 text-white hover:bg-slate-800"
                   >
-                    {isRecalculating ? "..." : "Calculer"}
+                    {isRecalculating ? "IA..." : "Analyser"}
                   </Button>
                 </div>
                 <div className="text-xs text-gray-400">

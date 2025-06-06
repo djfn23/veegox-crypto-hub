@@ -10,7 +10,7 @@ export interface LoanData {
 export interface CreditScore {
   score: number;
   last_calculated: string;
-  factors?: Record<string, any>;
+  factors?: Record<string, any> | null;
 }
 
 export interface Loan {
