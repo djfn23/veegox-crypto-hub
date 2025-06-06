@@ -20,7 +20,7 @@ export const useOptimizedTokenBalances = (address: string | null, chainId: numbe
     enabled: !!address,
     refetchInterval: 30000,
     staleTime: 15000, // Consider data stale after 15 seconds
-    cacheTime: 300000, // Keep in cache for 5 minutes
+    gcTime: 300000, // Keep in cache for 5 minutes (updated from cacheTime)
     retry: (failureCount, error) => {
       // Custom retry logic
       if (failureCount >= 3) return false;
@@ -47,7 +47,7 @@ export const useOptimizedTransactionHistory = (address: string | null, chainId: 
     enabled: !!address,
     refetchInterval: 60000,
     staleTime: 30000,
-    cacheTime: 600000, // Keep in cache for 10 minutes
+    gcTime: 600000, // Keep in cache for 10 minutes (updated from cacheTime)
   });
 };
 
@@ -68,7 +68,7 @@ export const useOptimizedWalletBalance = (address: string | null, chainId: numbe
     enabled: !!address,
     refetchInterval: 30000,
     staleTime: 15000,
-    cacheTime: 300000,
+    gcTime: 300000, // Updated from cacheTime
   });
 };
 

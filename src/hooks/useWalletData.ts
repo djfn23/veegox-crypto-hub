@@ -4,7 +4,7 @@ import { Web3Service } from "@/services/web3Service";
 import { useAppStore } from "@/store/useAppStore";
 
 export const useWalletBalance = (address: string | null, chainId: number = 1) => {
-  const { setLoading } = useAppStore();
+  const { setLoading, addNotification } = useAppStore();
   
   return useQuery({
     queryKey: ['wallet-balance', address, chainId],
@@ -13,15 +13,15 @@ export const useWalletBalance = (address: string | null, chainId: number = 1) =>
       try {
         const result = await Web3Service.getWalletBalance(address!, chainId);
         return result;
+      } catch (error) {
+        setLoading('wallets', false);
+        throw error;
       } finally {
         setLoading('wallets', false);
       }
     },
     enabled: !!address,
     refetchInterval: 30000,
-    onError: () => {
-      setLoading('wallets', false);
-    },
   });
 };
 
@@ -35,21 +35,21 @@ export const useTransactionHistory = (address: string | null, chainId: number = 
       try {
         const result = await Web3Service.getTransactionHistory(address!, chainId);
         return result;
+      } catch (error) {
+        setLoading('transactions', false);
+        addNotification({
+          title: 'Erreur de chargement',
+          message: 'Impossible de récupérer l\'historique des transactions',
+          type: 'error',
+          read: false,
+        });
+        throw error;
       } finally {
         setLoading('transactions', false);
       }
     },
     enabled: !!address,
     refetchInterval: 60000,
-    onError: (error: any) => {
-      setLoading('transactions', false);
-      addNotification({
-        title: 'Erreur de chargement',
-        message: 'Impossible de récupérer l\'historique des transactions',
-        type: 'error',
-        read: false,
-      });
-    },
   });
 };
 
