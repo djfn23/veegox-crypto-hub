@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,8 +6,20 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import TokenManager from "./components/modules/TokenManager";
+import CreditModule from "./components/modules/CreditModule";
+import StakingModule from "./components/modules/StakingModule";
+import DAOModule from "./components/modules/DAOModule";
+import ProfileSettings from "./components/modules/ProfileSettings";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1
+    }
+  }
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -16,7 +29,11 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/tokens" element={<TokenManager />} />
+          <Route path="/credit" element={<CreditModule />} />
+          <Route path="/staking" element={<StakingModule />} />
+          <Route path="/dao" element={<DAOModule />} />
+          <Route path="/profile" element={<ProfileSettings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
