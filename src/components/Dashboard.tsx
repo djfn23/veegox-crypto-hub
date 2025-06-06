@@ -17,6 +17,8 @@ import {
   Eye
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { MobileContainer, MobileSection, MobileGrid, MobileCard, MobileHeading, MobileText } from "@/components/ui/mobile-components";
+import { TouchButton } from "@/components/ui/mobile-touch-target";
 
 const Dashboard = () => {
   const isMobile = useIsMobile();
@@ -65,18 +67,20 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-4 md:space-y-6 p-4 lg:p-0">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="bg-white/5 border-white/10">
-              <CardHeader className="pb-2">
-                <Skeleton className="h-4 w-24 bg-white/10" />
-                <Skeleton className="h-8 w-16 bg-white/10" />
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-      </div>
+      <MobileContainer centered>
+        <MobileSection>
+          <MobileGrid cols={isMobile ? 2 : 4} gap="default">
+            {[...Array(4)].map((_, i) => (
+              <MobileCard key={i} variant="glass">
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-20 bg-white/10" />
+                  <Skeleton className="h-8 w-16 bg-white/10" />
+                </div>
+              </MobileCard>
+            ))}
+          </MobileGrid>
+        </MobileSection>
+      </MobileContainer>
     );
   }
 
@@ -92,163 +96,183 @@ const Dashboard = () => {
       title: "Portefeuilles",
       value: stats?.walletsCount || 0,
       icon: Wallet,
-      color: "text-blue-500",
+      color: "text-blue-400",
       bgColor: "bg-blue-500/10"
     },
     {
       title: "Tokens Créés",
       value: stats?.tokensCount || 0,
       icon: TrendingUp,
-      color: "text-green-500",
+      color: "text-green-400",
       bgColor: "bg-green-500/10"
     },
     {
       title: "Campagnes",
       value: stats?.campaignsCount || 0,
       icon: Users,
-      color: "text-purple-500",
+      color: "text-purple-400",
       bgColor: "bg-purple-500/10"
     },
     {
       title: "Fonds Levés",
       value: `$${(stats?.totalRaised || 0).toLocaleString()}`,
       icon: DollarSign,
-      color: "text-yellow-500",
+      color: "text-yellow-400",
       bgColor: "bg-yellow-500/10"
     }
   ];
 
   return (
-    <div className="space-y-4 md:space-y-8 p-4 lg:p-0">
-      {/* Welcome Section */}
-      <div className="text-center md:text-left">
-        <h1 className="text-2xl md:text-4xl font-bold text-white mb-2 md:mb-3">
-          Tableau de Bord
-        </h1>
-        <p className="text-gray-400 text-sm md:text-lg leading-relaxed">
-          Bienvenue sur votre plateforme Web3 tout-en-un
-        </p>
-      </div>
+    <MobileContainer centered>
+      <div className="space-y-6 md:space-y-8">
+        {/* Welcome Section */}
+        <MobileSection size="sm">
+          <div className="text-center md:text-left space-y-2">
+            <MobileHeading level={1} className="animate-mobile-fade-in">
+              Tableau de Bord
+            </MobileHeading>
+            <MobileText className="animate-mobile-fade-in" style={{ animationDelay: '0.1s' }}>
+              Bienvenue sur votre plateforme Web3 tout-en-un
+            </MobileText>
+          </div>
+        </MobileSection>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {statCards.map((stat, index) => (
-          <Card key={index} className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-400">
-                {stat.title}
-              </CardTitle>
-              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-xl md:text-2xl font-bold text-white">
-                {stat.value}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="space-y-4">
-        <h2 className="text-lg md:text-xl font-semibold text-white">Actions Rapides</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickActions.map((action, index) => (
-            <Button
-              key={index}
-              asChild
-              size={isMobile ? "lg" : "default"}
-              className={`bg-gradient-to-r ${action.color} hover:opacity-90 transition-all duration-300 min-h-[60px] md:min-h-[80px] group`}
-            >
-              <a href={action.href} className="flex flex-col items-center space-y-2">
-                <action.icon className="h-5 w-5 md:h-6 md:w-6 group-hover:scale-110 transition-transform" />
-                <span className="text-xs md:text-sm font-medium">{action.name}</span>
-              </a>
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white text-base md:text-lg">Transactions Récentes</CardTitle>
-            <CardDescription className="text-gray-400 text-sm">
-              Vos dernières activités blockchain
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
-              <div className="space-y-3">
-                {stats.recentTransactions.map((tx, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-primary/20 rounded-lg">
-                        {tx.tx_type === 'send' ? (
-                          <ArrowUpRight className="h-4 w-4 text-red-400" />
-                        ) : (
-                          <ArrowDownRight className="h-4 w-4 text-green-400" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-white">
-                          {tx.tx_type === 'send' ? 'Envoi' : 'Réception'}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {new Date(tx.timestamp || '').toLocaleDateString()}
-                        </p>
-                      </div>
+        {/* Stats Grid */}
+        <MobileSection size="sm">
+          <MobileGrid cols={isMobile ? 2 : 4} gap="default">
+            {statCards.map((stat, index) => (
+              <MobileCard 
+                key={index} 
+                variant="glass" 
+                interactive
+                className="animate-mobile-scale"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2 flex-1 min-w-0">
+                    <MobileText variant="caption" className="text-gray-400 uppercase tracking-wide font-medium">
+                      {stat.title}
+                    </MobileText>
+                    <div className="text-xl md:text-2xl font-bold text-white truncate">
+                      {stat.value}
                     </div>
-                    <Badge variant="outline" className="text-xs">
-                      {tx.status}
+                  </div>
+                  <div className={`p-2 md:p-3 rounded-xl ${stat.bgColor} flex-shrink-0`}>
+                    <stat.icon className={`h-4 w-4 md:h-5 md:w-5 ${stat.color}`} />
+                  </div>
+                </div>
+              </MobileCard>
+            ))}
+          </MobileGrid>
+        </MobileSection>
+
+        {/* Quick Actions */}
+        <MobileSection size="sm">
+          <div className="space-y-4">
+            <MobileHeading level={2}>Actions Rapides</MobileHeading>
+            <MobileGrid cols={isMobile ? 2 : 4} gap="default">
+              {quickActions.map((action, index) => (
+                <TouchButton
+                  key={index}
+                  size="lg"
+                  variant="none"
+                  className={`bg-gradient-to-r ${action.color} hover:opacity-90 transition-all duration-300 h-16 md:h-20 group rounded-xl animate-mobile-bounce`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                  onClick={() => window.location.href = action.href}
+                >
+                  <div className="flex flex-col items-center space-y-2">
+                    <action.icon className="h-5 w-5 md:h-6 md:w-6 group-hover:scale-110 transition-transform text-white" />
+                    <span className="text-xs md:text-sm font-medium text-white">{action.name}</span>
+                  </div>
+                </TouchButton>
+              ))}
+            </MobileGrid>
+          </div>
+        </MobileSection>
+
+        {/* Recent Activity */}
+        <MobileSection size="sm">
+          <MobileGrid cols={isMobile ? 1 : 2} gap="lg">
+            <MobileCard variant="glass" className="animate-mobile-slide-up">
+              <div className="space-y-4">
+                <div>
+                  <MobileHeading level={3} className="mb-2">Transactions Récentes</MobileHeading>
+                  <MobileText variant="caption">
+                    Vos dernières activités blockchain
+                  </MobileText>
+                </div>
+                
+                {stats?.recentTransactions && stats.recentTransactions.length > 0 ? (
+                  <div className="space-y-3">
+                    {stats.recentTransactions.map((tx, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg mobile-interactive">
+                        <div className="flex items-center space-x-3">
+                          <div className="p-2 bg-primary/20 rounded-lg flex-shrink-0">
+                            {tx.tx_type === 'send' ? (
+                              <ArrowUpRight className="h-4 w-4 text-red-400" />
+                            ) : (
+                              <ArrowDownRight className="h-4 w-4 text-green-400" />
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-white truncate">
+                              {tx.tx_type === 'send' ? 'Envoi' : 'Réception'}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {new Date(tx.timestamp || '').toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="text-xs flex-shrink-0">
+                          {tx.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Activity className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                    <MobileText variant="caption">Aucune transaction récente</MobileText>
+                  </div>
+                )}
+              </div>
+            </MobileCard>
+
+            <MobileCard variant="glass" className="animate-mobile-slide-up" style={{ animationDelay: '0.2s' }}>
+              <div className="space-y-4">
+                <div>
+                  <MobileHeading level={3} className="mb-2">Performances</MobileHeading>
+                  <MobileText variant="caption">
+                    Aperçu de votre activité
+                  </MobileText>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg mobile-interactive">
+                    <MobileText variant="caption">Tokens créés ce mois</MobileText>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 flex-shrink-0">
+                      {stats?.tokensCount || 0}
                     </Badge>
                   </div>
-                ))}
+                  <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg mobile-interactive">
+                    <MobileText variant="caption">Campagnes actives</MobileText>
+                    <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 flex-shrink-0">
+                      {stats?.campaignsCount || 0}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg mobile-interactive">
+                    <MobileText variant="caption">Portefeuilles connectés</MobileText>
+                    <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 flex-shrink-0">
+                      {stats?.walletsCount || 0}
+                    </Badge>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="text-center py-6">
-                <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">Aucune transaction récente</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white text-base md:text-lg">Performances</CardTitle>
-            <CardDescription className="text-gray-400 text-sm">
-              Aperçu de votre activité
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                <span className="text-sm text-gray-400">Tokens créés ce mois</span>
-                <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                  {stats?.tokensCount || 0}
-                </Badge>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                <span className="text-sm text-gray-400">Campagnes actives</span>
-                <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                  {stats?.campaignsCount || 0}
-                </Badge>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                <span className="text-sm text-gray-400">Portefeuilles connectés</span>
-                <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                  {stats?.walletsCount || 0}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </MobileCard>
+          </MobileGrid>
+        </MobileSection>
       </div>
-    </div>
+    </MobileContainer>
   );
 };
 
