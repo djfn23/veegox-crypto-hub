@@ -5,7 +5,7 @@ import { GlassCard } from "./glass-card"
 
 interface StatsCardProps {
   title: string
-  value: string | number
+  value: string | number | React.ReactNode
   change?: string
   changeType?: "positive" | "negative" | "neutral"
   icon?: React.ReactNode
@@ -21,6 +21,13 @@ const StatsCard = React.forwardRef<HTMLDivElement, StatsCardProps>(
       neutral: "text-gray-400"
     }
 
+    const formatValue = (val: string | number | React.ReactNode) => {
+      if (React.isValidElement(val)) {
+        return val;
+      }
+      return typeof val === 'number' ? val.toLocaleString() : val;
+    }
+
     return (
       <GlassCard ref={ref} variant={variant} className={cn("p-6", className)}>
         <div className="flex items-start justify-between">
@@ -29,9 +36,9 @@ const StatsCard = React.forwardRef<HTMLDivElement, StatsCardProps>(
               {title}
             </p>
             <div className="flex items-baseline space-x-2">
-              <p className="text-3xl font-bold text-white">
-                {typeof value === 'number' ? value.toLocaleString() : value}
-              </p>
+              <div className="text-3xl font-bold text-white">
+                {formatValue(value)}
+              </div>
               {change && (
                 <span className={cn("text-sm font-medium", changeColors[changeType])}>
                   {change}

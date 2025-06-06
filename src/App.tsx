@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { AppLayout } from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import TokenManager from "./components/modules/TokenManager";
@@ -28,41 +30,46 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: 1
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
     }
   }
 });
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/tokens" element={<TokenManager />} />
-          <Route path="/credit" element={<CreditModule />} />
-          <Route path="/staking" element={<StakingModule />} />
-          <Route path="/dao" element={<DAOModule />} />
-          <Route path="/profile" element={<ProfileSettings />} />
-          <Route path="/crowdfunding" element={<CrowdfundingModule />} />
-          <Route path="/crowdfunding/:id" element={<CampaignDetails />} />
-          <Route path="/market-analysis" element={<MarketAnalysisModule />} />
-          <Route path="/exchange" element={<ExchangeModule />} />
-          <Route path="/ai-recommendations" element={<AIRecommendationsModule />} />
-          <Route path="/social" element={<SocialModule />} />
-          <Route path="/wallet" element={<Wallet />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/legal" element={<Legal />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/security" element={<Security />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppLayout>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/tokens" element={<TokenManager />} />
+              <Route path="/credit" element={<CreditModule />} />
+              <Route path="/staking" element={<StakingModule />} />
+              <Route path="/dao" element={<DAOModule />} />
+              <Route path="/profile" element={<ProfileSettings />} />
+              <Route path="/crowdfunding" element={<CrowdfundingModule />} />
+              <Route path="/crowdfunding/:id" element={<CampaignDetails />} />
+              <Route path="/market-analysis" element={<MarketAnalysisModule />} />
+              <Route path="/exchange" element={<ExchangeModule />} />
+              <Route path="/ai-recommendations" element={<AIRecommendationsModule />} />
+              <Route path="/social" element={<SocialModule />} />
+              <Route path="/wallet" element={<Wallet />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/legal" element={<Legal />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/security" element={<Security />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AppLayout>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
