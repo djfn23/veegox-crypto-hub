@@ -45,19 +45,19 @@ const Dashboard = () => {
         .select('*')
         .eq('creator_id', user.id);
 
-      // Fetch recent transactions
+      // Fetch recent transactions from transactions_history table
       const { data: transactions } = await supabase
-        .from('transactions')
+        .from('transactions_history')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .order('timestamp', { ascending: false })
         .limit(5);
 
       return {
         walletsCount: wallets?.length || 0,
         tokensCount: tokens?.length || 0,
         campaignsCount: campaigns?.length || 0,
-        totalRaised: campaigns?.reduce((sum, c) => sum + (c.amount_raised || 0), 0) || 0,
+        totalRaised: campaigns?.reduce((sum, c) => sum + (c.current_amount || 0), 0) || 0,
         recentTransactions: transactions || []
       };
     },
@@ -187,7 +187,7 @@ const Dashboard = () => {
                   <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className="p-2 bg-primary/20 rounded-lg">
-                        {tx.transaction_type === 'send' ? (
+                        {tx.tx_type === 'send' ? (
                           <ArrowUpRight className="h-4 w-4 text-red-400" />
                         ) : (
                           <ArrowDownRight className="h-4 w-4 text-green-400" />
@@ -195,10 +195,10 @@ const Dashboard = () => {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-white">
-                          {tx.transaction_type === 'send' ? 'Envoi' : 'Réception'}
+                          {tx.tx_type === 'send' ? 'Envoi' : 'Réception'}
                         </p>
                         <p className="text-xs text-gray-400">
-                          {new Date(tx.created_at).toLocaleDateString()}
+                          {new Date(tx.timestamp || '').toLocaleDateString()}
                         </p>
                       </div>
                     </div>
