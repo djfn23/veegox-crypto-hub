@@ -27,14 +27,6 @@ const Wallet = () => {
     return connectedWallet || defaultWallet;
   });
 
-  // Assets de démonstration - dans une vraie app, ces données viendraient aussi d'Alchemy
-  const assets = [
-    { symbol: "ETH", name: "Ethereum", balance: 2.45, value: 6125.50, change: "+5.2%", changeType: "positive" as const, color: "from-blue-500 to-purple-600" },
-    { symbol: "BTC", name: "Bitcoin", balance: 0.125, value: 5625.00, change: "+3.8%", changeType: "positive" as const, color: "from-orange-500 to-yellow-500" },
-    { symbol: "USDC", name: "USD Coin", balance: 1250, value: 1250.00, change: "0.0%", changeType: "neutral" as const, color: "from-blue-400 to-blue-600" },
-    { symbol: "UNI", name: "Uniswap", balance: 45, value: 315.00, change: "-2.1%", changeType: "negative" as const, color: "from-pink-500 to-purple-600" }
-  ];
-
   const handleConnectNewWallet = () => {
     connectWallet('metamask');
   };
@@ -68,7 +60,7 @@ const Wallet = () => {
         }
       />
 
-      <WalletOverview wallets={allWallets} assetsCount={assets.length} />
+      <WalletOverview wallets={allWallets} />
 
       <Tabs defaultValue="assets" className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1">
@@ -84,7 +76,7 @@ const Wallet = () => {
         </TabsList>
 
         <TabsContent value="assets" className="mt-6">
-          <AssetsTab assets={assets} />
+          <AssetsTab wallets={allWallets} />
         </TabsContent>
 
         <TabsContent value="transactions" className="mt-6">
