@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -5,8 +6,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import CreditScoreCard from "./credit/CreditScoreCard";
 import LoanCalculator from "./credit/LoanCalculator";
 import LoansList from "./credit/LoansList";
+import { ERC20CreditIntegration } from "./credit/ERC20CreditIntegration";
 import { LoanData, CreditScore, Loan, Wallet } from "./credit/types";
 import { calculateLTV } from "./credit/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const CreditModule = () => {
   const [loanData, setLoanData] = useState<LoanData>({
@@ -122,6 +125,62 @@ const CreditModule = () => {
     },
   });
 
+  const { data: creditScore, isLoading: isLoadingScore } = useQuery({
+    queryKey: ['credit-score'],
+    queryFn: async (): Promise<CreditScore | null> => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data } = await supabase
+        .from('credit_scores')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!data) return null;
+
+      return {
+        score: data.score || 0,
+        last_calculated: data.last_calculated || '',
+        factors: data.factors as Record<string, any> || null
+      };
+    },
+  });
+
+  const { data: loans } = useQuery({
+    queryKey: ['user-loans'],
+    queryFn: async (): Promise<Loan[]> => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('loans')
+        .select('*')
+        .eq('borrower_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: userWallet } = useQuery({
+    queryKey: ['user-primary-wallet'],
+    queryFn: async (): Promise<Wallet | null> => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data } = await supabase
+        .from('wallets')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_primary', true)
+        .maybeSingle();
+
+      return data;
+    },
+  });
+
   const handleSubmitLoan = () => {
     loanMutation.mutate(loanData);
   };
@@ -136,23 +195,45 @@ const CreditModule = () => {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        <CreditScoreCard 
-          creditScore={creditScore}
-          userWallet={userWallet}
-          isLoadingScore={isLoadingScore}
-        />
-        
-        <LoanCalculator 
-          loanData={loanData}
-          setLoanData={setLoanData}
-          creditScore={creditScore}
-          onSubmitLoan={handleSubmitLoan}
-          isSubmitting={loanMutation.isPending}
-        />
-      </div>
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1">
+          <TabsTrigger value="overview" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg">
+            Vue d'ensemble
+          </TabsTrigger>
+          <TabsTrigger value="erc20-collateral" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg">
+            Token Collateral
+          </TabsTrigger>
+          <TabsTrigger value="loans" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg">
+            Mes Prêts
+          </TabsTrigger>
+        </TabsList>
 
-      <LoansList loans={loans} />
+        <TabsContent value="overview" className="mt-6">
+          <div className="grid lg:grid-cols-3 gap-6">
+            <CreditScoreCard 
+              creditScore={creditScore}
+              userWallet={userWallet}
+              isLoadingScore={isLoadingScore}
+            />
+            
+            <LoanCalculator 
+              loanData={loanData}
+              setLoanData={setLoanData}
+              creditScore={creditScore}
+              onSubmitLoan={handleSubmitLoan}
+              isSubmitting={loanMutation.isPending}
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="erc20-collateral" className="mt-6">
+          <ERC20CreditIntegration />
+        </TabsContent>
+
+        <TabsContent value="loans" className="mt-6">
+          <LoansList loans={loans} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

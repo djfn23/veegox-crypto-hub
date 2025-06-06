@@ -3,26 +3,29 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { Badge } from "@/components/ui/badge";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { useMainContractInfo, useUserContractBalance, useAddressStatus, useOwnerFunctions } from "@/hooks/useMainContract";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { ExternalLink, Activity, Coins, Shield, AlertTriangle, Users, Zap, Lock } from "lucide-react";
+import { useWeb3Wallet } from "@/hooks/useWeb3Wallet";
+import { ExternalLink, Activity, Coins, Shield, AlertTriangle, Users, Zap, Lock, Wallet, TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { ContractTransactions } from "./ContractTransactions";
+import { ERC20CreditIntegration } from "../modules/credit/ERC20CreditIntegration";
+import { ERC20StakingPool } from "../modules/staking/ERC20StakingPool";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const MainContractDashboard = () => {
   const { data: contractInfo, isLoading: isLoadingContract } = useMainContractInfo();
-  const { connectedWallets } = useWalletConnection();
+  const { connectedWallet, connectMetaMask, isConnecting } = useWeb3Wallet();
   const [adminAddress, setAdminAddress] = useState("");
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   
-  const primaryWallet = connectedWallets.find(w => w.connected);
   const { data: userBalance, isLoading: isLoadingBalance } = useUserContractBalance(
-    primaryWallet?.address || null
+    connectedWallet?.address || null
   );
   
-  const { data: addressStatus } = useAddressStatus(primaryWallet?.address || null);
+  const { data: addressStatus } = useAddressStatus(connectedWallet?.address || null);
   const { data: adminStatus } = useAddressStatus(adminAddress);
   const { setNotTaxable, setBlackList, releaseAirdropMode } = useOwnerFunctions();
 
@@ -66,7 +69,7 @@ export const MainContractDashboard = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold text-white mb-2">
-              {tokenInfo?.name || "ERC20Template"} ({tokenInfo?.symbol || "TOKEN"}) - Polygon
+              {tokenInfo?.name || "ERC20Template"} ({tokenInfo?.symbol || "TOKEN"})
             </h2>
             <div className="flex items-center space-x-2">
               <span className="text-gray-400 font-mono text-sm">
@@ -81,7 +84,7 @@ export const MainContractDashboard = () => {
           <div className="flex flex-col space-y-2">
             <Badge variant="outline" className="text-purple-400 border-purple-400">
               <Shield className="h-3 w-3 mr-1" />
-              Smart Contract
+              Polygon Mainnet
             </Badge>
             {tokenInfo?.isAirdrop && (
               <Badge variant="outline" className="text-orange-400 border-orange-400">
@@ -137,8 +140,31 @@ export const MainContractDashboard = () => {
           </div>
         </div>
 
+        {/* Connection Wallet */}
+        {!connectedWallet && (
+          <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-lg mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Wallet className="h-6 w-6 text-yellow-400" />
+                <div>
+                  <p className="text-yellow-400 font-medium">Connectez votre wallet</p>
+                  <p className="text-gray-400 text-sm">
+                    Pour interagir avec le contrat et effectuer des transactions
+                  </p>
+                </div>
+              </div>
+              <GradientButton 
+                onClick={connectMetaMask}
+                disabled={isConnecting}
+              >
+                {isConnecting ? "Connexion..." : "Connecter MetaMask"}
+              </GradientButton>
+            </div>
+          </div>
+        )}
+
         {/* Statut de l'utilisateur connecté */}
-        {primaryWallet && addressStatus && (
+        {connectedWallet && addressStatus && (
           <div className="bg-white/5 p-4 rounded-lg">
             <h3 className="text-lg font-semibold text-white mb-3">Statut de votre adresse</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -171,118 +197,124 @@ export const MainContractDashboard = () => {
         )}
       </GlassCard>
 
-      {/* Actions rapides */}
-      <GlassCard className="p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Actions Disponibles</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <GradientButton variant="outline" size="sm">
+      {/* Onglets principales */}
+      <Tabs defaultValue="transactions" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1">
+          <TabsTrigger value="transactions" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg">
             <Coins className="h-4 w-4 mr-2" />
-            Transfer
-          </GradientButton>
-          <GradientButton variant="outline" size="sm">
-            <Shield className="h-4 w-4 mr-2" />
-            Approuver
-          </GradientButton>
-          <GradientButton variant="outline" size="sm">
-            <AlertTriangle className="h-4 w-4 mr-2" />
-            Burn
-          </GradientButton>
-          <GradientButton 
-            variant="primary" 
-            size="sm"
-            onClick={() => setShowAdminPanel(!showAdminPanel)}
-          >
+            Transactions
+          </TabsTrigger>
+          <TabsTrigger value="credit" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg">
+            <TrendingUp className="h-4 w-4 mr-2" />
+            Crédit
+          </TabsTrigger>
+          <TabsTrigger value="staking" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg">
             <Lock className="h-4 w-4 mr-2" />
+            Staking
+          </TabsTrigger>
+          <TabsTrigger value="admin" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg">
+            <Shield className="h-4 w-4 mr-2" />
             Admin
-          </GradientButton>
-        </div>
-      </GlassCard>
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Panel d'administration */}
-      {showAdminPanel && (
-        <GlassCard className="p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Panel d'Administration</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Vérifier une adresse
-              </label>
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="0x..."
-                  value={adminAddress}
-                  onChange={(e) => setAdminAddress(e.target.value)}
-                  className="bg-white/10 border-white/20 text-white"
-                />
-                <Button 
-                  onClick={() => adminAddress && toast.info("Statut vérifié")}
-                  disabled={!adminAddress}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  Vérifier
-                </Button>
-              </div>
-            </div>
+        <TabsContent value="transactions" className="mt-6">
+          <ContractTransactions />
+        </TabsContent>
 
-            {adminStatus && adminAddress && (
-              <div className="bg-white/5 p-4 rounded-lg">
-                <h4 className="text-white font-medium mb-2">Statut de {adminAddress.slice(0, 6)}...{adminAddress.slice(-4)}</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-300">
-                      Blacklisté: <span className={adminStatus.isBlacklisted ? 'text-red-400' : 'text-green-400'}>
-                        {adminStatus.isBlacklisted ? 'Oui' : 'Non'}
-                      </span>
-                    </p>
-                    <p className="text-sm text-gray-300">
-                      Exempt de taxe: <span className={adminStatus.isNotTaxable ? 'text-green-400' : 'text-yellow-400'}>
-                        {adminStatus.isNotTaxable ? 'Oui' : 'Non'}
-                      </span>
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Button
-                      size="sm"
-                      onClick={() => setBlackList.mutate({ 
-                        address: adminAddress, 
-                        blacklisted: !adminStatus.isBlacklisted 
-                      })}
-                      className="w-full bg-red-600 hover:bg-red-700"
-                    >
-                      {adminStatus.isBlacklisted ? 'Débloquer' : 'Blacklister'}
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => setNotTaxable.mutate({ 
-                        address: adminAddress, 
-                        taxable: !adminStatus.isNotTaxable 
-                      })}
-                      className="w-full bg-green-600 hover:bg-green-700"
-                    >
-                      {adminStatus.isNotTaxable ? 'Rendre taxable' : 'Exempter taxe'}
-                    </Button>
-                  </div>
+        <TabsContent value="credit" className="mt-6">
+          <ERC20CreditIntegration />
+        </TabsContent>
+
+        <TabsContent value="staking" className="mt-6">
+          <ERC20StakingPool />
+        </TabsContent>
+
+        <TabsContent value="admin" className="mt-6">
+          <GlassCard className="p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Panel d'Administration</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Vérifier une adresse
+                </label>
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="0x..."
+                    value={adminAddress}
+                    onChange={(e) => setAdminAddress(e.target.value)}
+                    className="bg-white/10 border-white/20 text-white"
+                  />
+                  <Button 
+                    onClick={() => adminAddress && toast.info("Statut vérifié")}
+                    disabled={!adminAddress}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Vérifier
+                  </Button>
                 </div>
               </div>
-            )}
 
-            {tokenInfo?.isAirdrop && (
-              <div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-lg">
-                <h4 className="text-orange-400 font-medium mb-2">Mode Airdrop Actif</h4>
-                <p className="text-sm text-gray-300 mb-3">
-                  Le mode airdrop est actuellement activé. Seules les adresses exemptées peuvent transférer.
-                </p>
-                <Button
-                  onClick={() => releaseAirdropMode.mutate()}
-                  className="bg-orange-600 hover:bg-orange-700"
-                >
-                  Désactiver le mode Airdrop
-                </Button>
-              </div>
-            )}
-          </div>
-        </GlassCard>
-      )}
+              {adminStatus && adminAddress && (
+                <div className="bg-white/5 p-4 rounded-lg">
+                  <h4 className="text-white font-medium mb-2">Statut de {adminAddress.slice(0, 6)}...{adminAddress.slice(-4)}</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-300">
+                        Blacklisté: <span className={adminStatus.isBlacklisted ? 'text-red-400' : 'text-green-400'}>
+                          {adminStatus.isBlacklisted ? 'Oui' : 'Non'}
+                        </span>
+                      </p>
+                      <p className="text-sm text-gray-300">
+                        Exempt de taxe: <span className={adminStatus.isNotTaxable ? 'text-green-400' : 'text-yellow-400'}>
+                          {adminStatus.isNotTaxable ? 'Oui' : 'Non'}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Button
+                        size="sm"
+                        onClick={() => setBlackList.mutate({ 
+                          address: adminAddress, 
+                          blacklisted: !adminStatus.isBlacklisted 
+                        })}
+                        className="w-full bg-red-600 hover:bg-red-700"
+                      >
+                        {adminStatus.isBlacklisted ? 'Débloquer' : 'Blacklister'}
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => setNotTaxable.mutate({ 
+                          address: adminAddress, 
+                          taxable: !adminStatus.isNotTaxable 
+                        })}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                      >
+                        {adminStatus.isNotTaxable ? 'Rendre taxable' : 'Exempter taxe'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {tokenInfo?.isAirdrop && (
+                <div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-lg">
+                  <h4 className="text-orange-400 font-medium mb-2">Mode Airdrop Actif</h4>
+                  <p className="text-sm text-gray-300 mb-3">
+                    Le mode airdrop est actuellement activé. Seules les adresses exemptées peuvent transférer.
+                  </p>
+                  <Button
+                    onClick={() => releaseAirdropMode.mutate()}
+                    className="bg-orange-600 hover:bg-orange-700"
+                  >
+                    Désactiver le mode Airdrop
+                  </Button>
+                </div>
+              )}
+            </div>
+          </GlassCard>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
