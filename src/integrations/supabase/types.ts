@@ -9,6 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_recommendations: {
+        Row: {
+          acted_upon: boolean | null
+          asset_address: string
+          confidence_score: number
+          created_at: string
+          expiry_at: string | null
+          id: string
+          rationale: string
+          recommendation_type: string
+          user_id: string
+        }
+        Insert: {
+          acted_upon?: boolean | null
+          asset_address: string
+          confidence_score: number
+          created_at?: string
+          expiry_at?: string | null
+          id?: string
+          rationale: string
+          recommendation_type: string
+          user_id: string
+        }
+        Update: {
+          acted_upon?: boolean | null
+          asset_address?: string
+          confidence_score?: number
+          created_at?: string
+          expiry_at?: string | null
+          id?: string
+          rationale?: string
+          recommendation_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_recommendations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credit_scores: {
         Row: {
           calculation_version: string | null
@@ -41,6 +85,122 @@ export type Database = {
           {
             foreignKeyName: "credit_scores_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crowdfunding_campaigns: {
+        Row: {
+          banner_image_url: string | null
+          category: string | null
+          created_at: string | null
+          creator_id: string
+          current_amount: number
+          description: string
+          end_date: string
+          id: string
+          reward_token_address: string | null
+          start_date: string
+          status: string
+          target_amount: number
+          title: string
+          token_address: string | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          banner_image_url?: string | null
+          category?: string | null
+          created_at?: string | null
+          creator_id: string
+          current_amount?: number
+          description: string
+          end_date: string
+          id?: string
+          reward_token_address?: string | null
+          start_date?: string
+          status?: string
+          target_amount: number
+          title: string
+          token_address?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          banner_image_url?: string | null
+          category?: string | null
+          created_at?: string | null
+          creator_id?: string
+          current_amount?: number
+          description?: string
+          end_date?: string
+          id?: string
+          reward_token_address?: string | null
+          start_date?: string
+          status?: string
+          target_amount?: number
+          title?: string
+          token_address?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crowdfunding_campaigns_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crowdfunding_contributions: {
+        Row: {
+          amount: number
+          campaign_id: string
+          contribution_date: string
+          contributor_id: string
+          id: string
+          reward_claimed: boolean | null
+          reward_claimed_at: string | null
+          token_address: string
+          transaction_hash: string | null
+        }
+        Insert: {
+          amount: number
+          campaign_id: string
+          contribution_date?: string
+          contributor_id: string
+          id?: string
+          reward_claimed?: boolean | null
+          reward_claimed_at?: string | null
+          token_address: string
+          transaction_hash?: string | null
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string
+          contribution_date?: string
+          contributor_id?: string
+          id?: string
+          reward_claimed?: boolean | null
+          reward_claimed_at?: string | null
+          token_address?: string
+          transaction_hash?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crowdfunding_contributions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "crowdfunding_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crowdfunding_contributions_contributor_id_fkey"
+            columns: ["contributor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -151,6 +311,196 @@ export type Database = {
           },
         ]
       }
+      exchange_transactions: {
+        Row: {
+          amount_in: number
+          amount_out: number
+          created_at: string | null
+          id: string
+          pool_id: string
+          status: string
+          token_in_address: string
+          token_out_address: string
+          transaction_hash: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_in: number
+          amount_out: number
+          created_at?: string | null
+          id?: string
+          pool_id: string
+          status?: string
+          token_in_address: string
+          token_out_address: string
+          transaction_hash?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_in?: number
+          amount_out?: number
+          created_at?: string | null
+          id?: string
+          pool_id?: string
+          status?: string
+          token_in_address?: string
+          token_out_address?: string
+          transaction_hash?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exchange_transactions_pool_id_fkey"
+            columns: ["pool_id"]
+            isOneToOne: false
+            referencedRelation: "liquidity_pools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exchange_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_comments: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string | null
+          id: string
+          likes_count: number | null
+          post_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          post_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          post_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_posts: {
+        Row: {
+          author_id: string
+          category: string
+          comments_count: number | null
+          content: string
+          created_at: string | null
+          id: string
+          likes_count: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id: string
+          category: string
+          comments_count?: number | null
+          content: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string
+          category?: string
+          comments_count?: number | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      liquidity_pools: {
+        Row: {
+          created_at: string | null
+          creator_id: string | null
+          fee_percentage: number
+          id: string
+          is_active: boolean | null
+          token_a_address: string
+          token_a_amount: number
+          token_b_address: string
+          token_b_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          creator_id?: string | null
+          fee_percentage?: number
+          id?: string
+          is_active?: boolean | null
+          token_a_address: string
+          token_a_amount?: number
+          token_b_address: string
+          token_b_amount?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          creator_id?: string | null
+          fee_percentage?: number
+          id?: string
+          is_active?: boolean | null
+          token_a_address?: string
+          token_a_amount?: number
+          token_b_address?: string
+          token_b_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "liquidity_pools_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loans: {
         Row: {
           borrower_id: string
@@ -212,6 +562,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      market_analysis: {
+        Row: {
+          category: string
+          id: string
+          last_updated: string
+          metric_name: string
+          metric_value: number
+          source: string | null
+          trend_percentage: number | null
+        }
+        Insert: {
+          category: string
+          id?: string
+          last_updated?: string
+          metric_name: string
+          metric_value: number
+          source?: string | null
+          trend_percentage?: number | null
+        }
+        Update: {
+          category?: string
+          id?: string
+          last_updated?: string
+          metric_name?: string
+          metric_value?: number
+          source?: string | null
+          trend_percentage?: number | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {

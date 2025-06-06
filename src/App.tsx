@@ -11,6 +11,12 @@ import CreditModule from "./components/modules/CreditModule";
 import StakingModule from "./components/modules/StakingModule";
 import DAOModule from "./components/modules/DAOModule";
 import ProfileSettings from "./components/modules/ProfileSettings";
+import CrowdfundingModule from "./components/modules/CrowdfundingModule";
+import MarketAnalysisModule from "./components/modules/market/MarketAnalysisModule";
+import ExchangeModule from "./components/modules/exchange/ExchangeModule";
+import AIRecommendationsModule from "./components/modules/ai/AIRecommendationsModule";
+import SocialModule from "./components/modules/social/SocialModule";
+import CampaignDetails from "./components/modules/crowdfunding/CampaignDetails";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +40,12 @@ const App = () => (
           <Route path="/staking" element={<StakingModule />} />
           <Route path="/dao" element={<DAOModule />} />
           <Route path="/profile" element={<ProfileSettings />} />
+          <Route path="/crowdfunding" element={<CrowdfundingModule />} />
+          <Route path="/crowdfunding/:id" element={<CampaignDetails />} />
+          <Route path="/market-analysis" element={<MarketAnalysisModule />} />
+          <Route path="/exchange" element={<ExchangeModule />} />
+          <Route path="/ai-recommendations" element={<AIRecommendationsModule />} />
+          <Route path="/social" element={<SocialModule />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
