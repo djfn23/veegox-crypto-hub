@@ -128,14 +128,24 @@ const DAOModule = () => {
 
       if (error) throw error;
 
-      // Mettre à jour les compteurs de la proposition
-      const { error: updateError } = await supabase.rpc('update_proposal_votes', {
-        proposal_id: proposalId,
-        vote_power: votePower,
-        is_for: choice
+      // Au lieu d'utiliser une RPC, nous allons faire une requête vers l'Edge Function
+      const response = await fetch("https://zjsfulbimcvoaqflfbir.supabase.co/functions/v1/updateProposalVotes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${supabase.auth.getSession().then(res => res.data.session?.access_token)}`
+        },
+        body: JSON.stringify({
+          proposal_id: proposalId,
+          vote_power: votePower,
+          is_for: choice
+        })
       });
 
-      if (updateError) throw updateError;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erreur lors de la mise à jour des votes");
+      }
 
       return data;
     },
