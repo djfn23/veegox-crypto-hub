@@ -6,30 +6,15 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { WalletOverview } from "@/components/wallet/WalletOverview";
 import { AssetsTab } from "@/components/wallet/AssetsTab";
 import { TransactionsTab } from "@/components/wallet/TransactionsTab";
-import { WalletsTab } from "@/components/wallet/WalletsTab";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { EnhancedWalletsTab } from "@/components/wallet/EnhancedWalletsTab";
+import { WalletConnectionModal } from "@/components/wallet/WalletConnectionModal";
+import { useEnhancedWallet } from "@/hooks/useEnhancedWallet";
 import { Wallet as WalletIcon, Download, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 const Wallet = () => {
-  const { connectedWallets, isConnecting, connectWallet, disconnectWallet } = useWalletConnection();
-  
-  // Ajouter des wallets par défaut non connectés pour l'interface
-  const defaultWallets = [
-    { id: "metamask", name: "MetaMask", address: "", chainId: 1, connected: false, icon: "🦊" },
-    { id: "coinbase", name: "Coinbase Wallet", address: "", chainId: 1, connected: false, icon: "🔷" },
-    { id: "walletconnect", name: "WalletConnect", address: "", chainId: 1, connected: false, icon: "🔗" }
-  ];
-
-  // Fusionner les wallets connectés avec les wallets par défaut
-  const allWallets = defaultWallets.map(defaultWallet => {
-    const connectedWallet = connectedWallets.find(cw => cw.id === defaultWallet.id);
-    return connectedWallet || defaultWallet;
-  });
-
-  const handleConnectNewWallet = () => {
-    connectWallet('metamask');
-  };
+  const [showConnectionModal, setShowConnectionModal] = useState(false);
+  const { connectedWallets, isConnecting } = useEnhancedWallet();
 
   const handleExport = () => {
     toast.success("Export en développement");
@@ -50,7 +35,7 @@ const Wallet = () => {
             <GradientButton 
               variant="primary" 
               size="sm" 
-              onClick={handleConnectNewWallet}
+              onClick={() => setShowConnectionModal(true)}
               disabled={isConnecting}
             >
               <Plus className="h-4 w-4" />
@@ -60,7 +45,7 @@ const Wallet = () => {
         }
       />
 
-      <WalletOverview wallets={allWallets} />
+      <WalletOverview wallets={connectedWallets} />
 
       <Tabs defaultValue="assets" className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1">
@@ -76,22 +61,22 @@ const Wallet = () => {
         </TabsList>
 
         <TabsContent value="assets" className="mt-6">
-          <AssetsTab wallets={allWallets} />
+          <AssetsTab wallets={connectedWallets} />
         </TabsContent>
 
         <TabsContent value="transactions" className="mt-6">
-          <TransactionsTab wallets={allWallets} />
+          <TransactionsTab wallets={connectedWallets} />
         </TabsContent>
 
         <TabsContent value="wallets" className="mt-6">
-          <WalletsTab 
-            wallets={allWallets} 
-            onConnectWallet={connectWallet}
-            onDisconnectWallet={disconnectWallet}
-            isConnecting={isConnecting}
-          />
+          <EnhancedWalletsTab />
         </TabsContent>
       </Tabs>
+
+      <WalletConnectionModal 
+        isOpen={showConnectionModal}
+        onClose={() => setShowConnectionModal(false)}
+      />
     </div>
   );
 };
