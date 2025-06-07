@@ -23,6 +23,11 @@ import Settings from "./pages/Settings";
 import Bridge from "./pages/Bridge";
 import YieldFarming from "./pages/YieldFarming";
 import Lending from "./pages/Lending";
+import Staking from "./pages/Staking";
+import Credit from "./pages/Credit";
+import Social from "./pages/Social";
+import Collections from "./pages/Collections";
+import AIAssistant from "./pages/AIAssistant";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +51,11 @@ const App = () => (
             <Route path="/bridge" element={<Bridge />} />
             <Route path="/yield-farming" element={<YieldFarming />} />
             <Route path="/lending" element={<Lending />} />
+            <Route path="/staking" element={<Staking />} />
+            <Route path="/credit" element={<Credit />} />
+            <Route path="/social" element={<Social />} />
+            <Route path="/collections" element={<Collections />} />
+            <Route path="/ai" element={<AIAssistant />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/help" element={<Help />} />
             <Route path="/security" element={<Security />} />

@@ -26,95 +26,51 @@ export class NotificationService {
   }
 
   async initialize() {
-    // Écouter les notifications temps réel
-    this.setupRealtimeSubscription();
-    
-    // Charger les notifications existantes
-    await this.loadNotifications();
-  }
-
-  private setupRealtimeSubscription() {
-    const channel = supabase
-      .channel('notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'user_notifications'
-        },
-        (payload) => {
-          const notification = this.mapDbNotification(payload.new);
-          this.addNotification(notification);
-          this.showToast(notification);
-        }
-      )
-      .subscribe();
-  }
-
-  private async loadNotifications() {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('user_notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-
-      this.notifications = data?.map(this.mapDbNotification) || [];
-      this.notifyListeners();
-    } catch (error) {
-      console.error('Error loading notifications:', error);
-    }
-  }
-
-  private mapDbNotification(dbNotification: any): Notification {
-    return {
-      id: dbNotification.id,
-      title: dbNotification.title,
-      message: dbNotification.message,
-      type: dbNotification.type,
-      timestamp: new Date(dbNotification.created_at),
-      read: dbNotification.read,
-      actionUrl: dbNotification.action_url,
-      metadata: dbNotification.metadata
-    };
+    // Simuler des notifications pour le moment
+    this.notifications = [
+      {
+        id: '1',
+        title: 'Transaction réussie',
+        message: 'Votre swap a été confirmé sur la blockchain',
+        type: 'success',
+        timestamp: new Date(),
+        read: false,
+        actionUrl: '/trading'
+      },
+      {
+        id: '2',
+        title: 'Nouvelle proposition DAO',
+        message: 'Une nouvelle proposition de gouvernance est disponible',
+        type: 'info',
+        timestamp: new Date(Date.now() - 3600000),
+        read: false,
+        actionUrl: '/governance'
+      }
+    ];
+    this.notifyListeners();
   }
 
   async createNotification(
-    userId: string,
     title: string,
     message: string,
     type: 'success' | 'warning' | 'error' | 'info',
     actionUrl?: string,
     metadata?: any
   ) {
-    try {
-      const { data, error } = await supabase
-        .from('user_notifications')
-        .insert({
-          user_id: userId,
-          title,
-          message,
-          type,
-          action_url: actionUrl,
-          metadata
-        })
-        .select()
-        .single();
+    const notification: Notification = {
+      id: Date.now().toString(),
+      title,
+      message,
+      type,
+      timestamp: new Date(),
+      read: false,
+      actionUrl,
+      metadata
+    };
 
-      if (error) throw error;
-
-      return data;
-    } catch (error) {
-      console.error('Error creating notification:', error);
-      throw error;
-    }
+    this.addNotification(notification);
+    this.showToast(notification);
+    return notification;
   }
 
   private addNotification(notification: Notification) {
@@ -139,19 +95,10 @@ export class NotificationService {
   }
 
   async markAsRead(notificationId: string) {
-    try {
-      await supabase
-        .from('user_notifications')
-        .update({ read: true })
-        .eq('id', notificationId);
-
-      const index = this.notifications.findIndex(n => n.id === notificationId);
-      if (index !== -1) {
-        this.notifications[index].read = true;
-        this.notifyListeners();
-      }
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
+    const index = this.notifications.findIndex(n => n.id === notificationId);
+    if (index !== -1) {
+      this.notifications[index].read = true;
+      this.notifyListeners();
     }
   }
 
@@ -174,10 +121,9 @@ export class NotificationService {
     this.listeners.forEach(listener => listener(this.notifications));
   }
 
-  // Notifications prédéfinies pour événements communs
-  async notifyTransactionSuccess(userId: string, txHash: string, type: string) {
+  // Notifications prédéfinies
+  async notifyTransactionSuccess(txHash: string, type: string) {
     await this.createNotification(
-      userId,
       'Transaction réussie',
       `Votre ${type} a été confirmé sur la blockchain`,
       'success',
@@ -186,20 +132,16 @@ export class NotificationService {
     );
   }
 
-  async notifyTransactionFailed(userId: string, txHash: string, error: string) {
+  async notifyTransactionFailed(error: string) {
     await this.createNotification(
-      userId,
       'Transaction échouée',
       `Erreur: ${error}`,
-      'error',
-      undefined,
-      { txHash, error }
+      'error'
     );
   }
 
-  async notifyPriceAlert(userId: string, token: string, price: number, threshold: number) {
+  async notifyPriceAlert(token: string, price: number, threshold: number) {
     await this.createNotification(
-      userId,
       'Alerte prix',
       `${token} a atteint ${price}$ (seuil: ${threshold}$)`,
       'warning',
