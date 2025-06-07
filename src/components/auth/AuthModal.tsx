@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { texts, getResponsiveText } from '@/lib/constants/texts';
+import { Chrome, Twitter, Mail, Lock, User } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -20,18 +22,22 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
   const handleSignUp = async () => {
     setIsLoading(true);
     try {
+      const redirectUrl = `${window.location.origin}/`;
+      
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName,
-          }
+          },
+          emailRedirectTo: redirectUrl
         }
       });
       
@@ -65,6 +71,64 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     }
   };
 
+  const handleOAuthSignIn = async (provider: 'google' | 'twitter') => {
+    setOauthLoading(provider);
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: provider === 'google' ? {
+            access_type: 'offline',
+            prompt: 'consent',
+          } : undefined
+        }
+      });
+      
+      if (error) throw error;
+      
+      // Don't close modal or show success message here - the redirect will handle it
+    } catch (error: any) {
+      console.error(`${provider} OAuth error:`, error);
+      if (error.message.includes('Invalid login credentials')) {
+        toast.error(`Erreur de connexion ${provider}. Veuillez réessayer.`);
+      } else if (error.message.includes('not configured')) {
+        toast.error(`L'authentification ${provider} n'est pas configurée.`);
+      } else {
+        toast.error(`Erreur de connexion avec ${provider}: ${error.message}`);
+      }
+    } finally {
+      setOauthLoading(null);
+    }
+  };
+
+  const OAuthButton = ({ 
+    provider, 
+    icon: Icon, 
+    label, 
+    colorClass 
+  }: { 
+    provider: 'google' | 'twitter'; 
+    icon: any; 
+    label: string; 
+    colorClass: string;
+  }) => (
+    <Button
+      onClick={() => handleOAuthSignIn(provider)}
+      disabled={oauthLoading !== null}
+      className={`w-full ${colorClass} ${isMobile ? 'h-12 text-base' : 'h-10'}`}
+    >
+      {oauthLoading === provider ? (
+        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+      ) : (
+        <Icon className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />
+      )}
+      {oauthLoading === provider ? 'Connexion...' : label}
+    </Button>
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={`${isMobile ? 'w-[95vw] h-[90vh] max-w-none flex flex-col' : 'sm:max-w-md'} bg-slate-900 border-slate-700`}>
@@ -73,18 +137,46 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         </DialogHeader>
         
         <div className={`${isMobile ? 'flex-1 overflow-y-auto' : ''} px-1`}>
+          {/* OAuth Buttons Section */}
+          <div className={`space-y-3 ${isMobile ? 'mb-6' : 'mb-4'}`}>
+            <OAuthButton
+              provider="google"
+              icon={Chrome}
+              label="Continuer avec Google"
+              colorClass="bg-white hover:bg-gray-100 text-gray-900 border border-gray-300"
+            />
+            
+            <OAuthButton
+              provider="twitter"
+              icon={Twitter}
+              label="Continuer avec Twitter"
+              colorClass="bg-blue-500 hover:bg-blue-600 text-white"
+            />
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full bg-slate-600" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-slate-900 px-2 text-slate-400">ou</span>
+            </div>
+          </div>
+
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className={`grid w-full grid-cols-2 bg-slate-800 ${isMobile ? 'h-12' : ''}`}>
+            <TabsList className={`grid w-full grid-cols-2 bg-slate-800 ${isMobile ? 'h-12 mt-6' : 'mt-4'}`}>
               <TabsTrigger 
                 value="signin" 
                 className={`text-white data-[state=active]:bg-slate-700 ${isMobile ? 'text-sm py-3' : ''}`}
               >
+                <Mail className="h-4 w-4 mr-1" />
                 {getResponsiveText(texts.auth.modal.tabs.signin, isMobile)}
               </TabsTrigger>
               <TabsTrigger 
                 value="signup" 
                 className={`text-white data-[state=active]:bg-slate-700 ${isMobile ? 'text-sm py-3' : ''}`}
               >
+                <User className="h-4 w-4 mr-1" />
                 {getResponsiveText(texts.auth.modal.tabs.signup, isMobile)}
               </TabsTrigger>
             </TabsList>
@@ -115,8 +207,9 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
               <Button 
                 onClick={handleSignIn} 
                 className={`w-full bg-blue-600 hover:bg-blue-700 ${isMobile ? 'h-12 text-base mt-6' : ''}`}
-                disabled={isLoading}
+                disabled={isLoading || oauthLoading !== null}
               >
+                <Lock className="h-4 w-4 mr-2" />
                 {isLoading ? texts.auth.modal.buttons.signin.loading : texts.auth.modal.buttons.signin.default}
               </Button>
             </TabsContent>
@@ -157,8 +250,9 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
               <Button 
                 onClick={handleSignUp} 
                 className={`w-full bg-green-600 hover:bg-green-700 ${isMobile ? 'h-12 text-base mt-6' : ''}`}
-                disabled={isLoading}
+                disabled={isLoading || oauthLoading !== null}
               >
+                <User className="h-4 w-4 mr-2" />
                 {isLoading ? texts.auth.modal.buttons.signup.loading : texts.auth.modal.buttons.signup.default}
               </Button>
             </TabsContent>
