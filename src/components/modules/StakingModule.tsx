@@ -1,18 +1,13 @@
 
-import { useState } from "react";
-import { GlassCard } from "@/components/ui/glass-card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { GradientButton } from "@/components/ui/gradient-button";
-import { Progress } from "@/components/ui/progress";
-import { Lock, Unlock, Trophy, DollarSign, TrendingUp, Coins } from "lucide-react";
+import { TabsContent } from "@/components/ui/tabs";
 import { ERC20StakingPool } from "./staking/ERC20StakingPool";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { texts, getResponsiveText } from "@/lib/constants/texts";
+import { StakingHeader } from "./staking/StakingHeader";
+import { StakingStats } from "./staking/StakingStats";
+import { StakingTabs } from "./staking/StakingTabs";
+import { GenericPoolCard } from "./staking/GenericPoolCard";
+import { MyStakeCard } from "./staking/MyStakeCard";
 
 const StakingModule = () => {
-  const isMobile = useIsMobile();
-
   // Données simulées pour les pools génériques
   const genericPools = [
     {
@@ -57,89 +52,15 @@ const StakingModule = () => {
 
   return (
     <div className="space-y-4 md:space-y-6 px-4 lg:px-0">
-      <div>
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">{texts.staking.header.title}</h2>
-        <p className="text-gray-400 text-sm md:text-base leading-relaxed">
-          {texts.staking.header.description}
-        </p>
-        <div className="mt-2 text-xs md:text-sm text-purple-400">
-          {texts.staking.header.subtitle}
-        </div>
-      </div>
+      <StakingHeader />
 
-      {/* Statistiques globales */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
-        <GlassCard className="p-3 md:p-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-              <DollarSign className="h-4 w-4 md:h-5 md:w-5 text-blue-400" />
-            </div>
-            <div>
-              <p className="text-gray-400 text-xs md:text-sm">{texts.staking.stats.totalStaked}</p>
-              <p className="text-white font-bold text-sm md:text-base">${totalStakedValue.toLocaleString()}</p>
-            </div>
-          </div>
-        </GlassCard>
+      <StakingStats 
+        totalStakedValue={totalStakedValue}
+        totalRewards={totalRewards}
+        activeStakes={myStakes.length}
+      />
 
-        <GlassCard className="p-3 md:p-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-              <Trophy className="h-4 w-4 md:h-5 md:w-5 text-green-400" />
-            </div>
-            <div>
-              <p className="text-gray-400 text-xs md:text-sm">{texts.staking.stats.rewards}</p>
-              <p className="text-white font-bold text-sm md:text-base">${totalRewards.toFixed(2)}</p>
-            </div>
-          </div>
-        </GlassCard>
-
-        <GlassCard className="p-3 md:p-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-              <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-purple-400" />
-            </div>
-            <div>
-              <p className="text-gray-400 text-xs md:text-sm">{texts.staking.stats.averageApy}</p>
-              <p className="text-white font-bold text-sm md:text-base">12.8%</p>
-            </div>
-          </div>
-        </GlassCard>
-
-        <GlassCard className="p-3 md:p-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-              <Lock className="h-4 w-4 md:h-5 md:w-5 text-yellow-400" />
-            </div>
-            <div>
-              <p className="text-gray-400 text-xs md:text-sm">{texts.staking.stats.activePools}</p>
-              <p className="text-white font-bold text-sm md:text-base">{myStakes.length}</p>
-            </div>
-          </div>
-        </GlassCard>
-      </div>
-
-      <Tabs defaultValue="erc20-staking" className="w-full">
-        <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1 gap-1 h-auto p-1' : 'grid-cols-3'} bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1`}>
-          <TabsTrigger 
-            value="erc20-staking" 
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
-          >
-            {getResponsiveText(texts.staking.tabs.erc20, isMobile)}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="pools" 
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
-          >
-            {getResponsiveText(texts.staking.tabs.pools, isMobile)}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="my-stakes" 
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
-          >
-            {getResponsiveText(texts.staking.tabs.stakes, isMobile)}
-          </TabsTrigger>
-        </TabsList>
-
+      <StakingTabs defaultValue="erc20-staking">
         <TabsContent value="erc20-staking" className="mt-4 md:mt-6">
           <ERC20StakingPool />
         </TabsContent>
@@ -147,44 +68,7 @@ const StakingModule = () => {
         <TabsContent value="pools" className="mt-4 md:mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {genericPools.map((pool) => (
-              <GlassCard key={pool.id} className="p-4 md:p-6 hover:scale-[1.02] transition-all duration-200">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-lg md:text-2xl">
-                        {pool.icon}
-                      </div>
-                      <div>
-                        <h3 className="text-white font-semibold text-sm md:text-base">{pool.name}</h3>
-                        <p className="text-gray-400 text-xs md:text-sm">{pool.token}</p>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="text-green-400 border-green-400 text-xs">
-                      {pool.apy}% {texts.financial.apy}
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs md:text-sm">
-                      <span className="text-gray-400">{texts.staking.info.tvl}</span>
-                      <span className="text-white">${(pool.tvl / 1000000).toFixed(1)}M</span>
-                    </div>
-                    <div className="flex justify-between text-xs md:text-sm">
-                      <span className="text-gray-400">{texts.staking.info.minStake}</span>
-                      <span className="text-white">{pool.minStake} {pool.token}</span>
-                    </div>
-                    <div className="flex justify-between text-xs md:text-sm">
-                      <span className="text-gray-400">{texts.staking.info.lockPeriod}</span>
-                      <span className="text-white">{pool.lockPeriod === 0 ? texts.staking.info.flexible : `${pool.lockPeriod} jours`}</span>
-                    </div>
-                  </div>
-
-                  <GradientButton className="w-full" variant="outline" size={isMobile ? "default" : "sm"}>
-                    <Lock className="h-4 w-4 mr-2" />
-                    {texts.staking.actions.stake} {pool.token}
-                  </GradientButton>
-                </div>
-              </GlassCard>
+              <GenericPoolCard key={pool.id} pool={pool} />
             ))}
           </div>
         </TabsContent>
@@ -192,37 +76,11 @@ const StakingModule = () => {
         <TabsContent value="my-stakes" className="mt-4 md:mt-6">
           <div className="space-y-4">
             {myStakes.map((stake, index) => (
-              <GlassCard key={index} className="p-4 md:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                      <Lock className="h-5 w-5 md:h-6 md:w-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold text-sm md:text-base">{stake.pool}</h3>
-                      <p className="text-gray-400 text-xs md:text-sm">{stake.amount} tokens • ${stake.value.toLocaleString()}</p>
-                    </div>
-                  </div>
-                  <div className="text-left sm:text-right">
-                    <p className="text-green-400 font-semibold text-sm md:text-base">+${stake.rewards}</p>
-                    <p className="text-gray-400 text-xs md:text-sm">{stake.apy}% {texts.financial.apy}</p>
-                  </div>
-                </div>
-                <div className="mt-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                  <GradientButton variant="outline" size="sm" className="flex-1">
-                    <TrendingUp className="h-4 w-4 mr-2" />
-                    {texts.staking.actions.restake}
-                  </GradientButton>
-                  <GradientButton variant="outline" size="sm" className="flex-1">
-                    <Unlock className="h-4 w-4 mr-2" />
-                    {texts.staking.actions.unstake}
-                  </GradientButton>
-                </div>
-              </GlassCard>
+              <MyStakeCard key={index} stake={stake} />
             ))}
           </div>
         </TabsContent>
-      </Tabs>
+      </StakingTabs>
     </div>
   );
 };
