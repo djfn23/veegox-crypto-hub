@@ -19,7 +19,7 @@ interface NFTListing {
   nft_collections_metadata?: {
     name: string;
     image_url: string;
-  };
+  } | null;
 }
 
 interface NFTDetailModalProps {

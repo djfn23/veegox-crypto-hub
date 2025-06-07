@@ -69,10 +69,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             {/* Navigation - avec scroll optimisé */}
             <div className="flex-1 overflow-hidden">
               <div className="p-3 md:p-4 h-full overflow-y-auto">
-                <SidebarNavigation 
-                  onItemClick={() => isMobile && setSidebarOpen(false)}
-                  isMobile={isMobile}
-                />
+                <SidebarNavigation />
               </div>
             </div>
 

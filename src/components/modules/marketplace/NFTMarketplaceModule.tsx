@@ -5,7 +5,7 @@ import { NFTMarketGrid } from "./NFTMarketGrid";
 import { NFTMarketplaceFilters } from "./NFTMarketplaceFilters";
 import { CollectionsGrid } from "./CollectionsGrid";
 import { MyListingsGrid } from "./MyListingsGrid";
-import { TrendingIcon, Grid3X3, User, Plus } from "lucide-react";
+import { TrendingUp, Grid3X3, User, Plus } from "lucide-react";
 import { useWeb3Wallet } from "@/hooks/useWeb3Wallet";
 import { Button } from "@/components/ui/button";
 
@@ -44,7 +44,7 @@ export const NFTMarketplaceModule = () => {
             Marketplace
           </TabsTrigger>
           <TabsTrigger value="collections" className="flex items-center gap-2">
-            <TrendingIcon className="h-4 w-4" />
+            <TrendingUp className="h-4 w-4" />
             Collections
           </TabsTrigger>
           {connectedWallet && (
