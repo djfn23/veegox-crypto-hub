@@ -3,13 +3,14 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { WalletOverview } from "@/components/wallet/WalletOverview";
+import { RealTimeWalletOverview } from "@/components/wallet/RealTimeWalletOverview";
 import { AssetsTab } from "@/components/wallet/AssetsTab";
 import { TransactionsTab } from "@/components/wallet/TransactionsTab";
 import { EnhancedWalletsTab } from "@/components/wallet/EnhancedWalletsTab";
 import { WalletConnectionModal } from "@/components/wallet/WalletConnectionModal";
+import { RealTimeMarketData } from "@/components/analytics/RealTimeMarketData";
 import { useEnhancedWallet } from "@/hooks/useEnhancedWallet";
-import { Wallet as WalletIcon, Download, Plus } from "lucide-react";
+import { Wallet as WalletIcon, Download, Plus, Activity } from "lucide-react";
 import { toast } from "sonner";
 
 const Wallet = () => {
@@ -21,7 +22,7 @@ const Wallet = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto space-y-6">
       <PageHeader
         title="Mon Portefeuille"
         subtitle="Gérez vos actifs crypto en toute sécurité avec des données blockchain en temps réel"
@@ -45,7 +46,14 @@ const Wallet = () => {
         }
       />
 
-      <WalletOverview wallets={connectedWallets} />
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <RealTimeWalletOverview />
+        </div>
+        <div>
+          <RealTimeMarketData />
+        </div>
+      </div>
 
       <Tabs defaultValue="assets" className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1">

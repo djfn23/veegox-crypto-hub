@@ -1,291 +1,242 @@
 
-import { useState } from "react";
+import { PageLayout } from "@/components/layout/PageLayout";
+import { RealTimeMarketData } from "@/components/analytics/RealTimeMarketData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  BarChart3, 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Users, 
-  Activity,
-  PieChart,
-  LineChart
-} from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Badge } from "@/components/ui/badge";
+import { AnimatedNumber } from "@/components/ui/animated-number";
+import { TrendingUp, TrendingDown, DollarSign, Users, Zap, Activity } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+
+// Données simulées pour les graphiques
+const priceData = Array.from({ length: 30 }, (_, i) => ({
+  date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toLocaleDateString(),
+  price: 2500 + Math.sin(i * 0.2) * 200 + Math.random() * 100,
+  volume: 50000000 + Math.random() * 20000000
+}));
+
+const tvlData = Array.from({ length: 7 }, (_, i) => ({
+  day: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'][i],
+  tvl: 2000000000 + Math.random() * 400000000,
+  users: 40000 + Math.random() * 10000
+}));
 
 const Analytics = () => {
-  const isMobile = useIsMobile();
-  const [activeTab, setActiveTab] = useState("overview");
-
-  const analyticsData = [
-    {
-      title: "Volume Total",
-      value: "$2.4M",
-      change: "+12.5%",
-      icon: DollarSign,
-      color: "text-blue-400"
-    },
-    {
-      title: "Utilisateurs Actifs",
-      value: "15.2K",
-      change: "+8.3%",
-      icon: Users,
-      color: "text-green-400"
-    },
-    {
-      title: "Transactions",
-      value: "45.7K",
-      change: "+15.7%",
-      icon: Activity,
-      color: "text-purple-400"
-    },
-    {
-      title: "TVL Total",
-      value: "$8.9M",
-      change: "+5.2%",
-      icon: TrendingUp,
-      color: "text-orange-400"
-    }
-  ];
-
-  const protocolMetrics = [
-    { metric: "Staking APY", value: "12.5%", trend: "up" },
-    { metric: "Liquidity Pools", value: "24", trend: "up" },
-    { metric: "Governance Proposals", value: "8", trend: "stable" },
-    { metric: "Active Campaigns", value: "12", trend: "up" }
-  ];
-
   return (
-    <div className="space-y-4 md:space-y-6 p-2 md:p-0">
-      <div className="text-center md:text-left">
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Analytics & Métriques</h1>
-        <p className="text-gray-400 text-sm md:text-base px-2 md:px-0">
-          Analysez les performances et tendances de l'écosystème
-        </p>
-      </div>
+    <PageLayout
+      title="Analytics & Métriques"
+      subtitle="Suivez les performances de la plateforme et du marché en temps réel"
+    >
+      <div className="space-y-6">
+        {/* Market Data Overview */}
+        <RealTimeMarketData />
 
-      {/* Key Metrics - Responsive Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-        {analyticsData.map((item, index) => {
-          const IconComponent = item.icon;
-          return (
-            <Card key={index} className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardContent className="p-4 md:p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <IconComponent className={`h-5 w-5 md:h-6 md:w-6 ${item.color}`} />
-                  <div className={`text-xs font-medium px-2 py-1 rounded-full ${
-                    item.change.startsWith('+') ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400'
-                  }`}>
-                    {item.change}
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">TVL Total</p>
+                  <div className="text-2xl font-bold text-white">
+                    <AnimatedNumber value={2340000000} prefix="$" />
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-xs md:text-sm text-gray-400">{item.title}</p>
-                  <p className="text-lg md:text-2xl font-bold text-white">{item.value}</p>
+                <div className="p-3 bg-green-500/20 rounded-full">
+                  <DollarSign className="h-6 w-6 text-green-400" />
                 </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+              </div>
+              <div className="flex items-center mt-2">
+                <TrendingUp className="h-4 w-4 text-green-400 mr-1" />
+                <span className="text-green-400 text-sm">+5.2%</span>
+                <span className="text-gray-400 text-sm ml-1">vs hier</span>
+              </div>
+            </CardContent>
+          </Card>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2 gap-1 h-auto p-1' : 'grid-cols-4'} bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-1`}>
-          <TabsTrigger 
-            value="overview"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
-          >
-            {isMobile ? "Vue d'ensemble" : "Vue d'ensemble"}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="defi"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
-          >
-            DeFi
-          </TabsTrigger>
-          <TabsTrigger 
-            value="users"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
-          >
-            {isMobile ? "Utilisateurs" : "Utilisateurs"}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="revenue"
-            className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'text-xs py-3 px-2' : ''}`}
-          >
-            {isMobile ? "Revenus" : "Revenus"}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="mt-4 md:mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-            {/* Chart Container - Responsive */}
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-white flex items-center gap-2 text-lg">
-                  <BarChart3 className="h-5 w-5" />
-                  Volume de Trading (7j)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={`${isMobile ? 'h-48' : 'h-64'} bg-slate-800/50 rounded-lg flex items-center justify-center`}>
-                  <div className="text-center text-gray-400">
-                    <BarChart3 className={`${isMobile ? 'h-8 w-8' : 'h-12 w-12'} mx-auto mb-2 opacity-50`} />
-                    <p className={`${isMobile ? 'text-xs' : 'text-sm'}`}>Graphique de volume</p>
-                    <p className="text-xs opacity-75">Données en temps réel</p>
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Volume 24h</p>
+                  <div className="text-2xl font-bold text-white">
+                    <AnimatedNumber value={89500000} prefix="$" />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="p-3 bg-blue-500/20 rounded-full">
+                  <Activity className="h-6 w-6 text-blue-400" />
+                </div>
+              </div>
+              <div className="flex items-center mt-2">
+                <TrendingDown className="h-4 w-4 text-red-400 mr-1" />
+                <span className="text-red-400 text-sm">-2.1%</span>
+                <span className="text-gray-400 text-sm ml-1">vs hier</span>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Protocol Metrics */}
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-white flex items-center gap-2 text-lg">
-                  <Activity className="h-5 w-5" />
-                  Métriques du Protocole
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 md:space-y-4">
-                {protocolMetrics.map((metric, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                    <div>
-                      <p className="text-white text-sm font-medium">{metric.metric}</p>
-                      <p className="text-gray-400 text-xs">Dernière mise à jour</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-white font-mono text-sm">{metric.value}</span>
-                      {metric.trend === 'up' && <TrendingUp className="h-4 w-4 text-green-400" />}
-                      {metric.trend === 'down' && <TrendingDown className="h-4 w-4 text-red-400" />}
-                      {metric.trend === 'stable' && <div className="h-4 w-4 bg-gray-400 rounded-full"></div>}
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Utilisateurs Actifs</p>
+                  <div className="text-2xl font-bold text-white">
+                    <AnimatedNumber value={45230} />
+                  </div>
+                </div>
+                <div className="p-3 bg-purple-500/20 rounded-full">
+                  <Users className="h-6 w-6 text-purple-400" />
+                </div>
+              </div>
+              <div className="flex items-center mt-2">
+                <TrendingUp className="h-4 w-4 text-green-400 mr-1" />
+                <span className="text-green-400 text-sm">+12.8%</span>
+                <span className="text-gray-400 text-sm ml-1">vs hier</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Gas Price</p>
+                  <div className="text-2xl font-bold text-white">
+                    <AnimatedNumber value={25.6} suffix=" Gwei" decimals={1} />
+                  </div>
+                </div>
+                <div className="p-3 bg-orange-500/20 rounded-full">
+                  <Zap className="h-6 w-6 text-orange-400" />
+                </div>
+              </div>
+              <div className="flex items-center mt-2">
+                <TrendingDown className="h-4 w-4 text-red-400 mr-1" />
+                <span className="text-red-400 text-sm">-8.3%</span>
+                <span className="text-gray-400 text-sm ml-1">vs hier</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Charts */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white">Prix ETH (30 jours)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={priceData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis dataKey="date" stroke="#9CA3AF" fontSize={12} />
+                  <YAxis stroke="#9CA3AF" fontSize={12} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1F2937', 
+                      border: '1px solid #374151',
+                      borderRadius: '8px'
+                    }}
+                    labelStyle={{ color: '#F9FAFB' }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="price" 
+                    stroke="#8B5CF6" 
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white">TVL Evolution (7 jours)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={tvlData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis dataKey="day" stroke="#9CA3AF" fontSize={12} />
+                  <YAxis stroke="#9CA3AF" fontSize={12} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1F2937', 
+                      border: '1px solid #374151',
+                      borderRadius: '8px'
+                    }}
+                    labelStyle={{ color: '#F9FAFB' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="tvl" 
+                    stroke="#10B981" 
+                    fill="url(#colorTvl)"
+                  />
+                  <defs>
+                    <linearGradient id="colorTvl" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Protocol Stats */}
+        <Card className="bg-gray-800/50 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white">Statistiques des Protocoles</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="space-y-3">
+                <h4 className="text-gray-300 font-medium">Top Pools de Liquidité</h4>
+                {['ETH/USDC', 'MATIC/USDT', 'WBTC/ETH'].map((pair, i) => (
+                  <div key={pair} className="flex justify-between items-center p-2 bg-gray-700/50 rounded">
+                    <span className="text-white">{pair}</span>
+                    <div className="text-right">
+                      <div className="text-green-400 text-sm">APY: {(15 + i * 3).toFixed(1)}%</div>
+                      <div className="text-gray-400 text-xs">TVL: ${(50 - i * 10)}M</div>
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
-          </div>
+              </div>
 
-          {/* Additional Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mt-4 md:mt-6">
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-white flex items-center gap-2 text-lg">
-                  <LineChart className="h-5 w-5" />
-                  TVL Evolution
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={`${isMobile ? 'h-48' : 'h-64'} bg-slate-800/50 rounded-lg flex items-center justify-center`}>
-                  <div className="text-center text-gray-400">
-                    <LineChart className={`${isMobile ? 'h-8 w-8' : 'h-12 w-12'} mx-auto mb-2 opacity-50`} />
-                    <p className={`${isMobile ? 'text-xs' : 'text-sm'}`}>Évolution du TVL</p>
+              <div className="space-y-3">
+                <h4 className="text-gray-300 font-medium">Pools de Staking</h4>
+                {['ETH 2.0', 'MATIC', 'DOT'].map((token, i) => (
+                  <div key={token} className="flex justify-between items-center p-2 bg-gray-700/50 rounded">
+                    <span className="text-white">{token}</span>
+                    <div className="text-right">
+                      <div className="text-blue-400 text-sm">APR: {(8 + i * 2).toFixed(1)}%</div>
+                      <div className="text-gray-400 text-xs">Staked: ${(200 + i * 50)}M</div>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                ))}
+              </div>
 
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-white flex items-center gap-2 text-lg">
-                  <PieChart className="h-5 w-5" />
-                  Distribution des Assets
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={`${isMobile ? 'h-48' : 'h-64'} bg-slate-800/50 rounded-lg flex items-center justify-center`}>
-                  <div className="text-center text-gray-400">
-                    <PieChart className={`${isMobile ? 'h-8 w-8' : 'h-12 w-12'} mx-auto mb-2 opacity-50`} />
-                    <p className={`${isMobile ? 'text-xs' : 'text-sm'}`}>Répartition des assets</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="defi" className="mt-4 md:mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white text-lg">Pools de Liquidité</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {['ETH/USDC', 'BTC/ETH', 'MATIC/USDC'].map((pair, index) => (
-                    <div key={index} className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                      <span className="text-white text-sm">{pair}</span>
-                      <div className="text-right">
-                        <div className="text-green-400 text-sm font-mono">15.2% APY</div>
-                        <div className="text-gray-400 text-xs">$2.1M TVL</div>
+              <div className="space-y-3">
+                <h4 className="text-gray-300 font-medium">Marchés de Prêt</h4>
+                {['USDC', 'USDT', 'DAI'].map((token, i) => (
+                  <div key={token} className="flex justify-between items-center p-2 bg-gray-700/50 rounded">
+                    <span className="text-white">{token}</span>
+                    <div className="text-right">
+                      <div className="text-purple-400 text-sm">
+                        Borrow: {(5 + i).toFixed(1)}% | Supply: {(3 + i * 0.5).toFixed(1)}%
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white text-lg">Staking Stats</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-white mb-1">67%</div>
-                    <div className="text-sm text-gray-400">Tokens en Staking</div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="text-center p-3 bg-white/5 rounded-lg">
-                      <div className="text-lg font-bold text-white">12.5%</div>
-                      <div className="text-xs text-gray-400">APY Moyen</div>
-                    </div>
-                    <div className="text-center p-3 bg-white/5 rounded-lg">
-                      <div className="text-lg font-bold text-white">5.2K</div>
-                      <div className="text-xs text-gray-400">Stakers</div>
+                      <div className="text-gray-400 text-xs">Util: {(75 + i * 5)}%</div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="users" className="mt-4 md:mt-6">
-          <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-white text-lg">Analyse des Utilisateurs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`${isMobile ? 'h-48' : 'h-64'} bg-slate-800/50 rounded-lg flex items-center justify-center`}>
-                <div className="text-center text-gray-400">
-                  <Users className={`${isMobile ? 'h-8 w-8' : 'h-12 w-12'} mx-auto mb-2 opacity-50`} />
-                  <p className={`${isMobile ? 'text-xs' : 'text-sm'}`}>Analytics utilisateurs</p>
-                  <p className="text-xs opacity-75">Données détaillées bientôt</p>
-                </div>
+                ))}
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="revenue" className="mt-4 md:mt-6">
-          <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-white text-lg">Analyse des Revenus</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`${isMobile ? 'h-48' : 'h-64'} bg-slate-800/50 rounded-lg flex items-center justify-center`}>
-                <div className="text-center text-gray-400">
-                  <DollarSign className={`${isMobile ? 'h-8 w-8' : 'h-12 w-12'} mx-auto mb-2 opacity-50`} />
-                  <p className={`${isMobile ? 'text-xs' : 'text-sm'}`}>Suivi des revenus</p>
-                  <p className="text-xs opacity-75">Métriques de performance</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </PageLayout>
   );
 };
 
