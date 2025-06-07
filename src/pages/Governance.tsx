@@ -1,6 +1,6 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
-import { DAOModule } from "@/components/modules/DAOModule";
+import DAOModule from "@/components/modules/DAOModule";
 import { Vote } from "lucide-react";
 
 const Governance = () => {

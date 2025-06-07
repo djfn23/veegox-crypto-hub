@@ -1,6 +1,6 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
-import { ProfileSettings } from "@/components/modules/ProfileSettings";
+import ProfileSettings from "@/components/modules/ProfileSettings";
 import { Settings as SettingsIcon } from "lucide-react";
 
 const Settings = () => {

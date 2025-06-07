@@ -1,4 +1,3 @@
-
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,10 @@ import {
   Video,
   ExternalLink,
   ChevronRight,
-  Star
+  Star,
+  TrendingUp,
+  Image,
+  Shield
 } from "lucide-react";
 
 const helpCategories = [

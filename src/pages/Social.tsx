@@ -1,6 +1,6 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
-import { SocialModule } from "@/components/modules/social/SocialModule";
+import SocialModule from "@/components/modules/social/SocialModule";
 import { MessageCircle } from "lucide-react";
 
 const Social = () => {
