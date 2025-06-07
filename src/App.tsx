@@ -51,6 +51,16 @@ import CreditApplications from "./pages/credit/CreditApplications";
 import CreditHistory from "./pages/credit/CreditHistory";
 import CreditCollateral from "./pages/credit/CreditCollateral";
 
+// Crowdfunding sub-pages
+import CrowdfundingCampaigns from "./pages/crowdfunding/CrowdfundingCampaigns";
+import MyCampaigns from "./pages/crowdfunding/MyCampaigns";
+import MyContributions from "./pages/crowdfunding/MyContributions";
+import CreateCrowdfundingCampaign from "./pages/crowdfunding/CreateCrowdfundingCampaign";
+import CrowdfundingAnalytics from "./pages/crowdfunding/CrowdfundingAnalytics";
+import CrowdfundingCategories from "./pages/crowdfunding/CrowdfundingCategories";
+import CrowdfundingTrending from "./pages/crowdfunding/CrowdfundingTrending";
+import CrowdfundingFeatured from "./pages/crowdfunding/CrowdfundingFeatured";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -99,6 +109,14 @@ const App = () => (
             <Route path="/credit/collateral" element={<CreditCollateral />} />
             
             <Route path="/crowdfunding" element={<Crowdfunding />} />
+            <Route path="/crowdfunding/campaigns" element={<CrowdfundingCampaigns />} />
+            <Route path="/crowdfunding/my-campaigns" element={<MyCampaigns />} />
+            <Route path="/crowdfunding/my-contributions" element={<MyContributions />} />
+            <Route path="/crowdfunding/create" element={<CreateCrowdfundingCampaign />} />
+            <Route path="/crowdfunding/analytics" element={<CrowdfundingAnalytics />} />
+            <Route path="/crowdfunding/categories" element={<CrowdfundingCategories />} />
+            <Route path="/crowdfunding/trending" element={<CrowdfundingTrending />} />
+            <Route path="/crowdfunding/featured" element={<CrowdfundingFeatured />} />
             <Route path="/crowdfunding/:id" element={<CrowdfundingCampaign />} />
             
             <Route path="/social" element={<Social />} />
