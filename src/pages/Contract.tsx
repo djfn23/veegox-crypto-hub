@@ -1,19 +1,17 @@
 
+import { PageLayout } from "@/components/layout/PageLayout";
 import { MainContractDashboard } from "@/components/contract/MainContractDashboard";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { Shield } from "lucide-react";
+import { FileText } from "lucide-react";
 
 const Contract = () => {
   return (
-    <div className="max-w-7xl mx-auto">
-      <PageHeader
-        title="Smart Contract"
-        subtitle="Gérez votre token ERC20Template sur Polygon avec fonctionnalités avancées"
-        icon={<Shield className="h-8 w-8 text-purple-400" />}
-      />
-      
+    <PageLayout
+      title="Smart Contracts"
+      subtitle="Interagissez avec les contrats intelligents de l'écosystème"
+      icon={<FileText className="h-6 w-6 text-blue-400" />}
+    >
       <MainContractDashboard />
-    </div>
+    </PageLayout>
   );
 };
 

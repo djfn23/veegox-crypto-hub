@@ -1,271 +1,222 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageLayout } from "@/components/layout/PageLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { HelpCircle, Search, Book, Video, MessageSquare, ExternalLink, ChevronRight } from "lucide-react";
+import { 
+  HelpCircle, 
+  Search, 
+  MessageCircle, 
+  Book, 
+  Video,
+  ExternalLink,
+  ChevronRight,
+  Star
+} from "lucide-react";
+
+const helpCategories = [
+  {
+    title: "Premiers Pas",
+    icon: Book,
+    articles: 8,
+    color: "bg-blue-500",
+    topics: ["Créer un compte", "Connecter un wallet", "Premier dépôt", "Interface utilisateur"]
+  },
+  {
+    title: "Trading & DeFi",
+    icon: TrendingUp,
+    articles: 12,
+    color: "bg-green-500", 
+    topics: ["Swaps de tokens", "Pools de liquidité", "Yield farming", "Staking"]
+  },
+  {
+    title: "NFTs",
+    icon: Image,
+    articles: 6,
+    color: "bg-purple-500",
+    topics: ["Acheter des NFTs", "Créer des NFTs", "Collections", "Marketplace"]
+  },
+  {
+    title: "Sécurité",
+    icon: Shield,
+    articles: 10,
+    color: "bg-red-500",
+    topics: ["2FA", "Sécurité wallet", "Bonnes pratiques", "Récupération compte"]
+  }
+];
+
+const popularArticles = [
+  { title: "Comment connecter mon wallet MetaMask ?", views: "2.5k", rating: 4.8 },
+  { title: "Guide du yield farming pour débutants", views: "1.8k", rating: 4.9 },
+  { title: "Créer et vendre son premier NFT", views: "1.2k", rating: 4.7 },
+  { title: "Comprendre les frais de gas", views: "980", rating: 4.6 },
+  { title: "Sécuriser son portefeuille crypto", views: "750", rating: 4.9 }
+];
 
 const Help = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const faqItems = [
-    {
-      category: "Démarrage",
-      questions: [
-        { q: "Comment créer mon premier token ?", a: "Rendez-vous dans le module Token Manager, cliquez sur 'Créer un Token', remplissez les informations requises et déployez sur la blockchain de votre choix." },
-        { q: "Comment connecter mon portefeuille ?", a: "Cliquez sur 'Connecter Portefeuille' en haut à droite, sélectionnez votre portefeuille (MetaMask, Coinbase, WalletConnect) et autorisez la connexion." },
-        { q: "Quelles blockchains sont supportées ?", a: "Veegox supporte Ethereum, Polygon, Base et Arbitrum pour une expérience multi-chaînes optimale." }
-      ]
-    },
-    {
-      category: "DeFi",
-      questions: [
-        { q: "Comment fonctionne le scoring crédit IA ?", a: "Notre IA analyse votre historique on-chain, vos actifs, transactions et comportement DeFi pour calculer un score de crédit décentralisé." },
-        { q: "Quels sont les frais de staking ?", a: "Les frais varient selon le pool : généralement 2-5% de commission sur les récompenses. Consultez chaque pool pour les détails." },
-        { q: "Comment voter dans une DAO ?", a: "Vous devez détenir les tokens de gouvernance de la DAO. Allez dans le module DAO, sélectionnez une proposition et votez avec vos tokens." }
-      ]
-    },
-    {
-      category: "Sécurité",
-      questions: [
-        { q: "Mes fonds sont-ils sécurisés ?", a: "Vos fonds restent dans vos portefeuilles. Veegox n'a jamais accès à vos clés privées. Nous utilisons des smart contracts audités." },
-        { q: "Comment activer l'authentification 2FA ?", a: "Allez dans Profil > Sécurité > Authentification à deux facteurs et suivez les instructions pour configurer votre application authenticator." },
-        { q: "Que faire si je détecte une activité suspecte ?", a: "Déconnectez immédiatement tous vos portefeuilles, changez vos mots de passe et contactez notre support via le chat." }
-      ]
-    }
-  ];
-
-  const tutorials = [
-    { title: "Premiers pas avec Veegox", duration: "5 min", difficulty: "Débutant", type: "video" },
-    { title: "Créer et déployer un token ERC-20", duration: "10 min", difficulty: "Intermédiaire", type: "guide" },
-    { title: "Optimiser ses rendements de staking", duration: "8 min", difficulty: "Avancé", type: "video" },
-    { title: "Guide complet du module crédit IA", duration: "15 min", difficulty: "Intermédiaire", type: "guide" },
-    { title: "Participer à la gouvernance DAO", duration: "7 min", difficulty: "Débutant", type: "video" },
-    { title: "Stratégies d'investissement DeFi", duration: "20 min", difficulty: "Avancé", type: "guide" }
-  ];
-
-  const quickLinks = [
-    { title: "Status des Services", url: "https://status.veegox.com", external: true },
-    { title: "Documentation API", url: "/api-docs", external: false },
-    { title: "Communauté Discord", url: "https://discord.gg/veegox", external: true },
-    { title: "Blog Veegox", url: "/blog", external: false },
-    { title: "Rapports d'Audit", url: "/security", external: false },
-    { title: "Roadmap Produit", url: "/roadmap", external: false }
-  ];
-
-  const filteredFAQ = faqItems.map(category => ({
-    ...category,
-    questions: category.questions.filter(item => 
-      item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.a.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  })).filter(category => category.questions.length > 0);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center space-x-3 mb-8">
-          <HelpCircle className="h-8 w-8 text-purple-400" />
-          <h1 className="text-3xl font-bold text-white">Centre d'Aide</h1>
+    <PageLayout
+      title="Centre d'Aide"
+      subtitle="Trouvez des réponses à vos questions sur Veegox"
+      icon={<HelpCircle className="h-6 w-6 text-blue-400" />}
+    >
+      <div className="space-y-8">
+        {/* Search */}
+        <Card className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-500/30">
+          <CardContent className="p-6">
+            <div className="max-w-2xl mx-auto">
+              <h2 className="text-white text-xl font-semibold mb-4 text-center">
+                Comment pouvons-nous vous aider ?
+              </h2>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Input 
+                  placeholder="Rechercher dans la documentation..."
+                  className="pl-10 bg-white/10 border-white/20 text-white text-lg h-12"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <div className="grid md:grid-cols-3 gap-4">
+          <Card className="bg-slate-900/50 border-slate-700 hover:border-blue-500/50 transition-colors cursor-pointer">
+            <CardContent className="p-6 text-center">
+              <MessageCircle className="h-12 w-12 text-blue-400 mx-auto mb-3" />
+              <h3 className="text-white font-semibold mb-2">Chat en Direct</h3>
+              <p className="text-gray-400 text-sm mb-4">Parlez à notre équipe support</p>
+              <Badge variant="secondary" className="bg-green-600/20 text-green-300">
+                En ligne
+              </Badge>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-900/50 border-slate-700 hover:border-purple-500/50 transition-colors cursor-pointer">
+            <CardContent className="p-6 text-center">
+              <Video className="h-12 w-12 text-purple-400 mx-auto mb-3" />
+              <h3 className="text-white font-semibold mb-2">Tutoriels Vidéo</h3>
+              <p className="text-gray-400 text-sm mb-4">Guides visuels étape par étape</p>
+              <Badge variant="secondary" className="bg-purple-600/20 text-purple-300">
+                12 vidéos
+              </Badge>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-900/50 border-slate-700 hover:border-green-500/50 transition-colors cursor-pointer">
+            <CardContent className="p-6 text-center">
+              <Book className="h-12 w-12 text-green-400 mx-auto mb-3" />
+              <h3 className="text-white font-semibold mb-2">Documentation</h3>
+              <p className="text-gray-400 text-sm mb-4">Guide complet développeurs</p>
+              <Button variant="outline" size="sm" className="border-green-500/30 text-green-300">
+                <ExternalLink className="h-3 w-3 mr-1" />
+                Ouvrir
+              </Button>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative mb-8">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            placeholder="Rechercher dans la documentation..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400"
-          />
-        </div>
-
-        <Tabs defaultValue="faq" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-white/10">
-            <TabsTrigger value="faq" className="text-white">FAQ</TabsTrigger>
-            <TabsTrigger value="tutorials" className="text-white">Tutoriels</TabsTrigger>
-            <TabsTrigger value="guides" className="text-white">Guides</TabsTrigger>
-            <TabsTrigger value="contact" className="text-white">Contact</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="faq" className="mt-6">
-            <div className="grid gap-6">
-              {(searchQuery ? filteredFAQ : faqItems).map((category, categoryIndex) => (
-                <Card key={categoryIndex} className="bg-white/5 border-white/10 backdrop-blur-sm">
-                  <CardHeader>
-                    <CardTitle className="text-white">{category.category}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {category.questions.map((item, index) => (
-                        <div key={index} className="border-b border-white/10 pb-4 last:border-b-0">
-                          <h4 className="text-white font-medium mb-2">{item.q}</h4>
-                          <p className="text-gray-300 text-sm">{item.a}</p>
+        {/* Categories */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 className="text-white text-xl font-semibold mb-4">Catégories d'Aide</h3>
+            <div className="space-y-3">
+              {helpCategories.map((category, index) => (
+                <Card key={index} className="bg-slate-900/50 border-slate-700 hover:border-gray-600 transition-colors cursor-pointer">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 ${category.color} rounded-lg flex items-center justify-center`}>
+                        <category.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-white font-medium">{category.title}</h4>
+                          <ChevronRight className="h-4 w-4 text-gray-400" />
                         </div>
-                      ))}
+                        <p className="text-gray-400 text-sm">{category.articles} articles disponibles</p>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {category.topics.slice(0, 2).map((topic, i) => (
+                            <Badge key={i} variant="secondary" className="text-xs bg-white/10">
+                              {topic}
+                            </Badge>
+                          ))}
+                          {category.topics.length > 2 && (
+                            <Badge variant="secondary" className="text-xs bg-white/10">
+                              +{category.topics.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               ))}
-              {searchQuery && filteredFAQ.length === 0 && (
-                <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                  <CardContent className="text-center py-8">
-                    <Search className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                    <p className="text-gray-400">Aucun résultat trouvé pour "{searchQuery}"</p>
-                    <Button variant="outline" className="mt-4" onClick={() => setSearchQuery("")}>
-                      Effacer la recherche
-                    </Button>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-white text-xl font-semibold mb-4">Articles Populaires</h3>
+            <div className="space-y-3">
+              {popularArticles.map((article, index) => (
+                <Card key={index} className="bg-slate-900/50 border-slate-700 hover:border-gray-600 transition-colors cursor-pointer">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="text-white font-medium mb-2">{article.title}</h4>
+                        <div className="flex items-center gap-3 text-sm">
+                          <span className="text-gray-400">{article.views} vues</span>
+                          <div className="flex items-center gap-1">
+                            <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                            <span className="text-yellow-400">{article.rating}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-gray-400 mt-1" />
+                    </div>
                   </CardContent>
                 </Card>
-              )}
+              ))}
             </div>
-          </TabsContent>
 
-          <TabsContent value="tutorials" className="mt-6">
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white">Tutoriels Vidéo et Guides</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Apprenez à utiliser Veegox avec nos tutoriels détaillés
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {tutorials.map((tutorial, index) => (
-                    <div key={index} className="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center space-x-2">
-                          {tutorial.type === 'video' ? (
-                            <Video className="h-4 w-4 text-red-400" />
-                          ) : (
-                            <Book className="h-4 w-4 text-blue-400" />
-                          )}
-                          <Badge variant="secondary" className="text-xs">
-                            {tutorial.difficulty}
-                          </Badge>
-                        </div>
-                        <span className="text-gray-400 text-xs">{tutorial.duration}</span>
-                      </div>
-                      <h4 className="text-white font-medium mb-2">{tutorial.title}</h4>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-400 text-sm capitalize">{tutorial.type}</span>
-                        <ChevronRight className="h-4 w-4 text-gray-400" />
-                      </div>
-                    </div>
-                  ))}
+            <Button variant="outline" className="w-full mt-4">
+              Voir tous les articles
+            </Button>
+          </div>
+        </div>
+
+        {/* Contact Support */}
+        <Card className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border-green-500/30">
+          <CardHeader>
+            <CardTitle className="text-white">Besoin d'Aide Supplémentaire ?</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-gray-300 mb-4">
+                  Notre équipe support est disponible 24/7 pour vous aider avec vos questions.
+                </p>
+                <div className="space-y-2 text-sm">
+                  <p className="text-gray-400">📧 support@veegox.com</p>
+                  <p className="text-gray-400">💬 Chat en direct disponible</p>
+                  <p className="text-gray-400">⏱️ Temps de réponse moyen : 2 heures</p>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="guides" className="mt-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white">Liens Rapides</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Accès direct aux ressources importantes
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {quickLinks.map((link, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                        <span className="text-white">{link.title}</span>
-                        <ExternalLink className="h-4 w-4 text-gray-400" />
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white">Glossaire DeFi</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Termes et concepts essentiels
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="p-3 rounded-lg bg-white/5">
-                      <h4 className="text-white font-medium">TVL (Total Value Locked)</h4>
-                      <p className="text-gray-400 text-sm">Valeur totale des actifs verrouillés dans un protocole DeFi</p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-white/5">
-                      <h4 className="text-white font-medium">Yield Farming</h4>
-                      <p className="text-gray-400 text-sm">Stratégie pour maximiser les rendements en DeFi</p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-white/5">
-                      <h4 className="text-white font-medium">Liquidity Pool</h4>
-                      <p className="text-gray-400 text-sm">Pool de tokens utilisé pour faciliter les échanges décentralisés</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              </div>
+              <div className="space-y-3">
+                <Button className="w-full bg-green-600 hover:bg-green-700">
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Contacter le Support
+                </Button>
+                <Button variant="outline" className="w-full">
+                  <Book className="h-4 w-4 mr-2" />
+                  Parcourir la FAQ
+                </Button>
+              </div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="contact" className="mt-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white">Support Direct</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Contactez notre équipe pour une aide personnalisée
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <Button className="w-full justify-start" variant="outline">
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Chat en Direct
-                      <Badge className="ml-auto bg-green-500">En ligne</Badge>
-                    </Button>
-                    <Button className="w-full justify-start" variant="outline">
-                      <HelpCircle className="h-4 w-4 mr-2" />
-                      Créer un Ticket
-                    </Button>
-                    <div className="text-center text-gray-400 text-sm">
-                      Temps de réponse moyen: 15 minutes
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white">Communauté</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Rejoignez la communauté Veegox
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <Button className="w-full justify-start" variant="outline">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Discord Veegox
-                      <Badge className="ml-auto">12.5k membres</Badge>
-                    </Button>
-                    <Button className="w-full justify-start" variant="outline">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Telegram
-                      <Badge className="ml-auto">8.2k membres</Badge>
-                    </Button>
-                    <Button className="w-full justify-start" variant="outline">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Forum Communautaire
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

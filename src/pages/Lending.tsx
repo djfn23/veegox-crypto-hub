@@ -1,289 +1,339 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Banknote, TrendingUp, Shield, AlertTriangle } from "lucide-react";
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Banknote, 
+  TrendingUp, 
+  Shield, 
+  DollarSign,
+  Percent,
+  Clock,
+  AlertTriangle,
+  CheckCircle
+} from "lucide-react";
+
+const lendingPools = [
+  {
+    asset: 'USDC',
+    supplyAPY: '8.5%',
+    borrowAPY: '12.3%',
+    totalSupplied: '$12.5M',
+    totalBorrowed: '$8.9M',
+    utilization: '71%',
+    mySupply: '$2,500',
+    myBorrow: '$0',
+    collateralFactor: '85%'
+  },
+  {
+    asset: 'ETH',
+    supplyAPY: '4.2%',
+    borrowAPY: '6.8%',
+    totalSupplied: '$45.2M',
+    totalBorrowed: '$28.1M',
+    utilization: '62%',
+    mySupply: '$0',
+    myBorrow: '$1,200',
+    collateralFactor: '80%'
+  },
+  {
+    asset: 'VEEGOX',
+    supplyAPY: '15.6%',
+    borrowAPY: '22.4%',
+    totalSupplied: '$5.8M',
+    totalBorrowed: '$3.2M',
+    utilization: '55%',
+    mySupply: '$1,000',
+    myBorrow: '$0',
+    collateralFactor: '70%'
+  }
+];
 
 const Lending = () => {
-  const [supplyAmount, setSupplyAmount] = useState("");
-  const [borrowAmount, setBorrowAmount] = useState("");
-
-  const lendingPools = [
-    {
-      asset: "USDC",
-      supplyApy: 4.2,
-      borrowApy: 6.8,
-      totalSupplied: "12.4M",
-      totalBorrowed: "8.9M",
-      utilization: 72,
-      collateralFactor: 80,
-      liquidationThreshold: 85
-    },
-    {
-      asset: "ETH",
-      supplyApy: 3.8,
-      borrowApy: 5.9,
-      totalSupplied: "5.2M",
-      totalBorrowed: "3.1M",
-      utilization: 60,
-      collateralFactor: 75,
-      liquidationThreshold: 82
-    },
-    {
-      asset: "MATIC",
-      supplyApy: 5.1,
-      borrowApy: 7.3,
-      totalSupplied: "8.7M",
-      totalBorrowed: "5.4M",
-      utilization: 62,
-      collateralFactor: 70,
-      liquidationThreshold: 80
-    }
-  ];
-
-  const myPositions = [
-    {
-      type: "supply",
-      asset: "USDC",
-      amount: "1,000",
-      apy: 4.2,
-      earned: "12.34"
-    },
-    {
-      type: "borrow",
-      asset: "ETH",
-      amount: "0.5",
-      apy: 5.9,
-      debt: "892.45"
-    }
-  ];
-
   return (
     <PageLayout
-      title="Prêt & Emprunt"
-      subtitle="Prêtez vos actifs pour gagner des intérêts ou empruntez contre vos collatéraux"
+      title="Lending & Borrowing"
+      subtitle="Prêtez vos actifs ou empruntez contre collatéral"
+      icon={<Banknote className="h-6 w-6 text-green-400" />}
     >
       <div className="space-y-6">
-        {/* Overview Stats */}
-        <div className="grid md:grid-cols-4 gap-4">
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Banknote className="h-8 w-8 text-green-400" />
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="bg-gradient-to-r from-green-900/40 to-emerald-900/40 border-green-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm">Total Fourni</p>
-                  <p className="text-white text-xl font-bold">$1,000</p>
+                  <p className="text-green-300 text-sm">Total Fourni</p>
+                  <p className="text-2xl font-bold text-white">$3,500</p>
+                  <p className="text-green-400 text-sm">2 actifs</p>
                 </div>
+                <TrendingUp className="h-8 w-8 text-green-400" />
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="h-8 w-8 text-blue-400" />
+
+          <Card className="bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border-blue-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm">Total Emprunté</p>
-                  <p className="text-white text-xl font-bold">$892</p>
+                  <p className="text-blue-300 text-sm">Total Emprunté</p>
+                  <p className="text-2xl font-bold text-white">$1,200</p>
+                  <p className="text-blue-400 text-sm">1 actif</p>
                 </div>
+                <Banknote className="h-8 w-8 text-blue-400" />
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Shield className="h-8 w-8 text-purple-400" />
+
+          <Card className="bg-gradient-to-r from-purple-900/40 to-pink-900/40 border-purple-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm">Ratio Santé</p>
-                  <p className="text-green-400 text-xl font-bold">1.85</p>
+                  <p className="text-purple-300 text-sm">Revenus Net</p>
+                  <p className="text-2xl font-bold text-white">$156.80</p>
+                  <p className="text-purple-400 text-sm">Ce mois</p>
                 </div>
+                <DollarSign className="h-8 w-8 text-purple-400" />
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="h-8 w-8 text-yellow-400" />
+
+          <Card className="bg-gradient-to-r from-orange-900/40 to-red-900/40 border-orange-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm">Pouvoir d'Emprunt</p>
-                  <p className="text-white text-xl font-bold">$108</p>
+                  <p className="text-orange-300 text-sm">Ratio Santé</p>
+                  <p className="text-2xl font-bold text-white">2.8</p>
+                  <p className="text-orange-400 text-sm">Sécurisé</p>
                 </div>
+                <Shield className="h-8 w-8 text-orange-400" />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <Tabs defaultValue="markets" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-800 border-gray-700">
-            <TabsTrigger value="markets" className="text-gray-300 data-[state=active]:text-white">
-              Marchés
-            </TabsTrigger>
-            <TabsTrigger value="supply" className="text-gray-300 data-[state=active]:text-white">
-              Mes Dépôts
-            </TabsTrigger>
-            <TabsTrigger value="borrow" className="text-gray-300 data-[state=active]:text-white">
-              Mes Emprunts
-            </TabsTrigger>
+        {/* Lending Interface */}
+        <Tabs defaultValue="supply" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="supply">Fournir</TabsTrigger>
+            <TabsTrigger value="borrow">Emprunter</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="markets" className="space-y-4">
-            <h2 className="text-2xl font-bold text-white">Marchés de Prêt</h2>
-            
-            {lendingPools.map((pool) => (
-              <Card key={pool.asset} className="bg-gray-800/50 border-gray-700">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-                        {pool.asset.slice(0, 2)}
-                      </div>
-                      <div>
-                        <CardTitle className="text-white">{pool.asset}</CardTitle>
-                        <CardDescription>
-                          Utilisation: {pool.utilization}%
-                        </CardDescription>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant="outline" className="border-green-600 text-green-400">
-                        APY Dépôt: {pool.supplyApy}%
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent>
-                  <div className="grid md:grid-cols-5 gap-4 mb-4">
-                    <div>
-                      <p className="text-gray-400 text-sm">Total Fourni</p>
-                      <p className="text-white font-semibold">${pool.totalSupplied}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-sm">Total Emprunté</p>
-                      <p className="text-white font-semibold">${pool.totalBorrowed}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-sm">APY Emprunt</p>
-                      <p className="text-red-400 font-semibold">{pool.borrowApy}%</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-sm">Facteur Collatéral</p>
-                      <p className="text-white font-semibold">{pool.collateralFactor}%</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-sm">Utilisation</p>
-                      <Progress value={pool.utilization} className="mt-1" />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="flex-1">
-                      <Input
-                        type="number"
-                        placeholder={`Montant ${pool.asset}`}
-                        className="bg-gray-900 border-gray-600 text-white"
-                      />
-                    </div>
-                    <Button className="bg-green-600 hover:bg-green-700">
-                      Fournir
-                    </Button>
-                    <Button className="bg-red-600 hover:bg-red-700">
-                      Emprunter
+          <TabsContent value="supply" className="space-y-6">
+            <Card className="bg-gradient-to-r from-green-900/20 to-emerald-900/20 border-green-500/30">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-green-400" />
+                  Fournir des Liquidités
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-gray-300">Asset à Fournir</Label>
+                    <Button variant="outline" className="w-full mt-2 border-green-500/30 text-green-300 hover:bg-green-500/10">
+                      USDC
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                  <div>
+                    <Label className="text-gray-300">Montant</Label>
+                    <Input 
+                      placeholder="0.0" 
+                      className="bg-white/5 border-white/10 text-white mt-2"
+                    />
+                  </div>
+                </div>
+                <div className="bg-white/5 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-300">APY de Supply</span>
+                    <span className="text-green-400 font-bold">8.5%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-300">Revenus Estimés (annuel)</span>
+                    <span className="text-white">~$85.00</span>
+                  </div>
+                </div>
+                <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
+                  Fournir USDC
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
 
-          <TabsContent value="supply" className="space-y-4">
-            <h2 className="text-2xl font-bold text-white">Mes Positions de Dépôt</h2>
-            
-            {myPositions.filter(p => p.type === 'supply').map((position, index) => (
-              <Card key={index} className="bg-gray-800/50 border-gray-700">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-                        {position.asset.slice(0, 2)}
-                      </div>
-                      <div>
-                        <p className="text-white font-semibold">{position.asset}</p>
-                        <p className="text-gray-400 text-sm">Fourni: {position.amount}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-green-400 font-semibold">APY: {position.apy}%</p>
-                      <p className="text-gray-400 text-sm">Gagné: ${position.earned}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 mt-4">
-                    <Button variant="outline" className="border-gray-600 text-gray-300">
-                      Retirer
-                    </Button>
-                    <Button className="bg-purple-600 hover:bg-purple-700">
-                      Ajouter
+          <TabsContent value="borrow" className="space-y-6">
+            <Card className="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border-blue-500/30">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Banknote className="h-5 w-5 text-blue-400" />
+                  Emprunter des Actifs
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-gray-300">Asset à Emprunter</Label>
+                    <Button variant="outline" className="w-full mt-2 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">
+                      ETH
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="borrow" className="space-y-4">
-            <h2 className="text-2xl font-bold text-white">Mes Positions d'Emprunt</h2>
-            
-            {myPositions.filter(p => p.type === 'borrow').map((position, index) => (
-              <Card key={index} className="bg-gray-800/50 border-gray-700">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white font-bold">
-                        {position.asset.slice(0, 2)}
-                      </div>
-                      <div>
-                        <p className="text-white font-semibold">{position.asset}</p>
-                        <p className="text-gray-400 text-sm">Emprunté: {position.amount}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-red-400 font-semibold">APY: {position.apy}%</p>
-                      <p className="text-gray-400 text-sm">Dette: ${position.debt}</p>
-                    </div>
+                  <div>
+                    <Label className="text-gray-300">Montant</Label>
+                    <Input 
+                      placeholder="0.0" 
+                      className="bg-white/5 border-white/10 text-white mt-2"
+                    />
                   </div>
-                  <div className="flex gap-2 mt-4">
-                    <Button className="bg-green-600 hover:bg-green-700">
-                      Rembourser
-                    </Button>
-                    <Button variant="outline" className="border-gray-600 text-gray-300">
-                      Emprunter Plus
-                    </Button>
+                </div>
+                <div className="bg-white/5 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-300">APY d'Emprunt</span>
+                    <span className="text-red-400 font-bold">6.8%</span>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-300">Collatéral Requis</span>
+                    <span className="text-white">125%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-300">Ratio de Santé</span>
+                    <span className="text-green-400">2.5 (Sécurisé)</span>
+                  </div>
+                </div>
+                <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                  Emprunter ETH
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 
-        {/* Risk Warning */}
-        <Card className="bg-red-900/20 border-red-900">
+        {/* Markets Overview */}
+        <Card className="bg-slate-900/50 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-red-400 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
-              Avertissement de Risque
-            </CardTitle>
+            <CardTitle className="text-white">Marchés de Prêt</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-red-300">
-              Le prêt et l'emprunt impliquent des risques. Votre collatéral peut être liquidé si le ratio de santé tombe en dessous du seuil de liquidation. 
-              Assurez-vous de comprendre les risques avant de procéder.
-            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th className="text-left text-gray-400 pb-3">Asset</th>
+                    <th className="text-left text-gray-400 pb-3">Supply APY</th>
+                    <th className="text-left text-gray-400 pb-3">Borrow APY</th>
+                    <th className="text-left text-gray-400 pb-3">Total Supplied</th>
+                    <th className="text-left text-gray-400 pb-3">Utilisation</th>
+                    <th className="text-left text-gray-400 pb-3">Mes Positions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lendingPools.map((pool, index) => (
+                    <tr key={index} className="border-b border-white/5">
+                      <td className="py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            pool.asset === 'USDC' ? 'bg-green-600' :
+                            pool.asset === 'ETH' ? 'bg-blue-600' : 'bg-purple-600'
+                          }`}>
+                            <span className="text-white font-bold text-xs">{pool.asset.slice(0, 2)}</span>
+                          </div>
+                          <span className="text-white font-medium">{pool.asset}</span>
+                        </div>
+                      </td>
+                      <td className="py-4">
+                        <span className="text-green-400 font-medium">{pool.supplyAPY}</span>
+                      </td>
+                      <td className="py-4">
+                        <span className="text-red-400 font-medium">{pool.borrowAPY}</span>
+                      </td>
+                      <td className="py-4">
+                        <span className="text-white">{pool.totalSupplied}</span>
+                      </td>
+                      <td className="py-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white">{pool.utilization}</span>
+                          <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-green-500 to-yellow-500"
+                              style={{ width: pool.utilization }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4">
+                        <div className="space-y-1">
+                          {pool.mySupply !== '$0' && (
+                            <div className="text-green-400 text-sm">Supply: {pool.mySupply}</div>
+                          )}
+                          {pool.myBorrow !== '$0' && (
+                            <div className="text-red-400 text-sm">Borrow: {pool.myBorrow}</div>
+                          )}
+                          {pool.mySupply === '$0' && pool.myBorrow === '$0' && (
+                            <span className="text-gray-400 text-sm">Aucune position</span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </CardContent>
         </Card>
+
+        {/* Risk Management */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border-yellow-500/30">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-yellow-400" />
+                Gestion des Risques
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">Ratio de Liquidation</span>
+                <span className="text-yellow-400">1.25</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">Seuil d'Alerte</span>
+                <span className="text-orange-400">1.5</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">État Actuel</span>
+                <Badge variant="secondary" className="bg-green-600/20 text-green-300">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Sécurisé
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-purple-900/20 to-pink-900/20 border-purple-500/30">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Percent className="h-5 w-5 text-purple-400" />
+                Revenus et Coûts
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">Revenus de Supply</span>
+                <span className="text-green-400">+$12.50/mois</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">Coûts d'Emprunt</span>
+                <span className="text-red-400">-$6.80/mois</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">Net</span>
+                <span className="text-green-400 font-bold">+$5.70/mois</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </PageLayout>
   );

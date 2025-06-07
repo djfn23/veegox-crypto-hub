@@ -1,314 +1,251 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageLayout } from "@/components/layout/PageLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Scale, Shield, FileText, AlertTriangle } from "lucide-react";
+import { Scale, FileText, Shield, Clock } from "lucide-react";
 
 const Legal = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900 p-6">
+    <PageLayout
+      title="Mentions Légales"
+      subtitle="Conditions d'utilisation et politique de confidentialité"
+      icon={<Scale className="h-6 w-6 text-blue-400" />}
+    >
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center space-x-3 mb-8">
-          <Scale className="h-8 w-8 text-purple-400" />
-          <h1 className="text-3xl font-bold text-white">Mentions Légales</h1>
-        </div>
-
-        <Tabs defaultValue="terms" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-white/10">
-            <TabsTrigger value="terms" className="text-white">CGU</TabsTrigger>
-            <TabsTrigger value="privacy" className="text-white">Confidentialité</TabsTrigger>
-            <TabsTrigger value="disclaimers" className="text-white">Avertissements</TabsTrigger>
-            <TabsTrigger value="company" className="text-white">Société</TabsTrigger>
+        <Tabs defaultValue="terms" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="terms">Conditions d'Utilisation</TabsTrigger>
+            <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
+            <TabsTrigger value="risks">Avertissements</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="terms" className="mt-6">
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+          <TabsContent value="terms" className="space-y-6">
+            <Card className="bg-slate-900/50 border-slate-700">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-white">Conditions Générales d'Utilisation</CardTitle>
-                  <Badge className="bg-green-500/20 text-green-400">Version 2.1</Badge>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-blue-400" />
+                    Conditions d'Utilisation
+                  </CardTitle>
+                  <Badge variant="secondary" className="bg-blue-600/20 text-blue-300">
+                    Version 2.1
+                  </Badge>
                 </div>
-                <CardDescription className="text-gray-300">
-                  Dernière mise à jour : 15 janvier 2024
-                </CardDescription>
+                <p className="text-gray-400">Dernière mise à jour : 15 décembre 2024</p>
               </CardHeader>
               <CardContent className="space-y-6 text-gray-300">
                 <section>
-                  <h3 className="text-white font-semibold mb-3">1. Acceptation des Conditions</h3>
-                  <p className="mb-4">
-                    En accédant et en utilisant la plateforme Veegox, vous acceptez d'être lié par les présentes 
-                    conditions générales d'utilisation. Si vous n'acceptez pas ces conditions, vous ne devez 
-                    pas utiliser nos services.
+                  <h3 className="text-white text-lg font-semibold mb-3">1. Acceptation des Conditions</h3>
+                  <p className="leading-relaxed">
+                    En accédant et en utilisant la plateforme Veegox, vous acceptez d'être lié par ces conditions d'utilisation. 
+                    Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser nos services.
                   </p>
                 </section>
 
                 <section>
-                  <h3 className="text-white font-semibold mb-3">2. Description du Service</h3>
-                  <p className="mb-4">
+                  <h3 className="text-white text-lg font-semibold mb-3">2. Description du Service</h3>
+                  <p className="leading-relaxed mb-3">
                     Veegox est une plateforme DeFi (Finance Décentralisée) qui permet aux utilisateurs de :
                   </p>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Créer et gérer des tokens (ERC-20, NFT)</li>
-                    <li>Accéder à des services de prêt avec scoring IA</li>
-                    <li>Participer au staking de cryptomonnaies</li>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Échanger des crypto-monnaies</li>
+                    <li>Participer à des pools de liquidité</li>
+                    <li>Staker des tokens pour gagner des récompenses</li>
                     <li>Participer à la gouvernance DAO</li>
-                    <li>Échanger des tokens de manière décentralisée</li>
+                    <li>Créer et échanger des NFTs</li>
                   </ul>
                 </section>
 
                 <section>
-                  <h3 className="text-white font-semibold mb-3">3. Éligibilité</h3>
-                  <p className="mb-4">
-                    Vous devez avoir au moins 18 ans et être légalement autorisé à utiliser nos services 
-                    dans votre juridiction. L'utilisation de Veegox peut être restreinte ou interdite 
-                    dans certains pays.
+                  <h3 className="text-white text-lg font-semibold mb-3">3. Éligibilité</h3>
+                  <p className="leading-relaxed">
+                    Vous devez avoir au moins 18 ans pour utiliser nos services. L'utilisation de Veegox peut être 
+                    restreinte ou interdite dans certaines juridictions. Il vous incombe de vous assurer que votre 
+                    utilisation est conforme aux lois locales.
                   </p>
                 </section>
 
                 <section>
-                  <h3 className="text-white font-semibold mb-3">4. Risques et Responsabilités</h3>
-                  <p className="mb-4">
-                    L'utilisation de services DeFi implique des risques significatifs, notamment :
-                  </p>
+                  <h3 className="text-white text-lg font-semibold mb-3">4. Responsabilités de l'Utilisateur</h3>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Volatilité des prix des cryptomonnaies</li>
-                    <li>Risques techniques liés aux smart contracts</li>
-                    <li>Risques de liquidité</li>
-                    <li>Changements réglementaires</li>
+                    <li>Maintenir la sécurité de vos clés privées et mots de passe</li>
+                    <li>Fournir des informations exactes et à jour</li>
+                    <li>Ne pas utiliser la plateforme à des fins illégales</li>
+                    <li>Respecter les droits de propriété intellectuelle</li>
                   </ul>
                 </section>
 
                 <section>
-                  <h3 className="text-white font-semibold mb-3">5. Propriété Intellectuelle</h3>
-                  <p className="mb-4">
-                    Tous les contenus, logos, marques et technologies de Veegox sont protégés par 
-                    des droits de propriété intellectuelle. Toute reproduction non autorisée est interdite.
+                  <h3 className="text-white text-lg font-semibold mb-3">5. Frais et Commissions</h3>
+                  <p className="leading-relaxed">
+                    L'utilisation de certains services peut entraîner des frais. Tous les frais sont clairement 
+                    affichés avant la confirmation des transactions. Les frais de gas blockchain sont à la charge 
+                    de l'utilisateur.
                   </p>
                 </section>
 
                 <section>
-                  <h3 className="text-white font-semibold mb-3">6. Limitation de Responsabilité</h3>
-                  <p className="mb-4">
-                    Veegox ne saurait être tenu responsable des pertes financières résultant de 
-                    l'utilisation de la plateforme, incluant mais non limité aux bugs de smart contracts, 
-                    erreurs d'utilisateur, ou conditions de marché défavorables.
+                  <h3 className="text-white text-lg font-semibold mb-3">6. Limitation de Responsabilité</h3>
+                  <p className="leading-relaxed">
+                    Veegox n'est pas responsable des pertes financières résultant de l'utilisation de la plateforme, 
+                    des fluctuations de prix des crypto-monnaies, ou des défaillances techniques des blockchains 
+                    sous-jacentes.
                   </p>
                 </section>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="privacy" className="mt-6">
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+          <TabsContent value="privacy" className="space-y-6">
+            <Card className="bg-slate-900/50 border-slate-700">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-white flex items-center">
-                    <Shield className="h-5 w-5 mr-2" />
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-green-400" />
                     Politique de Confidentialité
                   </CardTitle>
-                  <Badge className="bg-blue-500/20 text-blue-400">RGPD Compliant</Badge>
+                  <Badge variant="secondary" className="bg-green-600/20 text-green-300">
+                    RGPD Conforme
+                  </Badge>
                 </div>
-                <CardDescription className="text-gray-300">
-                  Dernière mise à jour : 15 janvier 2024
-                </CardDescription>
+                <p className="text-gray-400">Dernière mise à jour : 15 décembre 2024</p>
               </CardHeader>
               <CardContent className="space-y-6 text-gray-300">
                 <section>
-                  <h3 className="text-white font-semibold mb-3">1. Collecte de Données</h3>
-                  <p className="mb-4">
-                    Veegox collecte uniquement les données nécessaires au fonctionnement de la plateforme :
+                  <h3 className="text-white text-lg font-semibold mb-3">Collecte des Données</h3>
+                  <p className="leading-relaxed mb-3">
+                    Nous collectons les informations suivantes :
                   </p>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Adresses de wallet publiques</li>
+                    <li>Historique des transactions</li>
+                    <li>Données d'utilisation de la plateforme</li>
+                    <li>Informations techniques (IP, user agent)</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h3 className="text-white text-lg font-semibold mb-3">Utilisation des Données</h3>
+                  <p className="leading-relaxed">
+                    Vos données sont utilisées exclusivement pour améliorer nos services, assurer la sécurité 
+                    de la plateforme et respecter nos obligations légales. Nous ne vendons jamais vos données 
+                    personnelles à des tiers.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="text-white text-lg font-semibold mb-3">Protection des Données</h3>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Adresses de portefeuilles connectés</li>
-                    <li>Historique des transactions on-chain (publiques)</li>
-                    <li>Données de navigation anonymisées</li>
-                    <li>Préférences utilisateur</li>
+                    <li>Chiffrement end-to-end pour les données sensibles</li>
+                    <li>Stockage sécurisé avec authentification multi-facteurs</li>
+                    <li>Audits de sécurité réguliers</li>
+                    <li>Accès restreint aux données personnelles</li>
                   </ul>
                 </section>
 
                 <section>
-                  <h3 className="text-white font-semibold mb-3">2. Utilisation des Données</h3>
-                  <p className="mb-4">
-                    Vos données sont utilisées pour :
+                  <h3 className="text-white text-lg font-semibold mb-3">Vos Droits</h3>
+                  <p className="leading-relaxed mb-3">
+                    Conformément au RGPD, vous avez le droit de :
                   </p>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Calculer votre score de crédit IA</li>
-                    <li>Personnaliser votre expérience</li>
-                    <li>Fournir des recommandations d'investissement</li>
-                    <li>Assurer la sécurité de la plateforme</li>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Accéder à vos données personnelles</li>
+                    <li>Rectifier vos informations</li>
+                    <li>Supprimer votre compte</li>
+                    <li>Exporter vos données</li>
+                    <li>Vous opposer au traitement</li>
                   </ul>
                 </section>
 
                 <section>
-                  <h3 className="text-white font-semibold mb-3">3. Stockage et Sécurité</h3>
-                  <p className="mb-4">
-                    Toutes les données sont stockées de manière sécurisée avec chiffrement AES-256. 
-                    Nous n'avons jamais accès à vos clés privées - elles restent dans votre portefeuille.
-                  </p>
-                </section>
-
-                <section>
-                  <h3 className="text-white font-semibold mb-3">4. Partage de Données</h3>
-                  <p className="mb-4">
-                    Veegox ne vend, ne loue, ni ne partage vos données personnelles avec des tiers, 
-                    sauf dans les cas suivants :
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Obligation légale ou réglementaire</li>
-                    <li>Protection contre la fraude</li>
-                    <li>Consentement explicite de l'utilisateur</li>
-                  </ul>
-                </section>
-
-                <section>
-                  <h3 className="text-white font-semibold mb-3">5. Vos Droits</h3>
-                  <p className="mb-4">
-                    Conformément au RGPD, vous disposez des droits suivants :
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Accès à vos données personnelles</li>
-                    <li>Rectification des données incorrectes</li>
-                    <li>Suppression de vos données</li>
-                    <li>Portabilité des données</li>
-                    <li>Opposition au traitement</li>
-                  </ul>
-                </section>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="disclaimers" className="mt-6">
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <AlertTriangle className="h-5 w-5 mr-2 text-yellow-400" />
-                  Avertissements et Risques
-                </CardTitle>
-                <CardDescription className="text-gray-300">
-                  Informations importantes sur les risques liés à la DeFi
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6 text-gray-300">
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-                  <h3 className="text-red-400 font-semibold mb-3">⚠️ Risques Majeurs</h3>
-                  <ul className="space-y-2">
-                    <li>• <strong>Perte totale possible :</strong> Les investissements DeFi peuvent entraîner une perte totale du capital</li>
-                    <li>• <strong>Volatilité extrême :</strong> Les prix peuvent varier de plus de 50% en une journée</li>
-                    <li>• <strong>Risques techniques :</strong> Bugs dans les smart contracts, hacks, erreurs de code</li>
-                    <li>• <strong>Risque réglementaire :</strong> Changements dans la législation crypto</li>
-                  </ul>
-                </div>
-
-                <section>
-                  <h3 className="text-white font-semibold mb-3">Scoring Crédit IA</h3>
-                  <p className="mb-4">
-                    Le scoring crédit basé sur l'IA est expérimental et ne garantit pas la solvabilité. 
-                    Il ne doit pas être considéré comme un conseil financier professionnel.
-                  </p>
-                </section>
-
-                <section>
-                  <h3 className="text-white font-semibold mb-3">Recommandations d'Investissement</h3>
-                  <p className="mb-4">
-                    Les recommandations générées par notre IA sont basées sur des algorithmes et des 
-                    données historiques. Elles ne constituent pas des conseils en investissement personnalisés.
-                  </p>
-                </section>
-
-                <section>
-                  <h3 className="text-white font-semibold mb-3">Smart Contracts</h3>
-                  <p className="mb-4">
-                    Bien que nos smart contracts soient audités, ils peuvent contenir des bugs ou 
-                    vulnérabilités non détectées. Utilisez uniquement des fonds que vous pouvez vous permettre de perdre.
-                  </p>
-                </section>
-
-                <section>
-                  <h3 className="text-white font-semibold mb-3">Impermanent Loss</h3>
-                  <p className="mb-4">
-                    La fourniture de liquidité peut entraîner une "perte impermanente" si les prix 
-                    des tokens évoluent différemment par rapport à la simple détention.
+                  <h3 className="text-white text-lg font-semibold mb-3">Cookies et Tracking</h3>
+                  <p className="leading-relaxed">
+                    Nous utilisons des cookies essentiels pour le fonctionnement de la plateforme et des cookies 
+                    analytiques pour améliorer l'expérience utilisateur. Vous pouvez gérer vos préférences dans 
+                    les paramètres de votre navigateur.
                   </p>
                 </section>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="company" className="mt-6">
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+          <TabsContent value="risks" className="space-y-6">
+            <Card className="bg-gradient-to-r from-red-900/20 to-orange-900/20 border-red-500/30">
               <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <FileText className="h-5 w-5 mr-2" />
-                  Informations Société
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-red-400" />
+                  Avertissements sur les Risques
                 </CardTitle>
-                <CardDescription className="text-gray-300">
-                  Détails légaux de la société Veegox
-                </CardDescription>
+                <p className="text-red-300">
+                  Important : Lisez attentivement avant d'utiliser les services DeFi
+                </p>
               </CardHeader>
               <CardContent className="space-y-6 text-gray-300">
-                <section>
-                  <h3 className="text-white font-semibold mb-3">Identification de la Société</h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <p><strong>Dénomination sociale :</strong> Veegox SAS</p>
-                      <p><strong>Forme juridique :</strong> Société par Actions Simplifiée</p>
-                      <p><strong>Capital social :</strong> 100,000 EUR</p>
-                      <p><strong>SIRET :</strong> 12345678901234</p>
-                    </div>
-                    <div>
-                      <p><strong>RCS :</strong> Paris B 123 456 789</p>
-                      <p><strong>TVA Intracommunautaire :</strong> FR12345678901</p>
-                      <p><strong>Code APE :</strong> 6201Z</p>
-                    </div>
-                  </div>
-                </section>
-
-                <section>
-                  <h3 className="text-white font-semibold mb-3">Siège Social</h3>
-                  <p>
-                    123 Avenue des Champs-Élysées<br />
-                    75008 Paris, France
+                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                  <h4 className="text-red-300 font-semibold mb-2">⚠️ Risques Généraux</h4>
+                  <p className="text-sm">
+                    Les investissements en crypto-monnaies sont hautement spéculatifs et comportent des risques 
+                    importants de perte. Ne jamais investir plus que ce que vous pouvez vous permettre de perdre.
                   </p>
-                </section>
+                </div>
 
                 <section>
-                  <h3 className="text-white font-semibold mb-3">Direction</h3>
-                  <p><strong>Président :</strong> [Nom du Dirigeant]</p>
-                  <p><strong>Directeur de la Publication :</strong> [Nom du Directeur]</p>
-                </section>
-
-                <section>
-                  <h3 className="text-white font-semibold mb-3">Hébergement</h3>
-                  <p>
-                    <strong>Hébergeur :</strong> Vercel Inc.<br />
-                    340 S Lemon Ave #4133<br />
-                    Walnut, CA 91789, États-Unis
-                  </p>
-                </section>
-
-                <section>
-                  <h3 className="text-white font-semibold mb-3">Licences et Autorisations</h3>
-                  <ul className="space-y-2">
-                    <li>• <strong>PSAN :</strong> Prestataire de Services sur Actifs Numériques (en cours)</li>
-                    <li>• <strong>Audits :</strong> Smart contracts audités par Consensys Diligence</li>
-                    <li>• <strong>Assurance :</strong> Couverture cyber-risques 10M EUR</li>
+                  <h3 className="text-white text-lg font-semibold mb-3">Risques de Marché</h3>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li>Volatilité extrême des prix des crypto-monnaies</li>
+                    <li>Risque de perte totale du capital investi</li>
+                    <li>Fluctuations des APY et rendements</li>
+                    <li>Risque de liquidation en cas de collatéral insuffisant</li>
                   </ul>
                 </section>
 
                 <section>
-                  <h3 className="text-white font-semibold mb-3">Contact Légal</h3>
-                  <p>
-                    Pour toute question juridique :<br />
-                    <strong>Email :</strong> legal@veegox.com<br />
-                    <strong>Téléphone :</strong> +33 1 23 45 67 89
-                  </p>
+                  <h3 className="text-white text-lg font-semibold mb-3">Risques Techniques</h3>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li>Bugs ou vulnérabilités dans les smart contracts</li>
+                    <li>Risques de hacking ou d'exploit</li>
+                    <li>Congestion du réseau blockchain</li>
+                    <li>Frais de gas imprévisibles</li>
+                  </ul>
                 </section>
+
+                <section>
+                  <h3 className="text-white text-lg font-semibold mb-3">Risques Réglementaires</h3>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li>Changements dans la réglementation des crypto-monnaies</li>
+                    <li>Restrictions d'accès selon la juridiction</li>
+                    <li>Implications fiscales variables</li>
+                    <li>Conformité KYC/AML requise</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h3 className="text-white text-lg font-semibold mb-3">Risques de Liquidité</h3>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li>Difficultés à vendre ou échanger certains tokens</li>
+                    <li>Slippage important sur les gros ordres</li>
+                    <li>Périodes de lock-up pour le staking</li>
+                    <li>Risque d'impermanent loss dans les pools</li>
+                  </ul>
+                </section>
+
+                <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
+                  <h4 className="text-orange-300 font-semibold mb-2">💡 Recommandations</h4>
+                  <ul className="text-sm space-y-1">
+                    <li>• Diversifiez vos investissements</li>
+                    <li>• Commencez par de petits montants</li>
+                    <li>• Comprenez les mécanismes avant d'investir</li>
+                    <li>• Gardez vos clés privées en sécurité</li>
+                    <li>• Consultez un conseiller financier si nécessaire</li>
+                  </ul>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 
