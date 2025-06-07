@@ -28,29 +28,30 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-        {/* Mobile sidebar backdrop */}
-        {sidebarOpen && (
+        {/* Mobile sidebar backdrop - optimisé pour mobile */}
+        {sidebarOpen && isMobile && (
           <div 
-            className="fixed inset-0 z-40 mobile-overlay lg:hidden animate-mobile-fade-in"
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm animate-mobile-fade-in lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
-        {/* Sidebar */}
+        {/* Sidebar - amélioré pour mobile */}
         <div className={cn(
-          "fixed inset-y-0 left-0 z-50 w-80 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:w-72",
+          "fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out lg:translate-x-0",
+          "w-[280px] sm:w-[300px] lg:w-72",
           sidebarOpen ? "translate-x-0 animate-mobile-slide-up" : "-translate-x-full lg:translate-x-0"
         )}>
-          <MobileCard className="h-full mobile-card border-r border-white/10 flex flex-col">
-            {/* Header de la sidebar */}
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-xl font-heading">V</span>
+          <MobileCard className="h-full border-r border-white/10 flex flex-col overflow-hidden">
+            {/* Header de la sidebar - optimisé mobile */}
+            <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/10 flex-shrink-0">
+              <div className="flex items-center space-x-2 md:space-x-3 min-w-0">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                  <span className="text-white font-bold text-lg md:text-xl font-heading">V</span>
                 </div>
-                <div>
-                  <span className="text-white font-bold text-xl font-heading">Veegox</span>
-                  <p className="text-gray-400 text-xs">Crypto Hub</p>
+                <div className="min-w-0">
+                  <span className="text-white font-bold text-lg md:text-xl font-heading block truncate">Veegox</span>
+                  <p className="text-gray-400 text-xs hidden sm:block">Crypto Hub</p>
                 </div>
               </div>
               <TouchTarget
@@ -58,15 +59,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 variant="ghost"
                 shape="circle"
                 onClick={() => setSidebarOpen(false)}
-                className="lg:hidden"
+                className="lg:hidden flex-shrink-0"
               >
-                <X className="h-6 w-6 text-white" />
+                <X className="h-5 w-5 md:h-6 md:w-6 text-white" />
               </TouchTarget>
             </div>
 
-            {/* Navigation */}
+            {/* Navigation - avec scroll optimisé */}
             <div className="flex-1 overflow-hidden">
-              <div className="p-4">
+              <div className="p-3 md:p-4 h-full overflow-y-auto">
                 <SidebarNavigation 
                   onItemClick={() => isMobile && setSidebarOpen(false)}
                   isMobile={isMobile}
@@ -79,7 +80,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           </MobileCard>
         </div>
 
-        {/* Main content */}
+        {/* Main content - amélioré pour mobile */}
         <div className="lg:pl-72">
           {/* Mobile header */}
           <MobileHeader 
@@ -88,12 +89,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           />
 
           {/* Page content avec optimisation mobile */}
-          <main className="mobile-container mobile-section min-h-screen">
-            <div className="max-w-7xl mx-auto animate-mobile-fade-in">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
+          <main className="min-h-[calc(100vh-64px)] lg:min-h-screen">
+            <div className="px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 max-w-7xl mx-auto">
+              <div className="animate-mobile-fade-in">
+                {/* Breadcrumbs et recherche - masqués sur très petits écrans */}
+                <div className="hidden sm:flex items-center justify-between mb-4 md:mb-6">
                   <Breadcrumbs />
-                  <GlobalSearch />
+                  <div className="hidden md:block">
+                    <GlobalSearch />
+                  </div>
                 </div>
                 {children}
               </div>
