@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import Analytics from "./pages/Analytics";
@@ -52,6 +52,9 @@ const App = () => (
             <Route path="/contract" element={<Contract />} />
             <Route path="/governance" element={<Governance />} />
             <Route path="/governance/create" element={<CreateCampaign />} />
+            <Route path="/create-campaign" element={<CreateCampaign />} />
+            <Route path="/tokens" element={<Navigate to="/wallet" replace />} />
+            <Route path="/exchange" element={<Navigate to="/trading" replace />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/trading" element={<Trading />} />
             <Route path="/wallet" element={<Wallet />} />
