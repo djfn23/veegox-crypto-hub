@@ -1,122 +1,113 @@
-
-import React from "react"
-import { Link, useLocation } from "react-router-dom"
-import { cn } from "@/lib/utils"
-import { TouchTarget } from "@/components/ui/mobile-touch-target"
-import { MobileBadge, MobileHeading } from "@/components/ui/mobile-components"
+import { cn } from "@/lib/utils";
 import { 
   Home, 
   Wallet, 
-  CreditCard, 
   TrendingUp, 
   Users, 
-  Coins, 
-  BarChart3,
-  MessageSquare,
+  Settings, 
+  CreditCard,
+  Coins,
   Vote,
-  Brain,
-  Search,
-  Plus
-} from "lucide-react"
-import { texts, getResponsiveText } from "@/lib/constants/texts"
+  Target,
+  Image, // Ajouté pour NFT Marketplace
+  BarChart3,
+  Bell,
+  HelpCircle,
+  Shield
+} from "lucide-react";
+import { NavLink } from "react-router-dom";
 
-const primaryNavigation = [
-  { name: texts.navigation.primary.home, href: "/", icon: Home, badge: 0 },
-  { name: texts.navigation.primary.wallet, href: "/wallet", icon: Wallet, badge: 0 },
-  { name: texts.navigation.primary.tokens, href: "/tokens", icon: Coins, badge: 0 },
-  { name: texts.navigation.primary.exchange, href: "/exchange", icon: TrendingUp, badge: 0 },
-  { name: texts.navigation.primary.trading, href: "/trading", icon: BarChart3, badge: 0 },
-]
+const navigation = [
+  { name: "Accueil", href: "/", icon: Home },
+  { name: "Portefeuille", href: "/wallet", icon: Wallet },
+  { name: "Trading", href: "/trading", icon: TrendingUp },
+  { name: "NFT Marketplace", href: "/marketplace", icon: Image }, // Nouvelle route
+  { name: "Staking", href: "/staking", icon: Coins },
+  { name: "Crédit", href: "/credit", icon: CreditCard },
+  { name: "Crowdfunding", href: "/crowdfunding", icon: Target },
+  { name: "Gouvernance", href: "/governance", icon: Vote },
+  { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Social", href: "/social", icon: Users },
+];
 
-const financialNavigation = [
-  { name: texts.navigation.financial.credit, href: "/credit", icon: CreditCard, badge: 2 },
-  { name: texts.navigation.financial.staking, href: "/staking", icon: TrendingUp, badge: 0 },
-  { name: texts.navigation.financial.crowdfunding, href: "/crowdfunding", icon: Users, badge: 1 },
-  { name: texts.navigation.financial.createCampaign, href: "/create-campaign", icon: Plus, badge: 0 },
-]
+const settingsNavigation = [
+  { name: "Notifications", href: "/notifications", icon: Bell },
+  { name: "Sécurité", href: "/security", icon: Shield },
+  { name: "Paramètres", href: "/settings", icon: Settings },
+];
 
-const advancedNavigation = [
-  { name: texts.navigation.advanced.dao, href: "/dao", icon: Users, badge: 0 },
-  { name: texts.navigation.advanced.governance, href: "/governance", icon: Vote, badge: 3 },
-  { name: texts.navigation.advanced.marketAnalysis, href: "/market-analysis", icon: Search, badge: 0 },
-  { name: texts.navigation.advanced.analytics, href: "/analytics", icon: BarChart3, badge: 0 },
-  { name: texts.navigation.advanced.aiRecommendations, href: "/ai-recommendations", icon: Brain, badge: 1 },
-  { name: texts.navigation.advanced.social, href: "/social", icon: MessageSquare, badge: 5 },
-]
+const helpNavigation = [
+  { name: "Aide", href: "/help", icon: HelpCircle },
+  { name: "À propos", href: "/about", icon: Users },
+  { name: "Juridique", href: "/legal", icon: Shield },
+];
 
-interface SidebarNavigationProps {
-  onItemClick?: () => void
-  isMobile?: boolean
-}
-
-export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
-  onItemClick,
-  isMobile = false
-}) => {
-  const location = useLocation()
-
-  const renderNavGroup = (items: typeof primaryNavigation, title: string) => (
-    <div className="pb-4">
-      <MobileHeading level={6} className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">
-        {title}
-      </MobileHeading>
-      {items.map((item) => {
-        const isActive = location.pathname === item.href
-        return (
-          <TouchTarget
-            key={item.name.full}
-            asChild
-            size="lg"
-            variant="none"
-            className={cn(
-              "w-full justify-start mobile-nav-item px-3 text-sm font-medium mb-1 transition-all duration-200",
-              isActive 
-                ? "mobile-nav-active bg-gradient-to-r from-primary/20 to-secondary/20 border-l-4 border-primary" 
-                : "hover:bg-white/5 hover:border-l-4 hover:border-white/20"
-            )}
-          >
-            <Link
-              to={item.href}
-              onClick={() => isMobile && onItemClick?.()}
-              className="flex items-center space-x-3 w-full"
-            >
-              <item.icon className={cn(
-                "h-5 w-5 flex-shrink-0 transition-colors",
-                isActive ? "text-primary" : "text-gray-300"
-              )} />
-              <span className={cn(
-                "truncate transition-colors",
-                isActive ? "text-white font-medium" : "text-gray-300"
-              )}>
-                {getResponsiveText(item.name, isMobile)}
-              </span>
-              {item.badge > 0 && (
-                <MobileBadge
-                  variant="primary"
-                  size="sm"
-                  className="ml-auto"
-                >
-                  {item.badge}
-                </MobileBadge>
-              )}
-            </Link>
-          </TouchTarget>
-        )
-      })}
-    </div>
-  )
-
+export function SidebarNavigation() {
   return (
-    <nav className="space-y-2 overflow-y-auto max-h-[calc(100vh-200px)] pb-4">
-      {renderNavGroup(primaryNavigation, texts.navigation.sections.principal)}
-      
-      <div className="border-t border-white/10 pt-4">
-        {renderNavGroup(financialNavigation, texts.navigation.sections.finance)}
+    <div className="flex flex-col space-y-6">
+      <div className="flex-1 space-y-2">
+        {navigation.map((item) => (
+          <NavLink
+            key={item.href}
+            to={item.href}
+            className={({ isActive }) =>
+              cn(
+                "group flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-primary",
+                isActive
+                  ? "bg-secondary text-primary"
+                  : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              )
+            }
+          >
+            <item.icon className="h-4 w-4" />
+            <span>{item.name}</span>
+          </NavLink>
+        ))}
       </div>
-      
-      <div className="border-t border-white/10 pt-4">
-        {renderNavGroup(advancedNavigation, texts.navigation.sections.advanced)}
+      <div className="flex-1 space-y-2">
+        <h2 className="px-3 text-sm font-semibold text-gray-900 dark:text-gray-50">
+          Paramètres
+        </h2>
+        {settingsNavigation.map((item) => (
+          <NavLink
+            key={item.href}
+            to={item.href}
+            className={({ isActive }) =>
+              cn(
+                "group flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-primary",
+                isActive
+                  ? "bg-secondary text-primary"
+                  : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              )
+            }
+          >
+            <item.icon className="h-4 w-4" />
+            <span>{item.name}</span>
+          </NavLink>
+        ))}
       </div>
-    </nav>
-  )
+      <div className="flex-1 space-y-2">
+        <h2 className="px-3 text-sm font-semibold text-gray-900 dark:text-gray-50">
+          Aide
+        </h2>
+        {helpNavigation.map((item) => (
+          <NavLink
+            key={item.href}
+            to={item.href}
+            className={({ isActive }) =>
+              cn(
+                "group flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-primary",
+                isActive
+                  ? "bg-secondary text-primary"
+                  : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              )
+            }
+          >
+            <item.icon className="h-4 w-4" />
+            <span>{item.name}</span>
+          </NavLink>
+        ))}
+      </div>
+    </div>
+  );
 }
