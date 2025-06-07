@@ -54,7 +54,7 @@ const TouchTarget = React.forwardRef<HTMLDivElement, TouchTargetProps>(
           touchTargetVariants({ size, variant, shape, className }),
           disabled && "opacity-50 cursor-not-allowed pointer-events-none"
         )}
-        ref={ref as any}
+        ref={ref}
         {...props}
       />
     )
@@ -62,25 +62,51 @@ const TouchTarget = React.forwardRef<HTMLDivElement, TouchTargetProps>(
 )
 TouchTarget.displayName = "TouchTarget"
 
-// Specialized components for common use cases
-const TouchButton = React.forwardRef<HTMLButtonElement, TouchTargetProps>(
-  ({ className, size = "lg", variant = "button", children, disabled, ...props }, ref) => (
-    <TouchTarget asChild size={size} variant={variant} disabled={disabled} className={className}>
-      <button ref={ref} disabled={disabled} {...props}>
-        {children}
-      </button>
-    </TouchTarget>
+// Interfaces spécifiques pour chaque composant spécialisé
+export interface TouchButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    Pick<VariantProps<typeof touchTargetVariants>, 'size' | 'variant' | 'shape'> {
+  disabled?: boolean
+}
+
+export interface TouchLinkProps
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement>,
+    Pick<VariantProps<typeof touchTargetVariants>, 'size' | 'variant' | 'shape'> {
+  href: string
+}
+
+// Composants spécialisés avec leurs propres types
+const TouchButton = React.forwardRef<HTMLButtonElement, TouchButtonProps>(
+  ({ className, size = "lg", variant = "button", shape, children, disabled, ...props }, ref) => (
+    <button
+      ref={ref}
+      disabled={disabled}
+      className={cn(
+        touchTargetVariants({ size, variant, shape }),
+        disabled && "opacity-50 cursor-not-allowed pointer-events-none",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </button>
   )
 )
 TouchButton.displayName = "TouchButton"
 
-const TouchLink = React.forwardRef<HTMLAnchorElement, TouchTargetProps & { href: string }>(
-  ({ className, size = "default", variant = "interactive", children, ...props }, ref) => (
-    <TouchTarget asChild size={size} variant={variant} className={className}>
-      <a ref={ref} {...props}>
-        {children}
-      </a>
-    </TouchTarget>
+const TouchLink = React.forwardRef<HTMLAnchorElement, TouchLinkProps>(
+  ({ className, size = "default", variant = "interactive", shape, children, href, ...props }, ref) => (
+    <a
+      ref={ref}
+      href={href}
+      className={cn(
+        touchTargetVariants({ size, variant, shape }),
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </a>
   )
 )
 TouchLink.displayName = "TouchLink"

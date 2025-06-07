@@ -33,7 +33,7 @@ export const MobileContainer = React.forwardRef<HTMLDivElement, MobileContainerP
 MobileContainer.displayName = "MobileContainer"
 
 // Mobile Section Component  
-interface MobileSectionProps extends React.HTMLAttributes<HTMLElement> {
+interface MobileSectionProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "default" | "lg"
   as?: "section" | "div" | "article" | "main"
 }
@@ -46,12 +46,13 @@ export const MobileSection = React.forwardRef<HTMLDivElement, MobileSectionProps
       lg: "py-8 md:py-12 lg:py-16"
     }
     
-    return (
-      <Component
-        ref={ref as any}
-        className={cn(sizeClasses[size], className)}
-        {...props}
-      />
+    return React.createElement(
+      Component,
+      {
+        ref: ref,
+        className: cn(sizeClasses[size], className),
+        ...props
+      }
     )
   }
 )
@@ -165,7 +166,7 @@ export const MobileHeading = React.forwardRef<HTMLHeadingElement, MobileHeadingP
     return React.createElement(
       Component,
       {
-        ref: ref as any,
+        ref: ref,
         className: cn(classes[level], "text-white", className),
         ...props
       },
