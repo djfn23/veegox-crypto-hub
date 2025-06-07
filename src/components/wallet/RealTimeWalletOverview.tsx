@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { useRealTimeWalletData } from "@/hooks/useRealTimeWeb3";
-import { Wallet, TrendingUp, TrendingDown, RefreshCw, Gas } from "lucide-react";
+import { Wallet, TrendingUp, TrendingDown, RefreshCw, Fuel } from "lucide-react";
 
 export const RealTimeWalletOverview = () => {
   const { 
@@ -65,7 +65,7 @@ export const RealTimeWalletOverview = () => {
             </div>
             <div>
               <p className="text-gray-400 text-sm flex items-center gap-1">
-                <Gas className="h-4 w-4" />
+                <Fuel className="h-4 w-4" />
                 Gas Price (Gwei)
               </p>
               <div className="text-2xl font-bold text-white">

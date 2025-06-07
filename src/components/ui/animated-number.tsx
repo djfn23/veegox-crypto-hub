@@ -8,6 +8,7 @@ interface AnimatedNumberProps {
   className?: string
   prefix?: string
   suffix?: string
+  decimals?: number
 }
 
 const AnimatedNumber: React.FC<AnimatedNumberProps> = ({ 
@@ -15,7 +16,8 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   duration = 1000, 
   className,
   prefix = "",
-  suffix = ""
+  suffix = "",
+  decimals = 0
 }) => {
   const [displayValue, setDisplayValue] = useState(0)
 
@@ -30,7 +32,7 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
       // Easing function for smooth animation
       const easeOutQuart = 1 - Math.pow(1 - progress, 4)
       
-      setDisplayValue(Math.floor(value * easeOutQuart))
+      setDisplayValue(value * easeOutQuart)
 
       if (progress < 1) {
         animationFrame = requestAnimationFrame(animate)
@@ -46,9 +48,16 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
     }
   }, [value, duration])
 
+  const formatNumber = (num: number) => {
+    if (decimals > 0) {
+      return num.toFixed(decimals)
+    }
+    return Math.floor(num).toLocaleString()
+  }
+
   return (
     <span className={className}>
-      {prefix}{displayValue.toLocaleString()}{suffix}
+      {prefix}{formatNumber(displayValue)}{suffix}
     </span>
   )
 }
