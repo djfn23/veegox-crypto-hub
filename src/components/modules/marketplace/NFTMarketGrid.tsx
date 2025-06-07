@@ -17,6 +17,22 @@ interface NFTMarketGridProps {
   filters: FiltersState;
 }
 
+interface NFTListing {
+  id: string;
+  contract_address: string;
+  token_id: string;
+  price: number;
+  currency_address: string;
+  status: string;
+  seller_id: string;
+  created_at: string;
+  metadata: any;
+  nft_collections_metadata?: {
+    name: string;
+    image_url: string;
+  } | null;
+}
+
 export const NFTMarketGrid = ({ filters }: NFTMarketGridProps) => {
   const { data: listings, isLoading, error } = useQuery({
     queryKey: ['nft-listings', filters],
@@ -47,7 +63,14 @@ export const NFTMarketGrid = ({ filters }: NFTMarketGridProps) => {
       const { data, error } = await query.order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      
+      // Transform the data to ensure it matches our interface
+      return (data || []).map(listing => ({
+        ...listing,
+        nft_collections_metadata: Array.isArray(listing.nft_collections_metadata) 
+          ? listing.nft_collections_metadata[0] || null
+          : listing.nft_collections_metadata
+      })) as NFTListing[];
     }
   });
 

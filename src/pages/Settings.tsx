@@ -6,246 +6,200 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Bell, Shield, Palette, Globe } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { User, Bell, Shield, Palette, Globe, Wallet } from "lucide-react";
+import { useState } from "react";
 
 const Settings = () => {
+  const [theme, setTheme] = useState("dark");
+  const [language, setLanguage] = useState("fr");
+  const [notifications, setNotifications] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [twoFactor, setTwoFactor] = useState(false);
+
   return (
     <PageLayout
       title="Paramètres"
       subtitle="Gérez vos préférences et paramètres de compte"
     >
-      <div className="max-w-4xl mx-auto">
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-gray-800/50">
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Profil */}
+        <Card className="bg-gray-800/50 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <User className="h-5 w-5" />
               Profil
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              Notifications
-            </TabsTrigger>
-            <TabsTrigger value="security" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Sécurité
-            </TabsTrigger>
-            <TabsTrigger value="appearance" className="flex items-center gap-2">
-              <Palette className="h-4 w-4" />
+            </CardTitle>
+            <CardDescription>
+              Informations personnelles et paramètres du compte
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-gray-300">Nom d'utilisateur</Label>
+                <Input
+                  defaultValue="user123"
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-gray-300">Email</Label>
+                <Input
+                  defaultValue="user@example.com"
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-gray-300">Bio</Label>
+              <Input
+                placeholder="Décrivez-vous en quelques mots..."
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Apparence */}
+        <Card className="bg-gray-800/50 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Palette className="h-5 w-5" />
               Apparence
-            </TabsTrigger>
-            <TabsTrigger value="language" className="flex items-center gap-2">
-              <Globe className="h-4 w-4" />
-              Langue
-            </TabsTrigger>
-          </TabsList>
+            </CardTitle>
+            <CardDescription>
+              Personnalisez l'apparence de l'interface
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-gray-300">Thème</Label>
+                <Select value={theme} onValueChange={setTheme}>
+                  <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dark">Sombre</SelectItem>
+                    <SelectItem value="light">Clair</SelectItem>
+                    <SelectItem value="auto">Automatique</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-gray-300">Langue</Label>
+                <Select value={language} onValueChange={setLanguage}>
+                  <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fr">Français</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Español</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          <TabsContent value="profile">
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Informations du profil</CardTitle>
-                <CardDescription>
-                  Modifiez vos informations personnelles et votre profil public
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName" className="text-gray-300">Prénom</Label>
-                    <Input
-                      id="firstName"
-                      placeholder="Votre prénom"
-                      className="bg-gray-800 border-gray-600 text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName" className="text-gray-300">Nom</Label>
-                    <Input
-                      id="lastName"
-                      placeholder="Votre nom"
-                      className="bg-gray-800 border-gray-600 text-white"
-                    />
-                  </div>
-                </div>
+        {/* Notifications */}
+        <Card className="bg-gray-800/50 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Notifications
+            </CardTitle>
+            <CardDescription>
+              Configurez vos préférences de notifications
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white">Notifications générales</Label>
+                <p className="text-sm text-gray-400">Recevoir des notifications sur l'activité</p>
+              </div>
+              <Switch checked={notifications} onCheckedChange={setNotifications} />
+            </div>
+            <Separator className="bg-gray-700" />
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white">Notifications par email</Label>
+                <p className="text-sm text-gray-400">Recevoir des emails pour les événements importants</p>
+              </div>
+              <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sécurité */}
+        <Card className="bg-gray-800/50 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Sécurité
+            </CardTitle>
+            <CardDescription>
+              Paramètres de sécurité et authentification
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white">Authentification à deux facteurs</Label>
+                <p className="text-sm text-gray-400">Sécurisez votre compte avec 2FA</p>
+              </div>
+              <Switch checked={twoFactor} onCheckedChange={setTwoFactor} />
+            </div>
+            <Separator className="bg-gray-700" />
+            <div className="space-y-2">
+              <Button variant="outline" className="border-gray-600 text-gray-300">
+                Changer le mot de passe
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Portefeuilles connectés */}
+        <Card className="bg-gray-800/50 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Wallet className="h-5 w-5" />
+              Portefeuilles connectés
+            </CardTitle>
+            <CardDescription>
+              Gérez vos portefeuilles Web3 connectés
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-gray-900/50 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="username" className="text-gray-300">Nom d'utilisateur</Label>
-                  <Input
-                    id="username"
-                    placeholder="@votreusername"
-                    className="bg-gray-800 border-gray-600 text-white"
-                  />
+                  <p className="text-white font-semibold">MetaMask</p>
+                  <p className="text-sm text-gray-400">0x1234...5678</p>
                 </div>
-                <div>
-                  <Label htmlFor="bio" className="text-gray-300">Bio</Label>
-                  <Input
-                    id="bio"
-                    placeholder="Parlez-nous de vous..."
-                    className="bg-gray-800 border-gray-600 text-white"
-                  />
-                </div>
-                <Button className="bg-purple-600 hover:bg-purple-700">
-                  Sauvegarder les modifications
+                <Button variant="outline" size="sm" className="border-gray-600 text-gray-300">
+                  Déconnecter
                 </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </div>
+            <Button className="bg-purple-600 hover:bg-purple-700">
+              Connecter un nouveau portefeuille
+            </Button>
+          </CardContent>
+        </Card>
 
-          <TabsContent value="notifications">
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Préférences de notification</CardTitle>
-                <CardDescription>
-                  Gérez vos notifications et alertes
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-medium">Notifications push</p>
-                    <p className="text-gray-400 text-sm">Recevez des notifications sur votre appareil</p>
-                  </div>
-                  <Switch />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-medium">Notifications email</p>
-                    <p className="text-gray-400 text-sm">Recevez des notifications par email</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-medium">Nouvelles transactions</p>
-                    <p className="text-gray-400 text-sm">Alertes pour les nouvelles transactions</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-medium">Offres NFT</p>
-                    <p className="text-gray-400 text-sm">Notifications pour les offres sur vos NFTs</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="security">
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Sécurité</CardTitle>
-                <CardDescription>
-                  Gérez vos paramètres de sécurité et d'authentification
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-medium">Authentification à deux facteurs</p>
-                    <p className="text-gray-400 text-sm">Renforcez la sécurité de votre compte</p>
-                  </div>
-                  <Switch />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-medium">Mode privé</p>
-                    <p className="text-gray-400 text-sm">Masquez votre profil des recherches publiques</p>
-                  </div>
-                  <Switch />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Changer le mot de passe</Label>
-                  <div className="space-y-2">
-                    <Input
-                      type="password"
-                      placeholder="Mot de passe actuel"
-                      className="bg-gray-800 border-gray-600 text-white"
-                    />
-                    <Input
-                      type="password"
-                      placeholder="Nouveau mot de passe"
-                      className="bg-gray-800 border-gray-600 text-white"
-                    />
-                    <Input
-                      type="password"
-                      placeholder="Confirmer le nouveau mot de passe"
-                      className="bg-gray-800 border-gray-600 text-white"
-                    />
-                  </div>
-                  <Button variant="outline" className="border-gray-600 text-gray-300">
-                    Mettre à jour le mot de passe
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="appearance">
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Apparence</CardTitle>
-                <CardDescription>
-                  Personnalisez l'apparence de l'application
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label className="text-gray-300">Thème</Label>
-                  <Select defaultValue="dark">
-                    <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="light">Clair</SelectItem>
-                      <SelectItem value="dark">Sombre</SelectItem>
-                      <SelectItem value="system">Système</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="language">
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Langue et région</CardTitle>
-                <CardDescription>
-                  Choisissez votre langue et vos préférences régionales
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label className="text-gray-300">Langue</Label>
-                  <Select defaultValue="fr">
-                    <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Español</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-gray-300">Devise</Label>
-                  <Select defaultValue="eur">
-                    <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="eur">EUR (€)</SelectItem>
-                      <SelectItem value="usd">USD ($)</SelectItem>
-                      <SelectItem value="eth">ETH (Ξ)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        {/* Actions */}
+        <div className="flex justify-end space-x-4">
+          <Button variant="outline" className="border-gray-600 text-gray-300">
+            Annuler
+          </Button>
+          <Button className="bg-purple-600 hover:bg-purple-700">
+            Sauvegarder
+          </Button>
+        </div>
       </div>
     </PageLayout>
   );
