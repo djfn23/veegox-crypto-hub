@@ -1,113 +1,99 @@
+
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { 
-  Home, 
-  Wallet, 
-  TrendingUp, 
-  Users, 
-  Settings, 
-  CreditCard,
-  Coins,
+import { Button } from "@/components/ui/button";
+import {
+  Home,
+  TrendingUp,
+  ShoppingBag,
+  Wallet,
+  Building2,
   Vote,
-  Target,
-  Image, // Ajouté pour NFT Marketplace
   BarChart3,
-  Bell,
+  ArrowUpDown,
+  Sprout,
+  Banknote,
+  Settings,
   HelpCircle,
-  Shield
+  Shield,
+  FileText,
+  Info
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
 
-const navigation = [
-  { name: "Accueil", href: "/", icon: Home },
-  { name: "Portefeuille", href: "/wallet", icon: Wallet },
-  { name: "Trading", href: "/trading", icon: TrendingUp },
-  { name: "NFT Marketplace", href: "/marketplace", icon: Image }, // Nouvelle route
-  { name: "Staking", href: "/staking", icon: Coins },
-  { name: "Crédit", href: "/credit", icon: CreditCard },
-  { name: "Crowdfunding", href: "/crowdfunding", icon: Target },
-  { name: "Gouvernance", href: "/governance", icon: Vote },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
-  { name: "Social", href: "/social", icon: Users },
+const navigationItems = [
+  {
+    title: "Principal",
+    items: [
+      { name: "Accueil", href: "/", icon: Home },
+      { name: "Portefeuille", href: "/wallet", icon: Wallet },
+      { name: "Marketplace", href: "/marketplace", icon: ShoppingBag },
+      { name: "Trading", href: "/trading", icon: TrendingUp },
+    ],
+  },
+  {
+    title: "DeFi",
+    items: [
+      { name: "Bridge", href: "/bridge", icon: ArrowUpDown },
+      { name: "Yield Farming", href: "/yield-farming", icon: Sprout },
+      { name: "Prêt & Emprunt", href: "/lending", icon: Banknote },
+    ],
+  },
+  {
+    title: "Gouvernance",
+    items: [
+      { name: "DAO", href: "/governance", icon: Vote },
+      { name: "Analytics", href: "/analytics", icon: BarChart3 },
+      { name: "Contrats", href: "/contract", icon: Building2 },
+    ],
+  },
+  {
+    title: "Support",
+    items: [
+      { name: "Paramètres", href: "/settings", icon: Settings },
+      { name: "Aide", href: "/help", icon: HelpCircle },
+      { name: "Sécurité", href: "/security", icon: Shield },
+      { name: "Légal", href: "/legal", icon: FileText },
+      { name: "À propos", href: "/about", icon: Info },
+    ],
+  },
 ];
 
-const settingsNavigation = [
-  { name: "Notifications", href: "/notifications", icon: Bell },
-  { name: "Sécurité", href: "/security", icon: Shield },
-  { name: "Paramètres", href: "/settings", icon: Settings },
-];
+export const SidebarNavigation = () => {
+  const location = useLocation();
 
-const helpNavigation = [
-  { name: "Aide", href: "/help", icon: HelpCircle },
-  { name: "À propos", href: "/about", icon: Users },
-  { name: "Juridique", href: "/legal", icon: Shield },
-];
-
-export function SidebarNavigation() {
   return (
-    <div className="flex flex-col space-y-6">
-      <div className="flex-1 space-y-2">
-        {navigation.map((item) => (
-          <NavLink
-            key={item.href}
-            to={item.href}
-            className={({ isActive }) =>
-              cn(
-                "group flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-primary",
-                isActive
-                  ? "bg-secondary text-primary"
-                  : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-              )
-            }
-          >
-            <item.icon className="h-4 w-4" />
-            <span>{item.name}</span>
-          </NavLink>
-        ))}
-      </div>
-      <div className="flex-1 space-y-2">
-        <h2 className="px-3 text-sm font-semibold text-gray-900 dark:text-gray-50">
-          Paramètres
-        </h2>
-        {settingsNavigation.map((item) => (
-          <NavLink
-            key={item.href}
-            to={item.href}
-            className={({ isActive }) =>
-              cn(
-                "group flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-primary",
-                isActive
-                  ? "bg-secondary text-primary"
-                  : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-              )
-            }
-          >
-            <item.icon className="h-4 w-4" />
-            <span>{item.name}</span>
-          </NavLink>
-        ))}
-      </div>
-      <div className="flex-1 space-y-2">
-        <h2 className="px-3 text-sm font-semibold text-gray-900 dark:text-gray-50">
-          Aide
-        </h2>
-        {helpNavigation.map((item) => (
-          <NavLink
-            key={item.href}
-            to={item.href}
-            className={({ isActive }) =>
-              cn(
-                "group flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-primary",
-                isActive
-                  ? "bg-secondary text-primary"
-                  : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-              )
-            }
-          >
-            <item.icon className="h-4 w-4" />
-            <span>{item.name}</span>
-          </NavLink>
-        ))}
-      </div>
-    </div>
+    <nav className="space-y-6">
+      {navigationItems.map((section) => (
+        <div key={section.title} className="space-y-3">
+          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider px-2">
+            {section.title}
+          </h3>
+          <div className="space-y-1">
+            {section.items.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.href;
+              
+              return (
+                <Link key={item.name} to={item.href}>
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-start h-10 px-3 text-left font-normal transition-all duration-200",
+                      "hover:bg-white/10 hover:text-white",
+                      isActive
+                        ? "bg-purple-600/20 text-purple-300 border-r-2 border-purple-400"
+                        : "text-gray-300"
+                    )}
+                  >
+                    <Icon className="mr-3 h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">{item.name}</span>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </nav>
   );
-}
+};

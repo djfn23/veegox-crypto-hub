@@ -53,6 +53,105 @@ export type Database = {
           },
         ]
       }
+      bridge_transactions: {
+        Row: {
+          actual_time: number | null
+          amount: number
+          bridge_fee: number
+          completed_at: string | null
+          created_at: string
+          destination_chain_id: number
+          destination_token_address: string
+          destination_tx_hash: string | null
+          estimated_time: number | null
+          id: string
+          source_chain_id: number
+          source_token_address: string
+          source_tx_hash: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          actual_time?: number | null
+          amount: number
+          bridge_fee: number
+          completed_at?: string | null
+          created_at?: string
+          destination_chain_id: number
+          destination_token_address: string
+          destination_tx_hash?: string | null
+          estimated_time?: number | null
+          id?: string
+          source_chain_id: number
+          source_token_address: string
+          source_tx_hash?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          actual_time?: number | null
+          amount?: number
+          bridge_fee?: number
+          completed_at?: string | null
+          created_at?: string
+          destination_chain_id?: number
+          destination_token_address?: string
+          destination_tx_hash?: string | null
+          estimated_time?: number | null
+          id?: string
+          source_chain_id?: number
+          source_token_address?: string
+          source_tx_hash?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      collection_stats: {
+        Row: {
+          avg_price: number | null
+          contract_address: string
+          floor_price: number | null
+          id: string
+          last_updated: string
+          market_cap: number | null
+          total_sales: number | null
+          total_volume: number | null
+          unique_owners: number | null
+          volume_24h: number | null
+          volume_30d: number | null
+          volume_7d: number | null
+        }
+        Insert: {
+          avg_price?: number | null
+          contract_address: string
+          floor_price?: number | null
+          id?: string
+          last_updated?: string
+          market_cap?: number | null
+          total_sales?: number | null
+          total_volume?: number | null
+          unique_owners?: number | null
+          volume_24h?: number | null
+          volume_30d?: number | null
+          volume_7d?: number | null
+        }
+        Update: {
+          avg_price?: number | null
+          contract_address?: string
+          floor_price?: number | null
+          id?: string
+          last_updated?: string
+          market_cap?: number | null
+          total_sales?: number | null
+          total_volume?: number | null
+          unique_owners?: number | null
+          volume_24h?: number | null
+          volume_30d?: number | null
+          volume_7d?: number | null
+        }
+        Relationships: []
+      }
       credit_scores: {
         Row: {
           calculation_version: string | null
@@ -365,6 +464,39 @@ export type Database = {
           },
         ]
       }
+      forum_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          posts_count: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          posts_count?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          posts_count?: number | null
+        }
+        Relationships: []
+      }
       forum_comments: {
         Row: {
           author_id: string
@@ -454,6 +586,96 @@ export type Database = {
           },
         ]
       }
+      insurance_policies: {
+        Row: {
+          claim_amount: number | null
+          coverage_amount: number
+          created_at: string
+          end_date: string
+          id: string
+          policy_holder_id: string
+          policy_type: string
+          premium_amount: number
+          protocol_address: string | null
+          start_date: string
+          status: string | null
+        }
+        Insert: {
+          claim_amount?: number | null
+          coverage_amount: number
+          created_at?: string
+          end_date: string
+          id?: string
+          policy_holder_id: string
+          policy_type: string
+          premium_amount: number
+          protocol_address?: string | null
+          start_date: string
+          status?: string | null
+        }
+        Update: {
+          claim_amount?: number | null
+          coverage_amount?: number
+          created_at?: string
+          end_date?: string
+          id?: string
+          policy_holder_id?: string
+          policy_type?: string
+          premium_amount?: number
+          protocol_address?: string | null
+          start_date?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
+      lending_pools: {
+        Row: {
+          borrow_apy: number
+          collateral_factor: number | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          liquidation_threshold: number | null
+          name: string
+          reserve_factor: number | null
+          supply_apy: number
+          token_address: string
+          total_borrowed: number | null
+          total_supplied: number | null
+          utilization_rate: number | null
+        }
+        Insert: {
+          borrow_apy: number
+          collateral_factor?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          liquidation_threshold?: number | null
+          name: string
+          reserve_factor?: number | null
+          supply_apy: number
+          token_address: string
+          total_borrowed?: number | null
+          total_supplied?: number | null
+          utilization_rate?: number | null
+        }
+        Update: {
+          borrow_apy?: number
+          collateral_factor?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          liquidation_threshold?: number | null
+          name?: string
+          reserve_factor?: number | null
+          supply_apy?: number
+          token_address?: string
+          total_borrowed?: number | null
+          total_supplied?: number | null
+          utilization_rate?: number | null
+        }
+        Relationships: []
+      }
       liquidity_pools: {
         Row: {
           created_at: string | null
@@ -497,6 +719,59 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loan_requests: {
+        Row: {
+          approved_at: string | null
+          borrower_id: string
+          collateral_amount: number
+          collateral_token_address: string
+          created_at: string
+          duration_days: number
+          funded_at: string | null
+          id: string
+          interest_rate: number
+          pool_id: string
+          requested_amount: number
+          status: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          borrower_id: string
+          collateral_amount: number
+          collateral_token_address: string
+          created_at?: string
+          duration_days: number
+          funded_at?: string | null
+          id?: string
+          interest_rate: number
+          pool_id: string
+          requested_amount: number
+          status?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          borrower_id?: string
+          collateral_amount?: number
+          collateral_token_address?: string
+          created_at?: string
+          duration_days?: number
+          funded_at?: string | null
+          id?: string
+          interest_rate?: number
+          pool_id?: string
+          requested_amount?: number
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_requests_pool_id_fkey"
+            columns: ["pool_id"]
+            isOneToOne: false
+            referencedRelation: "lending_pools"
             referencedColumns: ["id"]
           },
         ]
@@ -593,6 +868,36 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_fees: {
+        Row: {
+          created_at: string
+          fee_percentage: number
+          id: string
+          is_active: boolean | null
+          maximum_fee: number | null
+          minimum_fee: number | null
+          transaction_type: string
+        }
+        Insert: {
+          created_at?: string
+          fee_percentage?: number
+          id?: string
+          is_active?: boolean | null
+          maximum_fee?: number | null
+          minimum_fee?: number | null
+          transaction_type: string
+        }
+        Update: {
+          created_at?: string
+          fee_percentage?: number
+          id?: string
+          is_active?: boolean | null
+          maximum_fee?: number | null
+          minimum_fee?: number | null
+          transaction_type?: string
+        }
+        Relationships: []
+      }
       nft_collections_metadata: {
         Row: {
           banner_url: string | null
@@ -653,6 +958,30 @@ export type Database = {
           twitter_url?: string | null
           updated_at?: string
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      nft_favorites: {
+        Row: {
+          contract_address: string
+          created_at: string
+          id: string
+          token_id: string
+          user_id: string
+        }
+        Insert: {
+          contract_address: string
+          created_at?: string
+          id?: string
+          token_id: string
+          user_id: string
+        }
+        Update: {
+          contract_address?: string
+          created_at?: string
+          id?: string
+          token_id?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -745,6 +1074,39 @@ export type Database = {
           },
         ]
       }
+      nft_price_history: {
+        Row: {
+          block_number: number | null
+          contract_address: string
+          currency_address: string
+          id: string
+          price: number
+          timestamp: string
+          token_id: string
+          transaction_hash: string | null
+        }
+        Insert: {
+          block_number?: number | null
+          contract_address: string
+          currency_address?: string
+          id?: string
+          price: number
+          timestamp?: string
+          token_id: string
+          transaction_hash?: string | null
+        }
+        Update: {
+          block_number?: number | null
+          contract_address?: string
+          currency_address?: string
+          id?: string
+          price?: number
+          timestamp?: string
+          token_id?: string
+          transaction_hash?: string | null
+        }
+        Relationships: []
+      }
       nft_transactions: {
         Row: {
           buyer_id: string
@@ -790,6 +1152,33 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_metrics: {
+        Row: {
+          category: string
+          id: string
+          metric_name: string
+          metric_type: string
+          metric_value: number
+          timestamp: string
+        }
+        Insert: {
+          category: string
+          id?: string
+          metric_name: string
+          metric_type: string
+          metric_value: number
+          timestamp?: string
+        }
+        Update: {
+          category?: string
+          id?: string
+          metric_name?: string
+          metric_type?: string
+          metric_value?: number
+          timestamp?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -823,6 +1212,75 @@ export type Database = {
           updated_at?: string | null
           username?: string | null
           website?: string | null
+        }
+        Relationships: []
+      }
+      referral_system: {
+        Row: {
+          created_at: string
+          id: string
+          referee_id: string
+          referral_code: string
+          referrer_id: string
+          reward_amount: number | null
+          reward_token_address: string | null
+          rewarded_at: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referee_id: string
+          referral_code: string
+          referrer_id: string
+          reward_amount?: number | null
+          reward_token_address?: string | null
+          rewarded_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referee_id?: string
+          referral_code?: string
+          referrer_id?: string
+          reward_amount?: number | null
+          reward_token_address?: string | null
+          rewarded_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      revenue_tracking: {
+        Row: {
+          amount: number
+          currency: string
+          description: string | null
+          id: string
+          revenue_type: string
+          timestamp: string
+          transaction_hash: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          currency: string
+          description?: string | null
+          id?: string
+          revenue_type: string
+          timestamp?: string
+          transaction_hash?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          currency?: string
+          description?: string | null
+          id?: string
+          revenue_type?: string
+          timestamp?: string
+          transaction_hash?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1006,6 +1464,182 @@ export type Database = {
           },
         ]
       }
+      user_achievements: {
+        Row: {
+          achievement_name: string
+          achievement_type: string
+          badge_image_url: string | null
+          description: string | null
+          id: string
+          points_awarded: number | null
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_name: string
+          achievement_type: string
+          badge_image_url?: string | null
+          description?: string | null
+          id?: string
+          points_awarded?: number | null
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_name?: string
+          achievement_type?: string
+          badge_image_url?: string | null
+          description?: string | null
+          id?: string
+          points_awarded?: number | null
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_activity_logs: {
+        Row: {
+          action_details: Json | null
+          action_type: string
+          id: string
+          ip_address: unknown | null
+          timestamp: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_details?: Json | null
+          action_type: string
+          id?: string
+          ip_address?: unknown | null
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_details?: Json | null
+          action_type?: string
+          id?: string
+          ip_address?: unknown | null
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_farm_positions: {
+        Row: {
+          amount_staked: number
+          entry_timestamp: string
+          farm_id: string
+          id: string
+          is_active: boolean | null
+          last_harvest: string | null
+          rewards_earned: number | null
+          user_id: string
+        }
+        Insert: {
+          amount_staked: number
+          entry_timestamp?: string
+          farm_id: string
+          id?: string
+          is_active?: boolean | null
+          last_harvest?: string | null
+          rewards_earned?: number | null
+          user_id: string
+        }
+        Update: {
+          amount_staked?: number
+          entry_timestamp?: string
+          farm_id?: string
+          id?: string
+          is_active?: boolean | null
+          last_harvest?: string | null
+          rewards_earned?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_farm_positions_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "yield_farms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          email_notifications: boolean | null
+          id: string
+          language: string | null
+          notifications_enabled: boolean | null
+          privacy_mode: boolean | null
+          push_notifications: boolean | null
+          theme: string | null
+          two_factor_enabled: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          language?: string | null
+          notifications_enabled?: boolean | null
+          privacy_mode?: boolean | null
+          push_notifications?: boolean | null
+          theme?: string | null
+          two_factor_enabled?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          language?: string | null
+          notifications_enabled?: boolean | null
+          privacy_mode?: boolean | null
+          push_notifications?: boolean | null
+          theme?: string | null
+          two_factor_enabled?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          rated_id: string
+          rater_id: string
+          rating: number | null
+          review_text: string | null
+          transaction_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rated_id: string
+          rater_id: string
+          rating?: number | null
+          review_text?: string | null
+          transaction_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rated_id?: string
+          rater_id?: string
+          rating?: number | null
+          review_text?: string | null
+          transaction_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           granted_at: string | null
@@ -1044,6 +1678,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_sessions: {
+        Row: {
+          created_at: string
+          device_info: Json | null
+          expires_at: string
+          id: string
+          ip_address: unknown | null
+          is_active: boolean | null
+          session_token: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_info?: Json | null
+          expires_at: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          session_token: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_info?: Json | null
+          expires_at?: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          session_token?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_stakes: {
         Row: {
@@ -1136,6 +1806,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      yield_farms: {
+        Row: {
+          apy_rate: number
+          created_at: string
+          end_block: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          pool_address: string | null
+          reward_per_block: number
+          reward_token_address: string
+          start_block: number | null
+          token_a_address: string
+          token_b_address: string
+          total_staked: number | null
+        }
+        Insert: {
+          apy_rate: number
+          created_at?: string
+          end_block?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          pool_address?: string | null
+          reward_per_block: number
+          reward_token_address: string
+          start_block?: number | null
+          token_a_address: string
+          token_b_address: string
+          total_staked?: number | null
+        }
+        Update: {
+          apy_rate?: number
+          created_at?: string
+          end_block?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          pool_address?: string | null
+          reward_per_block?: number
+          reward_token_address?: string
+          start_block?: number | null
+          token_a_address?: string
+          token_b_address?: string
+          total_staked?: number | null
+        }
+        Relationships: []
       }
     }
     Views: {

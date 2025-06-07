@@ -23,7 +23,13 @@ export const NFTMarketGrid = ({ filters }: NFTMarketGridProps) => {
     queryFn: async () => {
       let query = supabase
         .from('nft_listings')
-        .select('*, nft_collections_metadata(*)')
+        .select(`
+          *,
+          nft_collections_metadata (
+            name,
+            image_url
+          )
+        `)
         .eq('status', filters.status === 'all' ? undefined : filters.status || 'active');
 
       if (filters.collection) {

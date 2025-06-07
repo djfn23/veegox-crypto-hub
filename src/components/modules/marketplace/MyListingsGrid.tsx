@@ -20,7 +20,13 @@ export const MyListingsGrid = ({ userAddress }: MyListingsGridProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('nft_listings')
-        .select('*, nft_collections_metadata(*)')
+        .select(`
+          *,
+          nft_collections_metadata (
+            name,
+            image_url
+          )
+        `)
         .eq('seller_id', userAddress)
         .order('created_at', { ascending: false });
       
