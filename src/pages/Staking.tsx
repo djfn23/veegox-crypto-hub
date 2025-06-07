@@ -1,8 +1,11 @@
+
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Coins, TrendingUp, Clock, Users } from "lucide-react";
+import { VeegoxStakingPool } from "@/components/modules/staking/VeegoxStakingPool";
+import { VeegoxTokenCard } from "@/components/veegox/VeegoxTokenCard";
 
 const stakingPools = [
   {
@@ -44,6 +47,14 @@ export default function Staking() {
       subtitle="Gagnez des récompenses en stakant vos tokens"
     >
       <div className="space-y-6">
+        {/* Token Veegox principal */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          <VeegoxTokenCard />
+          <div className="lg:col-span-2">
+            <VeegoxStakingPool />
+          </div>
+        </div>
+
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="bg-slate-900/50 border-slate-700">
@@ -95,10 +106,10 @@ export default function Staking() {
           </Card>
         </div>
 
-        {/* Staking Pools */}
+        {/* Autres Pools de Staking */}
         <Card className="bg-slate-900/50 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-white">Pools de Staking Disponibles</CardTitle>
+            <CardTitle className="text-white">Autres Pools de Staking</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">

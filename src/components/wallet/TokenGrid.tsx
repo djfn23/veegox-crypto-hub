@@ -3,7 +3,9 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Star } from "lucide-react";
+import { useVeegoxTokenInfo, useVeegoxBalance, useVeegoxStats } from "@/hooks/useVeegoxToken";
+import { VeegoxTokenService } from "@/services/veegoxTokenService";
 
 interface Token {
   address: string;
@@ -23,6 +25,10 @@ interface TokenGridProps {
 }
 
 const TokenGrid = ({ tokens, isLoading }: TokenGridProps) => {
+  const { data: veegoxInfo } = useVeegoxTokenInfo();
+  const { data: veegoxBalance } = useVeegoxBalance();
+  const { data: veegoxStats } = useVeegoxStats();
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -45,7 +51,30 @@ const TokenGrid = ({ tokens, isLoading }: TokenGridProps) => {
     );
   }
 
-  if (tokens.length === 0) {
+  // Construire la liste complète avec Veegox en premier
+  const allTokens = [];
+  
+  // Ajouter Veegox en premier si disponible
+  if (veegoxInfo && veegoxBalance && veegoxStats) {
+    const formattedBalance = VeegoxTokenService.formatVeegoxBalance(veegoxBalance, veegoxInfo.decimals);
+    const veegoxToken = {
+      address: VeegoxTokenService.getTokenConfig().address,
+      name: veegoxInfo.name,
+      symbol: veegoxInfo.symbol,
+      decimals: veegoxInfo.decimals,
+      balance: formattedBalance,
+      value: parseFloat(formattedBalance) * veegoxStats.price,
+      price: veegoxStats.price,
+      change24h: veegoxStats.change24h,
+      logo: VeegoxTokenService.getTokenConfig().logo
+    };
+    allTokens.push(veegoxToken);
+  }
+  
+  // Ajouter les autres tokens
+  allTokens.push(...tokens);
+
+  if (allTokens.length === 0) {
     return (
       <GlassCard className="p-8 text-center">
         <p className="text-gray-400">Aucun token trouvé</p>
@@ -65,13 +94,28 @@ const TokenGrid = ({ tokens, isLoading }: TokenGridProps) => {
     return "text-gray-400";
   };
 
+  const isVeegoxToken = (address: string) => {
+    return address === VeegoxTokenService.getTokenConfig().address;
+  };
+
   return (
     <div className="space-y-4">
-      {tokens.map((token) => (
-        <GlassCard key={token.address} className="p-4 hover:bg-white/10 transition-all duration-200">
+      {allTokens.map((token, index) => (
+        <GlassCard 
+          key={token.address} 
+          className={`p-4 hover:bg-white/10 transition-all duration-200 ${
+            isVeegoxToken(token.address) 
+              ? 'bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-purple-500/30' 
+              : ''
+          }`}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg ${
+                isVeegoxToken(token.address)
+                  ? 'bg-gradient-to-r from-purple-500 to-blue-500'
+                  : 'bg-gradient-to-r from-purple-500 to-blue-500'
+              }`}>
                 {token.logo ? (
                   <img src={token.logo} alt={token.symbol} className="w-8 h-8 rounded-full" />
                 ) : (
@@ -79,7 +123,17 @@ const TokenGrid = ({ tokens, isLoading }: TokenGridProps) => {
                 )}
               </div>
               <div>
-                <div className="text-white font-semibold">{token.name}</div>
+                <div className="flex items-center gap-2">
+                  <div className="text-white font-semibold">{token.name}</div>
+                  {isVeegoxToken(token.address) && (
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                      <Badge variant="secondary" className="bg-purple-600/20 text-purple-300 text-xs">
+                        Principal
+                      </Badge>
+                    </div>
+                  )}
+                </div>
                 <div className="text-gray-400 text-sm">
                   {parseFloat(token.balance).toFixed(4)} {token.symbol}
                 </div>
