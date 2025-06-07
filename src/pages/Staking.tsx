@@ -1,4 +1,3 @@
-
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,7 +41,7 @@ export default function Staking() {
   return (
     <PageLayout
       title="Staking"
-      description="Gagnez des récompenses en stakant vos tokens"
+      subtitle="Gagnez des récompenses en stakant vos tokens"
     >
       <div className="space-y-6">
         {/* Stats Overview */}

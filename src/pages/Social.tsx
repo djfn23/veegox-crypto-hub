@@ -48,7 +48,7 @@ export default function Social() {
   return (
     <PageLayout
       title="Forum Communautaire"
-      description="Discussions, analyses et partage d'expériences DeFi"
+      subtitle="Discussions, analyses et partage d'expériences DeFi"
     >
       <div className="space-y-6">
         {/* Stats Overview */}

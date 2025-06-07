@@ -1,4 +1,3 @@
-
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +44,7 @@ export default function Collections() {
   return (
     <PageLayout
       title="Collections NFT"
-      description="Découvrez et explorez les meilleures collections NFT"
+      subtitle="Découvrez et explorez les meilleures collections NFT"
     >
       <div className="space-y-6">
         {/* Stats Overview */}

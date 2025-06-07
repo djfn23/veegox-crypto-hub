@@ -1,4 +1,3 @@
-
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -10,7 +9,7 @@ export default function Credit() {
   return (
     <PageLayout
       title="Score de Crédit DeFi"
-      description="Votre réputation et score de crédit dans l'écosystème DeFi"
+      subtitle="Votre réputation et score de crédit dans l'écosystème DeFi"
     >
       <div className="space-y-6">
         {/* Credit Score Overview */}

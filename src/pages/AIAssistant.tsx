@@ -1,4 +1,3 @@
-
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,7 +39,7 @@ export default function AIAssistant() {
   return (
     <PageLayout
       title="Assistant IA"
-      description="Recommandations intelligentes et analyses automatisées"
+      subtitle="Recommandations intelligentes et analyses automatisées"
     >
       <div className="space-y-6">
         {/* AI Chat Interface */}

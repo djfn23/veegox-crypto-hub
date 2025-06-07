@@ -31,7 +31,6 @@ export const useSmartContract = () => {
       // Notifier le succès
       if (user) {
         await notificationService.notifyTransactionSuccess(
-          user.id,
           result.hash,
           functionName
         );
@@ -44,8 +43,6 @@ export const useSmartContract = () => {
       // Notifier l'échec
       if (user) {
         await notificationService.notifyTransactionFailed(
-          user.id,
-          '',
           error.message
         );
       }
