@@ -5,21 +5,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { EnhancedAppLayout } from "@/components/layout/EnhancedAppLayout";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { PerformanceMetrics } from "@/components/ui/performance-metrics";
+
+// Pages
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import TokenManager from "./components/modules/TokenManager";
-import CreditModule from "./components/modules/CreditModule";
-import StakingModule from "./components/modules/StakingModule";
-import DAOModule from "./components/modules/DAOModule";
-import ProfileSettings from "./components/modules/ProfileSettings";
-import CrowdfundingModule from "./components/modules/CrowdfundingModule";
-import MarketAnalysisModule from "./components/modules/market/MarketAnalysisModule";
-import ExchangeModule from "./components/modules/exchange/ExchangeModule";
-import AIRecommendationsModule from "./components/modules/ai/AIRecommendationsModule";
-import SocialModule from "./components/modules/social/SocialModule";
-import CampaignDetails from "./components/modules/crowdfunding/CampaignDetails";
 import Wallet from "./pages/Wallet";
 import Contract from "./pages/Contract";
 import Notifications from "./pages/Notifications";
@@ -32,20 +23,32 @@ import Trading from "./pages/Trading";
 import Analytics from "./pages/Analytics";
 import Governance from "./pages/Governance";
 
+// Modules
+import TokenManager from "./components/modules/TokenManager";
+import CreditModule from "./components/modules/CreditModule";
+import StakingModule from "./components/modules/StakingModule";
+import DAOModule from "./components/modules/DAOModule";
+import ProfileSettings from "./components/modules/ProfileSettings";
+import CrowdfundingModule from "./components/modules/CrowdfundingModule";
+import MarketAnalysisModule from "./components/modules/market/MarketAnalysisModule";
+import ExchangeModule from "./components/modules/exchange/ExchangeModule";
+import AIRecommendationsModule from "./components/modules/ai/AIRecommendationsModule";
+import SocialModule from "./components/modules/social/SocialModule";
+import CampaignDetails from "./components/modules/crowdfunding/CampaignDetails";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       retry: (failureCount, error) => {
-        // Don't retry on 4xx errors
         if (error && typeof error === 'object' && 'status' in error) {
           const status = (error as any).status;
           if (status >= 400 && status < 500) return false;
         }
         return failureCount < 3;
       },
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes (updated from cacheTime)
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
   },
@@ -58,7 +61,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <EnhancedAppLayout>
+          <AppLayout>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/tokens" element={<TokenManager />} />
@@ -85,7 +88,7 @@ const App = () => (
               <Route path="/security" element={<Security />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </EnhancedAppLayout>
+          </AppLayout>
         </BrowserRouter>
         <PerformanceMetrics />
       </TooltipProvider>
