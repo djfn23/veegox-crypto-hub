@@ -18,29 +18,30 @@ import {
   Search,
   Plus
 } from "lucide-react"
+import { texts, getResponsiveText } from "@/lib/constants/texts"
 
 const primaryNavigation = [
-  { name: "Accueil", href: "/", icon: Home, badge: 0 },
-  { name: "Portefeuille", href: "/wallet", icon: Wallet, badge: 0 },
-  { name: "Tokens", href: "/tokens", icon: Coins, badge: 0 },
-  { name: "Exchange", href: "/exchange", icon: TrendingUp, badge: 0 },
-  { name: "Trading", href: "/trading", icon: BarChart3, badge: 0 },
+  { name: texts.navigation.primary.home, href: "/", icon: Home, badge: 0 },
+  { name: texts.navigation.primary.wallet, href: "/wallet", icon: Wallet, badge: 0 },
+  { name: texts.navigation.primary.tokens, href: "/tokens", icon: Coins, badge: 0 },
+  { name: texts.navigation.primary.exchange, href: "/exchange", icon: TrendingUp, badge: 0 },
+  { name: texts.navigation.primary.trading, href: "/trading", icon: BarChart3, badge: 0 },
 ]
 
 const financialNavigation = [
-  { name: "Crédit", href: "/credit", icon: CreditCard, badge: 2 },
-  { name: "Staking", href: "/staking", icon: TrendingUp, badge: 0 },
-  { name: "Crowdfunding", href: "/crowdfunding", icon: Users, badge: 1 },
-  { name: "Créer Campagne", href: "/create-campaign", icon: Plus, badge: 0 },
+  { name: texts.navigation.financial.credit, href: "/credit", icon: CreditCard, badge: 2 },
+  { name: texts.navigation.financial.staking, href: "/staking", icon: TrendingUp, badge: 0 },
+  { name: texts.navigation.financial.crowdfunding, href: "/crowdfunding", icon: Users, badge: 1 },
+  { name: texts.navigation.financial.createCampaign, href: "/create-campaign", icon: Plus, badge: 0 },
 ]
 
 const advancedNavigation = [
-  { name: "DAO", href: "/dao", icon: Users, badge: 0 },
-  { name: "Gouvernance", href: "/governance", icon: Vote, badge: 3 },
-  { name: "Analyse Marché", href: "/market-analysis", icon: Search, badge: 0 },
-  { name: "Analytics", href: "/analytics", icon: BarChart3, badge: 0 },
-  { name: "IA Recommandations", href: "/ai-recommendations", icon: Brain, badge: 1 },
-  { name: "Social", href: "/social", icon: MessageSquare, badge: 5 },
+  { name: texts.navigation.advanced.dao, href: "/dao", icon: Users, badge: 0 },
+  { name: texts.navigation.advanced.governance, href: "/governance", icon: Vote, badge: 3 },
+  { name: texts.navigation.advanced.marketAnalysis, href: "/market-analysis", icon: Search, badge: 0 },
+  { name: texts.navigation.advanced.analytics, href: "/analytics", icon: BarChart3, badge: 0 },
+  { name: texts.navigation.advanced.aiRecommendations, href: "/ai-recommendations", icon: Brain, badge: 1 },
+  { name: texts.navigation.advanced.social, href: "/social", icon: MessageSquare, badge: 5 },
 ]
 
 interface SidebarNavigationProps {
@@ -63,7 +64,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         const isActive = location.pathname === item.href
         return (
           <TouchTarget
-            key={item.name}
+            key={item.name.full}
             asChild
             size="lg"
             variant="none"
@@ -87,7 +88,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                 "truncate transition-colors",
                 isActive ? "text-white font-medium" : "text-gray-300"
               )}>
-                {item.name}
+                {getResponsiveText(item.name, isMobile)}
               </span>
               {item.badge > 0 && (
                 <MobileBadge
@@ -107,14 +108,14 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
 
   return (
     <nav className="space-y-2 overflow-y-auto max-h-[calc(100vh-200px)] pb-4">
-      {renderNavGroup(primaryNavigation, "Principal")}
+      {renderNavGroup(primaryNavigation, texts.navigation.sections.principal)}
       
       <div className="border-t border-white/10 pt-4">
-        {renderNavGroup(financialNavigation, "Finance")}
+        {renderNavGroup(financialNavigation, texts.navigation.sections.finance)}
       </div>
       
       <div className="border-t border-white/10 pt-4">
-        {renderNavGroup(advancedNavigation, "Avancé")}
+        {renderNavGroup(advancedNavigation, texts.navigation.sections.advanced)}
       </div>
     </nav>
   )

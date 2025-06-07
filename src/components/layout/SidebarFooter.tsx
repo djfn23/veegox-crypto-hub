@@ -11,6 +11,7 @@ import {
   User,
   Crown
 } from "lucide-react"
+import { texts } from "@/lib/constants/texts"
 
 interface SidebarFooterProps {
   onItemClick?: () => void
@@ -33,7 +34,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({ onItemClick }) => 
           <div className="flex-1 min-w-0">
             <p className="text-white font-medium text-sm truncate">John Doe</p>
             <MobileText variant="caption" className="text-gray-400">
-              Premium Member
+              {texts.profile.member}
             </MobileText>
           </div>
         </div>
@@ -49,7 +50,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({ onItemClick }) => 
         >
           <Link to="/profile" onClick={onItemClick}>
             <Settings className="h-4 w-4" />
-            <span className="ml-3">Paramètres</span>
+            <span className="ml-3">{texts.profile.actions.settings}</span>
           </Link>
         </TouchTarget>
 
@@ -61,7 +62,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({ onItemClick }) => 
         >
           <Link to="/help" onClick={onItemClick}>
             <HelpCircle className="h-4 w-4" />
-            <span className="ml-3">Aide</span>
+            <span className="ml-3">{texts.profile.actions.help}</span>
           </Link>
         </TouchTarget>
 
@@ -73,7 +74,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({ onItemClick }) => 
         >
           <Link to="/security" onClick={onItemClick}>
             <Shield className="h-4 w-4" />
-            <span className="ml-3">Sécurité</span>
+            <span className="ml-3">{texts.profile.actions.security}</span>
           </Link>
         </TouchTarget>
 
@@ -83,7 +84,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({ onItemClick }) => 
           className="w-full justify-start px-3 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 mt-2"
         >
           <LogOut className="h-4 w-4" />
-          <span className="ml-3">Déconnexion</span>
+          <span className="ml-3">{texts.profile.actions.logout}</span>
         </TouchTarget>
       </div>
     </div>

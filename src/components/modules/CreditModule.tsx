@@ -6,6 +6,7 @@ import CreditModuleHeader from "./credit/CreditModuleHeader";
 import CreditOverview from "./credit/CreditOverview";
 import { useUserLoans } from "@/hooks/useCreditModule";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { texts, getResponsiveText } from "@/lib/constants/texts";
 
 const CreditModule = () => {
   const { data: loans } = useUserLoans();
@@ -21,19 +22,19 @@ const CreditModule = () => {
             value="overview" 
             className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
           >
-            {isMobile ? "🏠 Vue d'ensemble" : "Vue d'ensemble"}
+            {getResponsiveText(texts.credit.tabs.overview, isMobile)}
           </TabsTrigger>
           <TabsTrigger 
             value="erc20-collateral" 
             className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
           >
-            {isMobile ? "💰 Token Collateral" : "Token Collateral"}
+            {getResponsiveText(texts.credit.tabs.collateral, isMobile)}
           </TabsTrigger>
           <TabsTrigger 
             value="loans" 
             className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
           >
-            {isMobile ? "📋 Mes Prêts" : "Mes Prêts"}
+            {getResponsiveText(texts.credit.tabs.loans, isMobile)}
           </TabsTrigger>
         </TabsList>
 

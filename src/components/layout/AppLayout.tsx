@@ -13,6 +13,7 @@ import { GlobalSearch } from '@/components/ui/global-search';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { useTheme } from '@/hooks/useTheme';
 import { useAppStore } from '@/store/useAppStore';
+import { texts } from "@/lib/constants/texts";
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -50,8 +51,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   <span className="text-white font-bold text-lg md:text-xl font-heading">V</span>
                 </div>
                 <div className="min-w-0">
-                  <span className="text-white font-bold text-lg md:text-xl font-heading block truncate">Veegox</span>
-                  <p className="text-gray-400 text-xs hidden sm:block">Crypto Hub</p>
+                  <span className="text-white font-bold text-lg md:text-xl font-heading block truncate">{texts.app.name}</span>
+                  <p className="text-gray-400 text-xs hidden sm:block">{texts.app.tagline}</p>
                 </div>
               </div>
               <TouchTarget

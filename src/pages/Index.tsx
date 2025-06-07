@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileContainer, MobileSection, MobileGrid, MobileCard, MobileHeading, MobileText } from "@/components/ui/mobile-components";
 import { TouchTarget } from "@/components/ui/mobile-touch-target";
+import { texts } from "@/lib/constants/texts";
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -33,35 +34,55 @@ const Index = () => {
   const features = [
     {
       icon: Coins,
-      title: "Token Manager",
-      description: "Créez et gérez vos tokens personnalisés avec déploiement automatique",
+      title: texts.home.features.items.tokens.title,
+      description: texts.home.features.items.tokens.description,
       color: "bg-blue-500",
     },
     {
       icon: TrendingUp,
-      title: "Module Crédit IA",
-      description: "Système de prêts décentralisés avec scoring de crédit basé sur l'IA",
+      title: texts.home.features.items.credit.title,
+      description: texts.home.features.items.credit.description,
       color: "bg-green-500",
     },
     {
       icon: Zap,
-      title: "Module Staking",
-      description: "Pools de staking avec rendements optimisés et récompenses automatiques",
+      title: texts.home.features.items.staking.title,
+      description: texts.home.features.items.staking.description,
       color: "bg-purple-500",
     },
     {
       icon: Vote,
-      title: "Module DAO",
-      description: "Gouvernance décentralisée avec propositions et système de vote",
+      title: texts.home.features.items.dao.title,
+      description: texts.home.features.items.dao.description,
       color: "bg-orange-500",
     }
   ];
 
   const stats = [
-    { label: "Marché Web3 2025", value: "$6.15B", growth: "CAGR 38.9%", icon: DollarSign },
-    { label: "Marché DeFi 2025", value: "$32.36B", growth: "CAGR 53.8%", icon: Wallet },
-    { label: "TVL Veegox", value: "$2.4M", growth: "+147%", icon: TrendingUp },
-    { label: "Utilisateurs Actifs", value: "15K+", growth: "Segment cible", icon: Users }
+    { 
+      label: texts.home.stats.web3Market.label, 
+      value: texts.home.stats.web3Market.value, 
+      growth: texts.home.stats.web3Market.growth, 
+      icon: DollarSign 
+    },
+    { 
+      label: texts.home.stats.defiMarket.label, 
+      value: texts.home.stats.defiMarket.value, 
+      growth: texts.home.stats.defiMarket.growth, 
+      icon: Wallet 
+    },
+    { 
+      label: texts.home.stats.tvl.label, 
+      value: texts.home.stats.tvl.value, 
+      growth: texts.home.stats.tvl.growth, 
+      icon: TrendingUp 
+    },
+    { 
+      label: texts.home.stats.users.label, 
+      value: texts.home.stats.users.value, 
+      growth: texts.home.stats.users.growth, 
+      icon: Users 
+    }
   ];
 
   return (
@@ -72,8 +93,8 @@ const Index = () => {
           <div className="flex justify-between items-center py-3 md:py-4 min-h-[64px]">
             <div className="flex items-center space-x-2 md:space-x-3 min-w-0">
               <div className="w-7 h-7 md:w-8 md:h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex-shrink-0"></div>
-              <span className="text-lg md:text-xl font-bold text-white truncate">Veegox</span>
-              <Badge variant="secondary" className="ml-1 md:ml-2 text-xs px-2 py-0.5">Beta</Badge>
+              <span className="text-lg md:text-xl font-bold text-white truncate">{texts.app.name}</span>
+              <Badge variant="secondary" className="ml-1 md:ml-2 text-xs px-2 py-0.5">{texts.app.beta}</Badge>
             </div>
             <div className="flex space-x-2 md:space-x-3 flex-shrink-0">
               <TouchTarget
@@ -85,7 +106,7 @@ const Index = () => {
                 }}
                 className="text-white hover:bg-white/10 px-3 md:px-4"
               >
-                Connexion
+                {texts.auth.modal.messages.connectionButtons.login}
               </TouchTarget>
               <TouchTarget
                 size="lg"
@@ -95,7 +116,7 @@ const Index = () => {
                   setShowAuth(true);
                 }}
               >
-                Commencer
+                {texts.auth.modal.messages.connectionButtons.start}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </TouchTarget>
             </div>
@@ -111,9 +132,9 @@ const Index = () => {
               level={1}
               className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4 md:mb-6 leading-tight"
             >
-              La Plateforme DeFi
+              {texts.home.hero.title}
               <span className="block bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mt-2">
-                Tout-en-Un avec IA
+                {texts.home.hero.subtitle}
               </span>
             </MobileHeading>
             
@@ -121,8 +142,7 @@ const Index = () => {
               variant="body" 
               className="text-gray-300 mb-6 md:mb-8 max-w-4xl mx-auto leading-relaxed"
             >
-              Veegox révolutionne la DeFi avec une plateforme complète intégrant l'IA 
-              pour des recommandations d'investissement intelligentes.
+              {texts.home.hero.description}
             </MobileText>
             
             <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 mb-8 md:mb-12">
@@ -134,7 +154,7 @@ const Index = () => {
                   setShowAuth(true);
                 }}
               >
-                Lancer l'Application
+                {texts.home.hero.cta.primary}
                 <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
               </TouchTarget>
             </div>
@@ -168,7 +188,7 @@ const Index = () => {
               level={2}
               className="text-white mb-4 md:mb-6"
             >
-              4 Modules, 1 Plateforme
+              {texts.home.features.title}
             </MobileHeading>
           </div>
 
@@ -207,13 +227,13 @@ const Index = () => {
               level={2}
               className="text-white mb-6 md:mb-8"
             >
-              Rejoignez la Révolution DeFi
+              {texts.home.cta.title}
             </MobileHeading>
             <MobileText 
               variant="body"
               className="text-gray-300 mb-8 md:mb-10 leading-relaxed max-w-3xl mx-auto"
             >
-              Devenez pionnier de la première plateforme DeFi tout-en-un avec IA intégrée
+              {texts.home.cta.description}
             </MobileText>
             <TouchTarget
               size="lg"
@@ -223,7 +243,7 @@ const Index = () => {
                 setShowAuth(true);
               }}
             >
-              Commencer Maintenant
+              {texts.home.cta.button}
               <ArrowRight className="ml-3 h-4 w-4 md:h-5 md:w-5" />
             </TouchTarget>
           </div>
@@ -235,7 +255,7 @@ const Index = () => {
         <MobileContainer size="default" centered>
           <div className="text-center">
             <MobileText variant="caption" className="text-gray-400">
-              © 2024 Veegox. Révolutionnant la DeFi avec l'IA
+              {texts.home.footer}
             </MobileText>
           </div>
         </MobileContainer>

@@ -4,6 +4,7 @@ import { Search, Bell, Menu, User } from "lucide-react"
 import { TouchTarget } from "@/components/ui/mobile-touch-target"
 import { MobileContainer, MobileBadge } from "@/components/ui/mobile-components"
 import { cn } from "@/lib/utils"
+import { texts } from "@/lib/constants/texts"
 
 interface MobileHeaderProps {
   onToggleSidebar: () => void
@@ -39,7 +40,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0">
               <span className="text-white font-bold text-sm sm:text-base">V</span>
             </div>
-            <span className="text-white font-bold text-base sm:text-lg font-heading truncate">Veegox</span>
+            <span className="text-white font-bold text-base sm:text-lg font-heading truncate">{texts.app.name}</span>
           </div>
 
           {/* Actions rapides - optimisé pour mobile */}

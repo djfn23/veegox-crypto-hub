@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { texts, getResponsiveText } from '@/lib/constants/texts';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -36,7 +37,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       
       if (error) throw error;
       
-      toast.success('Compte créé avec succès ! Vérifiez votre email.');
+      toast.success(texts.auth.modal.messages.signupSuccess);
       onClose();
     } catch (error: any) {
       toast.error(error.message);
@@ -55,7 +56,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       
       if (error) throw error;
       
-      toast.success('Connexion réussie !');
+      toast.success(texts.auth.modal.messages.signinSuccess);
       onClose();
     } catch (error: any) {
       toast.error(error.message);
@@ -68,7 +69,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={`${isMobile ? 'w-[95vw] h-[90vh] max-w-none flex flex-col' : 'sm:max-w-md'} bg-slate-900 border-slate-700`}>
         <DialogHeader className={isMobile ? 'flex-shrink-0' : ''}>
-          <DialogTitle className="text-white text-center">Authentification</DialogTitle>
+          <DialogTitle className="text-white text-center">{texts.auth.modal.title}</DialogTitle>
         </DialogHeader>
         
         <div className={`${isMobile ? 'flex-1 overflow-y-auto' : ''} px-1`}>
@@ -78,36 +79,36 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 value="signin" 
                 className={`text-white data-[state=active]:bg-slate-700 ${isMobile ? 'text-sm py-3' : ''}`}
               >
-                {isMobile ? '📧 Connexion' : 'Connexion'}
+                {getResponsiveText(texts.auth.modal.tabs.signin, isMobile)}
               </TabsTrigger>
               <TabsTrigger 
                 value="signup" 
                 className={`text-white data-[state=active]:bg-slate-700 ${isMobile ? 'text-sm py-3' : ''}`}
               >
-                {isMobile ? '🆕 Inscription' : 'Inscription'}
+                {getResponsiveText(texts.auth.modal.tabs.signup, isMobile)}
               </TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin" className={`space-y-4 ${isMobile ? 'mt-6' : 'mt-4'}`}>
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">Email</Label>
+                <Label htmlFor="email" className="text-white">{texts.auth.modal.fields.email.label}</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="votre@email.com"
+                  placeholder={texts.auth.modal.fields.email.placeholder}
                   className={`bg-slate-800 border-slate-600 text-white ${isMobile ? 'h-12 text-base' : ''}`}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-white">Mot de passe</Label>
+                <Label htmlFor="password" className="text-white">{texts.auth.modal.fields.password.label}</Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder={texts.auth.modal.fields.password.placeholder}
                   className={`bg-slate-800 border-slate-600 text-white ${isMobile ? 'h-12 text-base' : ''}`}
                 />
               </div>
@@ -116,40 +117,40 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 className={`w-full bg-blue-600 hover:bg-blue-700 ${isMobile ? 'h-12 text-base mt-6' : ''}`}
                 disabled={isLoading}
               >
-                {isLoading ? 'Connexion...' : 'Se connecter'}
+                {isLoading ? texts.auth.modal.buttons.signin.loading : texts.auth.modal.buttons.signin.default}
               </Button>
             </TabsContent>
             
             <TabsContent value="signup" className={`space-y-4 ${isMobile ? 'mt-6' : 'mt-4'}`}>
               <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-white">Nom complet</Label>
+                <Label htmlFor="fullName" className="text-white">{texts.auth.modal.fields.fullName.label}</Label>
                 <Input
                   id="fullName"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Jean Dupont"
+                  placeholder={texts.auth.modal.fields.fullName.placeholder}
                   className={`bg-slate-800 border-slate-600 text-white ${isMobile ? 'h-12 text-base' : ''}`}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">Email</Label>
+                <Label htmlFor="email" className="text-white">{texts.auth.modal.fields.email.label}</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="votre@email.com"
+                  placeholder={texts.auth.modal.fields.email.placeholder}
                   className={`bg-slate-800 border-slate-600 text-white ${isMobile ? 'h-12 text-base' : ''}`}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-white">Mot de passe</Label>
+                <Label htmlFor="password" className="text-white">{texts.auth.modal.fields.password.label}</Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder={texts.auth.modal.fields.password.placeholder}
                   className={`bg-slate-800 border-slate-600 text-white ${isMobile ? 'h-12 text-base' : ''}`}
                 />
               </div>
@@ -158,7 +159,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 className={`w-full bg-green-600 hover:bg-green-700 ${isMobile ? 'h-12 text-base mt-6' : ''}`}
                 disabled={isLoading}
               >
-                {isLoading ? 'Inscription...' : 'S\'inscrire'}
+                {isLoading ? texts.auth.modal.buttons.signup.loading : texts.auth.modal.buttons.signup.default}
               </Button>
             </TabsContent>
           </Tabs>

@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Lock, Unlock, Trophy, DollarSign, TrendingUp, Coins } from "lucide-react";
 import { ERC20StakingPool } from "./staking/ERC20StakingPool";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { texts, getResponsiveText } from "@/lib/constants/texts";
 
 const StakingModule = () => {
   const isMobile = useIsMobile();
@@ -57,12 +58,12 @@ const StakingModule = () => {
   return (
     <div className="space-y-4 md:space-y-6 px-4 lg:px-0">
       <div>
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Module Staking</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">{texts.staking.header.title}</h2>
         <p className="text-gray-400 text-sm md:text-base leading-relaxed">
-          Stakez vos tokens et gagnez des récompenses passives
+          {texts.staking.header.description}
         </p>
         <div className="mt-2 text-xs md:text-sm text-purple-400">
-          💎 Incluant notre token ERC20Template avec des APY préférentiels
+          {texts.staking.header.subtitle}
         </div>
       </div>
 
@@ -74,7 +75,7 @@ const StakingModule = () => {
               <DollarSign className="h-4 w-4 md:h-5 md:w-5 text-blue-400" />
             </div>
             <div>
-              <p className="text-gray-400 text-xs md:text-sm">Total Staké</p>
+              <p className="text-gray-400 text-xs md:text-sm">{texts.staking.stats.totalStaked}</p>
               <p className="text-white font-bold text-sm md:text-base">${totalStakedValue.toLocaleString()}</p>
             </div>
           </div>
@@ -86,7 +87,7 @@ const StakingModule = () => {
               <Trophy className="h-4 w-4 md:h-5 md:w-5 text-green-400" />
             </div>
             <div>
-              <p className="text-gray-400 text-xs md:text-sm">Récompenses</p>
+              <p className="text-gray-400 text-xs md:text-sm">{texts.staking.stats.rewards}</p>
               <p className="text-white font-bold text-sm md:text-base">${totalRewards.toFixed(2)}</p>
             </div>
           </div>
@@ -98,7 +99,7 @@ const StakingModule = () => {
               <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-purple-400" />
             </div>
             <div>
-              <p className="text-gray-400 text-xs md:text-sm">APY Moyen</p>
+              <p className="text-gray-400 text-xs md:text-sm">{texts.staking.stats.averageApy}</p>
               <p className="text-white font-bold text-sm md:text-base">12.8%</p>
             </div>
           </div>
@@ -110,7 +111,7 @@ const StakingModule = () => {
               <Lock className="h-4 w-4 md:h-5 md:w-5 text-yellow-400" />
             </div>
             <div>
-              <p className="text-gray-400 text-xs md:text-sm">Pools Actifs</p>
+              <p className="text-gray-400 text-xs md:text-sm">{texts.staking.stats.activePools}</p>
               <p className="text-white font-bold text-sm md:text-base">{myStakes.length}</p>
             </div>
           </div>
@@ -123,19 +124,19 @@ const StakingModule = () => {
             value="erc20-staking" 
             className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
           >
-            {isMobile ? "🪙 Notre Token" : "Notre Token"}
+            {getResponsiveText(texts.staking.tabs.erc20, isMobile)}
           </TabsTrigger>
           <TabsTrigger 
             value="pools" 
             className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
           >
-            {isMobile ? "🔒 Pools Génériques" : "Pools Génériques"}
+            {getResponsiveText(texts.staking.tabs.pools, isMobile)}
           </TabsTrigger>
           <TabsTrigger 
             value="my-stakes" 
             className={`text-white data-[state=active]:bg-white/20 data-[state=active]:text-white rounded-lg ${isMobile ? 'justify-start text-sm py-3 px-4' : ''}`}
           >
-            {isMobile ? "🏆 Mes Stakes" : "Mes Stakes"}
+            {getResponsiveText(texts.staking.tabs.stakes, isMobile)}
           </TabsTrigger>
         </TabsList>
 
@@ -159,28 +160,28 @@ const StakingModule = () => {
                       </div>
                     </div>
                     <Badge variant="outline" className="text-green-400 border-green-400 text-xs">
-                      {pool.apy}% APY
+                      {pool.apy}% {texts.financial.apy}
                     </Badge>
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs md:text-sm">
-                      <span className="text-gray-400">TVL</span>
+                      <span className="text-gray-400">{texts.staking.info.tvl}</span>
                       <span className="text-white">${(pool.tvl / 1000000).toFixed(1)}M</span>
                     </div>
                     <div className="flex justify-between text-xs md:text-sm">
-                      <span className="text-gray-400">Min Stake</span>
+                      <span className="text-gray-400">{texts.staking.info.minStake}</span>
                       <span className="text-white">{pool.minStake} {pool.token}</span>
                     </div>
                     <div className="flex justify-between text-xs md:text-sm">
-                      <span className="text-gray-400">Lock Period</span>
-                      <span className="text-white">{pool.lockPeriod === 0 ? 'Flexible' : `${pool.lockPeriod} jours`}</span>
+                      <span className="text-gray-400">{texts.staking.info.lockPeriod}</span>
+                      <span className="text-white">{pool.lockPeriod === 0 ? texts.staking.info.flexible : `${pool.lockPeriod} jours`}</span>
                     </div>
                   </div>
 
                   <GradientButton className="w-full" variant="outline" size={isMobile ? "default" : "sm"}>
                     <Lock className="h-4 w-4 mr-2" />
-                    Staker {pool.token}
+                    {texts.staking.actions.stake} {pool.token}
                   </GradientButton>
                 </div>
               </GlassCard>
@@ -204,17 +205,17 @@ const StakingModule = () => {
                   </div>
                   <div className="text-left sm:text-right">
                     <p className="text-green-400 font-semibold text-sm md:text-base">+${stake.rewards}</p>
-                    <p className="text-gray-400 text-xs md:text-sm">{stake.apy}% APY</p>
+                    <p className="text-gray-400 text-xs md:text-sm">{stake.apy}% {texts.financial.apy}</p>
                   </div>
                 </div>
                 <div className="mt-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                   <GradientButton variant="outline" size="sm" className="flex-1">
                     <TrendingUp className="h-4 w-4 mr-2" />
-                    Restaker
+                    {texts.staking.actions.restake}
                   </GradientButton>
                   <GradientButton variant="outline" size="sm" className="flex-1">
                     <Unlock className="h-4 w-4 mr-2" />
-                    Unstaker
+                    {texts.staking.actions.unstake}
                   </GradientButton>
                 </div>
               </GlassCard>
