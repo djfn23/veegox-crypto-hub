@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,6 +29,12 @@ import Collections from "./pages/Collections";
 import AIAssistant from "./pages/AIAssistant";
 import Crowdfunding from "./pages/Crowdfunding";
 import CrowdfundingCampaign from "./pages/CrowdfundingCampaign";
+import Portfolio from "./pages/Portfolio";
+import Liquidity from "./pages/Liquidity";
+import CreateNFT from "./pages/CreateNFT";
+import MyNFTs from "./pages/MyNFTs";
+import Community from "./pages/Community";
+import Automation from "./pages/Automation";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +70,12 @@ const App = () => (
             <Route path="/security" element={<Security />} />
             <Route path="/legal" element={<Legal />} />
             <Route path="/about" element={<About />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/liquidity" element={<Liquidity />} />
+            <Route path="/create-nft" element={<CreateNFT />} />
+            <Route path="/my-nfts" element={<MyNFTs />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/automation" element={<Automation />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppLayout>
