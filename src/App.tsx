@@ -61,6 +61,13 @@ import CrowdfundingCategories from "./pages/crowdfunding/CrowdfundingCategories"
 import CrowdfundingTrending from "./pages/crowdfunding/CrowdfundingTrending";
 import CrowdfundingFeatured from "./pages/crowdfunding/CrowdfundingFeatured";
 
+// Token pages
+import Tokens from "./pages/Tokens";
+import CreateToken from "./pages/tokens/CreateToken";
+import TokenAnalytics from "./pages/tokens/TokenAnalytics";
+import ManageTokens from "./pages/tokens/ManageTokens";
+import TokenMarketplace from "./pages/tokens/TokenMarketplace";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -80,7 +87,6 @@ const App = () => (
             <Route path="/governance/create" element={<CreateCampaign />} />
             
             <Route path="/create-campaign" element={<CreateCampaign />} />
-            <Route path="/tokens" element={<Navigate to="/wallet" replace />} />
             <Route path="/exchange" element={<Navigate to="/trading" replace />} />
             
             <Route path="/marketplace" element={<Marketplace />} />
@@ -93,6 +99,12 @@ const App = () => (
             <Route path="/trading/strategies" element={<TradingStrategies />} />
             
             <Route path="/wallet" element={<Wallet />} />
+            
+            <Route path="/tokens" element={<Tokens />} />
+            <Route path="/tokens/create" element={<CreateToken />} />
+            <Route path="/tokens/analytics" element={<TokenAnalytics />} />
+            <Route path="/tokens/manage" element={<ManageTokens />} />
+            <Route path="/tokens/marketplace" element={<TokenMarketplace />} />
             
             <Route path="/settings" element={<Settings />} />
             <Route path="/bridge" element={<Bridge />} />
