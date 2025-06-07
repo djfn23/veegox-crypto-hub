@@ -28,6 +28,8 @@ import Credit from "./pages/Credit";
 import Social from "./pages/Social";
 import Collections from "./pages/Collections";
 import AIAssistant from "./pages/AIAssistant";
+import Crowdfunding from "./pages/Crowdfunding";
+import CrowdfundingCampaign from "./pages/CrowdfundingCampaign";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +55,8 @@ const App = () => (
             <Route path="/lending" element={<Lending />} />
             <Route path="/staking" element={<Staking />} />
             <Route path="/credit" element={<Credit />} />
+            <Route path="/crowdfunding" element={<Crowdfunding />} />
+            <Route path="/crowdfunding/:id" element={<CrowdfundingCampaign />} />
             <Route path="/social" element={<Social />} />
             <Route path="/collections" element={<Collections />} />
             <Route path="/ai" element={<AIAssistant />} />

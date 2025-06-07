@@ -49,6 +49,7 @@ const navigationItems = [
       { name: "Trading", href: "/trading", icon: TrendingUp },
       { name: "Staking", href: "/staking", icon: Coins },
       { name: "Crédit DeFi", href: "/credit", icon: CreditCard },
+      { name: "Crowdfunding", href: "/crowdfunding", icon: Target },
       { name: "Portfolio", href: "/portfolio", icon: PiggyBank },
     ],
   },
@@ -147,7 +148,7 @@ export const SidebarNavigation = () => {
             {section.items.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.href;
-              const isNew = ['Crédit DeFi', 'AI Assistant', 'Collections', 'Forum'].includes(item.name);
+              const isNew = ['Crédit DeFi', 'AI Assistant', 'Collections', 'Forum', 'Crowdfunding'].includes(item.name);
               const isBeta = ['Automation', 'Liquidity'].includes(item.name);
               
               return (
