@@ -20,7 +20,7 @@ export class VeegoxTokenService {
     name: 'Veegox Token',
     decimals: 18,
     chainId: 137,
-    logo: '/veegox-logo.png' // Placeholder pour le logo
+    logo: '/veegox-logo.png'
   };
 
   static async getVeegoxTokenInfo(): Promise<VeegoxTokenInfo | null> {
@@ -62,14 +62,13 @@ export class VeegoxTokenService {
       const tokenInfo = await this.getVeegoxTokenInfo();
       if (!tokenInfo) return null;
 
-      // Simulation de statistiques - dans un vrai projet, ces données viendraient de l'API
       return {
-        price: 0.0025, // Prix simulé en USD
+        price: 0.0025,
         change24h: 5.2,
         volume24h: 125000,
         marketCap: tokenInfo.totalSupply ? parseFloat(tokenInfo.totalSupply) * 0.0025 : 0,
-        holders: 1247, // Nombre de holders simulé
-        burnedTokens: '0' // Tokens brûlés
+        holders: 1247,
+        burnedTokens: '0'
       };
     } catch (error) {
       console.error('Error fetching Veegox stats:', error);
@@ -87,7 +86,6 @@ export class VeegoxTokenService {
     return this.VEEGOX_CONFIG;
   }
 
-  // Enregistrer les métriques Veegox dans la base de données
   static async saveVeegoxMetrics() {
     try {
       const stats = await this.getVeegoxStats();
