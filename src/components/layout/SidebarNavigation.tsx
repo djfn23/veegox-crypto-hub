@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,7 +31,8 @@ import {
   Zap,
   TrendingDown,
   PiggyBank,
-  Award
+  Award,
+  Plus
 } from "lucide-react";
 
 const navigationItems = [
@@ -41,6 +41,16 @@ const navigationItems = [
     items: [
       { name: "Accueil", href: "/", icon: Home },
       { name: "Portefeuille", href: "/wallet", icon: Wallet },
+    ],
+  },
+  {
+    title: "Tokens",
+    items: [
+      { name: "Mes Tokens", href: "/tokens", icon: Coins },
+      { name: "Créer Token", href: "/tokens/create", icon: Plus },
+      { name: "Gérer Tokens", href: "/tokens/manage", icon: Settings },
+      { name: "Analytics", href: "/tokens/analytics", icon: BarChart3 },
+      { name: "Marketplace", href: "/tokens/marketplace", icon: ShoppingBag },
     ],
   },
   {
@@ -148,8 +158,8 @@ export const SidebarNavigation = () => {
             {section.items.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.href;
-              const isNew = ['Crédit DeFi', 'AI Assistant', 'Collections', 'Forum', 'Crowdfunding'].includes(item.name);
-              const isBeta = ['Automation', 'Liquidity'].includes(item.name);
+              const isNew = ['Crédit DeFi', 'AI Assistant', 'Collections', 'Forum', 'Crowdfunding', 'Créer Token'].includes(item.name);
+              const isBeta = ['Automation', 'Liquidity', 'Marketplace'].includes(item.name);
               
               return (
                 <Link key={item.name} to={item.href}>
