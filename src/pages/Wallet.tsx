@@ -7,9 +7,11 @@ import { AssetsTab } from "@/components/wallet/AssetsTab";
 import { TransactionsTab } from "@/components/wallet/TransactionsTab";
 import { VeegoxWalletSection } from "@/components/wallet/VeegoxWalletSection";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 export default function Wallet() {
   const isMobile = useIsMobile();
+  const { connectedWallets, isConnecting, connectWallet, disconnectWallet } = useWalletConnection();
 
   return (
     <PageLayout
@@ -31,15 +33,20 @@ export default function Wallet() {
           </TabsContent>
 
           <TabsContent value="wallets" className="space-y-4">
-            <WalletsTab />
+            <WalletsTab 
+              wallets={connectedWallets}
+              onConnectWallet={connectWallet}
+              onDisconnectWallet={disconnectWallet}
+              isConnecting={isConnecting}
+            />
           </TabsContent>
 
           <TabsContent value="assets" className="space-y-4">
-            <AssetsTab />
+            <AssetsTab wallets={connectedWallets} />
           </TabsContent>
 
           <TabsContent value="transactions" className="space-y-4">
-            <TransactionsTab />
+            <TransactionsTab wallets={connectedWallets} />
           </TabsContent>
         </Tabs>
       </div>
