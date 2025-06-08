@@ -1,10 +1,12 @@
 
+import { useState } from 'react';
 import { GlassCard } from "@/components/ui/glass-card";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { Badge } from "@/components/ui/badge";
 import { AnimatedNumber } from "@/components/ui/animated-number";
-import { Plus } from "lucide-react";
+import { Plus, Wallet } from "lucide-react";
 import { useWalletBalance } from "@/hooks/useWalletData";
+import { WalletConnectionModal } from './WalletConnectionModal';
 
 interface WalletData {
   id: string;
@@ -17,50 +19,75 @@ interface WalletData {
 
 interface WalletsTabProps {
   wallets: WalletData[];
-  onConnectWallet: (walletType: 'metamask' | 'coinbase' | 'walletconnect') => void;
+  onConnectWallet: (walletId: string) => void;
   onDisconnectWallet: (walletId: string) => void;
   isConnecting: boolean;
 }
 
 const WalletsTab = ({ wallets, onConnectWallet, onDisconnectWallet, isConnecting }: WalletsTabProps) => {
+  const [showConnectionModal, setShowConnectionModal] = useState(false);
+
   return (
-    <GlassCard className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-white">Gestion des Portefeuilles</h3>
-        <GradientButton 
-          variant="primary" 
-          size="sm"
-          onClick={() => onConnectWallet('metamask')}
-          disabled={isConnecting}
-        >
-          <Plus className="h-4 w-4" />
-          {isConnecting ? "Connexion..." : "Nouveau Wallet"}
-        </GradientButton>
-      </div>
-      
-      <div className="space-y-4">
-        {wallets.map((wallet) => (
-          <WalletCard 
-            key={wallet.id} 
-            wallet={wallet} 
-            onConnect={onConnectWallet}
-            onDisconnect={onDisconnectWallet}
-            isConnecting={isConnecting}
-          />
-        ))}
-      </div>
-    </GlassCard>
+    <>
+      <GlassCard className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-white">Gestion des Portefeuilles</h3>
+          <GradientButton 
+            variant="primary" 
+            size="sm"
+            onClick={() => setShowConnectionModal(true)}
+            disabled={isConnecting}
+          >
+            <Plus className="h-4 w-4" />
+            {isConnecting ? "Connexion..." : "Connecter Wallet"}
+          </GradientButton>
+        </div>
+        
+        {wallets.length === 0 ? (
+          <div className="text-center py-12">
+            <Wallet className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h4 className="text-lg font-medium text-white mb-2">Aucun wallet connecté</h4>
+            <p className="text-gray-400 mb-6">Connectez votre premier wallet pour commencer</p>
+            <GradientButton 
+              variant="primary"
+              onClick={() => setShowConnectionModal(true)}
+              disabled={isConnecting}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Connecter un Wallet
+            </GradientButton>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {wallets.map((wallet) => (
+              <WalletCard 
+                key={wallet.id} 
+                wallet={wallet} 
+                onDisconnect={onDisconnectWallet}
+                isConnecting={isConnecting}
+              />
+            ))}
+          </div>
+        )}
+      </GlassCard>
+
+      <WalletConnectionModal 
+        isOpen={showConnectionModal}
+        onClose={() => setShowConnectionModal(false)}
+        onConnect={onConnectWallet}
+        isConnecting={isConnecting}
+      />
+    </>
   );
 };
 
 interface WalletCardProps {
   wallet: WalletData;
-  onConnect: (walletType: 'metamask' | 'coinbase' | 'walletconnect') => void;
   onDisconnect: (walletId: string) => void;
   isConnecting: boolean;
 }
 
-const WalletCard = ({ wallet, onConnect, onDisconnect, isConnecting }: WalletCardProps) => {
+const WalletCard = ({ wallet, onDisconnect, isConnecting }: WalletCardProps) => {
   const { data: balanceData, isLoading } = useWalletBalance(
     wallet.connected ? wallet.address : null,
     wallet.chainId
@@ -69,14 +96,6 @@ const WalletCard = ({ wallet, onConnect, onDisconnect, isConnecting }: WalletCar
   const balance = balanceData?.result?.balance || 0;
   const ethPrice = 2500; // Prix ETH approximatif
   const usdValue = balance * ethPrice;
-
-  const handleAction = () => {
-    if (wallet.connected) {
-      onDisconnect(wallet.id);
-    } else {
-      onConnect(wallet.id as 'metamask' | 'coinbase' | 'walletconnect');
-    }
-  };
 
   return (
     <GlassCard className="p-4 hover:scale-[1.01] transition-all duration-200">
@@ -115,12 +134,12 @@ const WalletCard = ({ wallet, onConnect, onDisconnect, isConnecting }: WalletCar
             </Badge>
           </div>
           <GradientButton 
-            variant={wallet.connected ? "outline" : "primary"}
+            variant="outline"
             size="sm"
-            onClick={handleAction}
+            onClick={() => onDisconnect(wallet.id)}
             disabled={isConnecting}
           >
-            {isConnecting ? "..." : (wallet.connected ? "Déconnecter" : "Connecter")}
+            Déconnecter
           </GradientButton>
         </div>
       </div>

@@ -6,28 +6,27 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useEnhancedWallet } from '@/hooks/useEnhancedWallet';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { WalletProvider } from '@/services/walletService';
-import { Search, Download, ExternalLink, Smartphone, Monitor, Shield, Building } from 'lucide-react';
-import { toast } from 'sonner';
+import { Search, Download, Smartphone, Monitor, Shield, Building, Users } from 'lucide-react';
 
 interface WalletConnectionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onConnect: (walletId: string) => void;
+  isConnecting: boolean;
 }
 
-export const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModalProps) => {
+export const WalletConnectionModal = ({ isOpen, onClose, onConnect, isConnecting }: WalletConnectionModalProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | WalletProvider['category']>('all');
   
   const {
-    connectWallet,
-    isConnecting,
-    isWalletConnecting,
-    getWalletsByCategory,
+    getAllWallets,
     getInstalledWallets,
-    getAllWallets
-  } = useEnhancedWallet();
+    getWalletsByCategory,
+    isWalletConnecting
+  } = useWalletConnection();
 
   const allWallets = getAllWallets();
   const installedWallets = getInstalledWallets();
@@ -40,9 +39,11 @@ export const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModal
   });
 
   const handleWalletConnect = async (walletId: string) => {
-    const success = await connectWallet(walletId);
-    if (success) {
+    try {
+      await onConnect(walletId);
       onClose();
+    } catch (error) {
+      // Error handling is done in the useWalletConnection hook
     }
   };
 
@@ -52,6 +53,7 @@ export const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModal
       case 'mobile': return <Smartphone className="h-4 w-4" />;
       case 'hardware': return <Shield className="h-4 w-4" />;
       case 'institutional': return <Building className="h-4 w-4" />;
+      case 'social': return <Users className="h-4 w-4" />;
       default: return <Monitor className="h-4 w-4" />;
     }
   };
@@ -62,6 +64,7 @@ export const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModal
       case 'mobile': return 'bg-green-500/20 text-green-400 border-green-500/30';
       case 'hardware': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
       case 'institutional': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+      case 'social': return 'bg-pink-500/20 text-pink-400 border-pink-500/30';
       default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
   };
@@ -71,6 +74,7 @@ export const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModal
       <DialogContent className="sm:max-w-4xl bg-slate-900 border-slate-700 max-h-[80vh]">
         <DialogHeader>
           <DialogTitle className="text-white text-xl">Connecter un Wallet</DialogTitle>
+          <p className="text-gray-400">Choisissez parmi plus de 300 wallets supportés</p>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -84,6 +88,30 @@ export const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModal
               className="pl-10 bg-slate-800 border-slate-600 text-white"
             />
           </div>
+
+          {/* Installed Wallets Section */}
+          {installedWallets.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                <Shield className="h-5 w-5 text-green-400" />
+                Wallets Installés ({installedWallets.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-48 overflow-y-auto">
+                {installedWallets.map((wallet) => (
+                  <WalletCard 
+                    key={`installed-${wallet.id}`}
+                    wallet={wallet}
+                    onConnect={handleWalletConnect}
+                    isConnecting={isConnecting}
+                    isWalletConnecting={isWalletConnecting}
+                    getCategoryIcon={getCategoryIcon}
+                    getCategoryColor={getCategoryColor}
+                    priority
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           <Tabs defaultValue="all" className="w-full">
             <TabsList className="grid w-full grid-cols-6 bg-slate-800">
@@ -123,6 +151,7 @@ export const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModal
                 onClick={() => setSelectedCategory('social')}
                 className="text-white data-[state=active]:bg-slate-700"
               >
+                <Users className="h-4 w-4 mr-1" />
                 Social
               </TabsTrigger>
               <TabsTrigger 
@@ -145,22 +174,6 @@ export const WalletConnectionModal = ({ isOpen, onClose }: WalletConnectionModal
                 getCategoryColor={getCategoryColor}
               />
             </TabsContent>
-
-            {/* Installed Wallets Section */}
-            {installedWallets.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-white mb-3">Wallets installés</h3>
-                <WalletGrid 
-                  wallets={installedWallets}
-                  onConnect={handleWalletConnect}
-                  isConnecting={isConnecting}
-                  isWalletConnecting={isWalletConnecting}
-                  getCategoryIcon={getCategoryIcon}
-                  getCategoryColor={getCategoryColor}
-                  priority
-                />
-              </div>
-            )}
           </Tabs>
         </div>
       </DialogContent>
@@ -191,69 +204,103 @@ const WalletGrid = ({
     <ScrollArea className="h-96">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {wallets.map((wallet) => (
-          <div
+          <WalletCard
             key={wallet.id}
-            className={`p-4 border rounded-lg bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-all duration-200 ${
-              priority ? 'ring-2 ring-blue-500/30' : ''
-            }`}
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                  <span className="text-xl">{wallet.icon}</span>
-                </div>
-                <div>
-                  <h4 className="text-white font-medium">{wallet.name}</h4>
-                  <Badge className={`text-xs ${getCategoryColor(wallet.category)}`}>
-                    {getCategoryIcon(wallet.category)}
-                    <span className="ml-1 capitalize">{wallet.category}</span>
-                  </Badge>
-                </div>
-              </div>
-              {wallet.isInstalled && (
-                <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                  Installé
-                </Badge>
-              )}
-            </div>
-            
-            <p className="text-gray-400 text-sm mb-4">{wallet.description}</p>
-            
-            <div className="flex space-x-2">
-              {wallet.isInstalled ? (
-                <Button
-                  onClick={() => onConnect(wallet.id)}
-                  disabled={isConnecting}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
-                >
-                  {isWalletConnecting(wallet.id) ? 'Connexion...' : 'Connecter'}
-                </Button>
-              ) : (
-                <>
-                  <Button
-                    onClick={() => onConnect(wallet.id)}
-                    disabled={isConnecting}
-                    variant="outline"
-                    className="flex-1 border-slate-600 text-white hover:bg-slate-700"
-                  >
-                    Essayer
-                  </Button>
-                  {wallet.downloadUrl && (
-                    <Button
-                      onClick={() => window.open(wallet.downloadUrl, '_blank')}
-                      variant="outline"
-                      size="sm"
-                      className="border-slate-600 text-white hover:bg-slate-700"
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
+            wallet={wallet}
+            onConnect={onConnect}
+            isConnecting={isConnecting}
+            isWalletConnecting={isWalletConnecting}
+            getCategoryIcon={getCategoryIcon}
+            getCategoryColor={getCategoryColor}
+            priority={priority}
+          />
         ))}
       </div>
     </ScrollArea>
+  );
+};
+
+interface WalletCardProps {
+  wallet: WalletProvider;
+  onConnect: (walletId: string) => void;
+  isConnecting: boolean;
+  isWalletConnecting: (walletId: string) => boolean;
+  getCategoryIcon: (category: WalletProvider['category']) => JSX.Element;
+  getCategoryColor: (category: WalletProvider['category']) => string;
+  priority?: boolean;
+}
+
+const WalletCard = ({ 
+  wallet, 
+  onConnect, 
+  isConnecting,
+  isWalletConnecting,
+  getCategoryIcon,
+  getCategoryColor,
+  priority = false 
+}: WalletCardProps) => {
+  const isThisWalletConnecting = isWalletConnecting(wallet.id);
+
+  return (
+    <div
+      className={`p-4 border rounded-lg bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-all duration-200 ${
+        priority ? 'ring-2 ring-green-500/30' : ''
+      }`}
+    >
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+            <span className="text-xl">{wallet.icon}</span>
+          </div>
+          <div>
+            <h4 className="text-white font-medium">{wallet.name}</h4>
+            <Badge className={`text-xs ${getCategoryColor(wallet.category)}`}>
+              {getCategoryIcon(wallet.category)}
+              <span className="ml-1 capitalize">{wallet.category}</span>
+            </Badge>
+          </div>
+        </div>
+        {wallet.isInstalled && (
+          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+            Installé
+          </Badge>
+        )}
+      </div>
+      
+      <p className="text-gray-400 text-sm mb-4">{wallet.description}</p>
+      
+      <div className="flex space-x-2">
+        {wallet.isInstalled ? (
+          <Button
+            onClick={() => onConnect(wallet.id)}
+            disabled={isConnecting}
+            className="flex-1 bg-blue-600 hover:bg-blue-700"
+          >
+            {isThisWalletConnecting ? 'Connexion...' : 'Connecter'}
+          </Button>
+        ) : (
+          <>
+            <Button
+              onClick={() => onConnect(wallet.id)}
+              disabled={isConnecting}
+              variant="outline"
+              className="flex-1 border-slate-600 text-white hover:bg-slate-700"
+            >
+              Essayer
+            </Button>
+            {wallet.downloadUrl && (
+              <Button
+                onClick={() => window.open(wallet.downloadUrl, '_blank')}
+                variant="outline"
+                size="sm"
+                className="border-slate-600 text-white hover:bg-slate-700"
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            )}
+          </>
+        )}
+      </div>
+    </div>
   );
 };
