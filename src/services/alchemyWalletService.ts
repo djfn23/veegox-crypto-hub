@@ -1,20 +1,21 @@
 
 import { 
-  AlchemyProvider,
-  SimpleSmartContractAccount,
-  LightSmartContractAccount,
-  LocalAccountSigner,
+  createSmartAccountClient,
   type SmartAccountSigner,
+  type SmartAccountClient,
+  LocalAccountSigner,
   getDefaultSimpleAccountFactoryAddress,
-  getDefaultLightAccountFactoryAddress
+  sepolia, 
+  polygon, 
+  mainnet, 
+  arbitrum
 } from '@alchemy/aa-core';
 import { AlchemySignerWebClient, AlchemySignerStatus } from '@alchemy/aa-alchemy';
-import { sepolia, polygon, mainnet, arbitrum } from '@alchemy/aa-core';
 
 export interface AlchemyWalletConnection {
   address: string;
   chainId: number;
-  provider: AlchemyProvider;
+  client: SmartAccountClient;
   accountType: 'eoa' | 'simple' | 'light';
   signer: SmartAccountSigner;
   isSmartAccount: boolean;
@@ -34,7 +35,6 @@ export class AlchemyWalletService {
   private static instance: AlchemyWalletService;
   private providers: Map<string, AlchemyWalletProvider> = new Map();
   private alchemySignerClient: AlchemySignerWebClient | null = null;
-  private currentProvider: AlchemyProvider | null = null;
 
   // Configuration Alchemy
   private readonly alchemyApiKey = import.meta.env.VITE_ALCHEMY_API_KEY || 'demo-key';
@@ -56,7 +56,7 @@ export class AlchemyWalletService {
     try {
       this.alchemySignerClient = new AlchemySignerWebClient({
         connectionConfig: {
-          rpcUrl: `/api/rpc/alchemy/${this.alchemyApiKey}`,
+          rpcUrl: `https://polygon-mainnet.g.alchemy.com/v2/${this.alchemyApiKey}`,
         },
         iframeConfig: {
           iframeContainerId: "alchemy-signer-iframe-container",
@@ -108,16 +108,6 @@ export class AlchemyWalletService {
       category: 'smart',
       type: 'smart-account',
       connect: this.connectSimpleSmartAccount.bind(this)
-    });
-
-    this.registerProvider({
-      id: 'alchemy-light-account',
-      name: 'Light Smart Account',
-      icon: '⚡',
-      description: 'Create a Light Smart Contract Account (gas optimized)',
-      category: 'smart',
-      type: 'smart-account',
-      connect: this.connectLightSmartAccount.bind(this)
     });
 
     // Traditional Wallet Integration via Alchemy
@@ -194,42 +184,24 @@ export class AlchemyWalletService {
 
   // Smart Account Methods
   private async connectSimpleSmartAccount(): Promise<AlchemyWalletConnection> {
-    const provider = this.createAlchemyProvider(polygon.id);
-    const signer = LocalAccountSigner.generatePrivateKey();
+    const signer = LocalAccountSigner.privateKeyToAccountSigner('0x' + '0'.repeat(64));
     
-    const smartAccount = await SimpleSmartContractAccount.create({
-      rpcClient: provider,
-      owner: signer,
-      factoryAddress: getDefaultSimpleAccountFactoryAddress(polygon),
-      salt: BigInt(0),
+    const client = createSmartAccountClient({
+      transport: `https://polygon-mainnet.g.alchemy.com/v2/${this.alchemyApiKey}`,
+      chain: polygon,
+      account: {
+        type: 'SimpleSmartAccount',
+        signer,
+        factoryAddress: getDefaultSimpleAccountFactoryAddress(polygon),
+        salt: BigInt(0),
+      },
     });
 
     return {
-      address: await smartAccount.getAddress(),
+      address: await client.getAddress(),
       chainId: polygon.id,
-      provider,
+      client,
       accountType: 'simple',
-      signer,
-      isSmartAccount: true
-    };
-  }
-
-  private async connectLightSmartAccount(): Promise<AlchemyWalletConnection> {
-    const provider = this.createAlchemyProvider(polygon.id);
-    const signer = LocalAccountSigner.generatePrivateKey();
-    
-    const smartAccount = await LightSmartContractAccount.create({
-      rpcClient: provider,
-      owner: signer,
-      factoryAddress: getDefaultLightAccountFactoryAddress(polygon),
-      salt: BigInt(0),
-    });
-
-    return {
-      address: await smartAccount.getAddress(),
-      chainId: polygon.id,
-      provider,
-      accountType: 'light',
       signer,
       isSmartAccount: true
     };
@@ -239,26 +211,22 @@ export class AlchemyWalletService {
     signer: SmartAccountSigner, 
     accountType: 'simple' | 'light' = 'simple'
   ): Promise<AlchemyWalletConnection> {
-    const provider = this.createAlchemyProvider(polygon.id);
     
-    const smartAccount = accountType === 'simple' 
-      ? await SimpleSmartContractAccount.create({
-          rpcClient: provider,
-          owner: signer,
-          factoryAddress: getDefaultSimpleAccountFactoryAddress(polygon),
-          salt: BigInt(0),
-        })
-      : await LightSmartContractAccount.create({
-          rpcClient: provider,
-          owner: signer,
-          factoryAddress: getDefaultLightAccountFactoryAddress(polygon),
-          salt: BigInt(0),
-        });
+    const client = createSmartAccountClient({
+      transport: `https://polygon-mainnet.g.alchemy.com/v2/${this.alchemyApiKey}`,
+      chain: polygon,
+      account: {
+        type: 'SimpleSmartAccount',
+        signer,
+        factoryAddress: getDefaultSimpleAccountFactoryAddress(polygon),
+        salt: BigInt(0),
+      },
+    });
 
     return {
-      address: await smartAccount.getAddress(),
+      address: await client.getAddress(),
       chainId: polygon.id,
-      provider,
+      client,
       accountType,
       signer,
       isSmartAccount: true
@@ -274,33 +242,28 @@ export class AlchemyWalletService {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const chainId = await window.ethereum.request({ method: 'eth_chainId' });
     
-    const provider = this.createAlchemyProvider(parseInt(chainId, 16));
+    const client = createSmartAccountClient({
+      transport: `https://polygon-mainnet.g.alchemy.com/v2/${this.alchemyApiKey}`,
+      chain: this.getChainById(parseInt(chainId, 16)),
+      account: {
+        type: 'SimpleSmartAccount',
+        signer: window.ethereum as any,
+        factoryAddress: getDefaultSimpleAccountFactoryAddress(polygon),
+        salt: BigInt(0),
+      },
+    });
 
     return {
       address: accounts[0],
       chainId: parseInt(chainId, 16),
-      provider,
+      client,
       accountType: 'eoa',
-      signer: window.ethereum,
+      signer: window.ethereum as any,
       isSmartAccount: false
     };
   }
 
   // Utility Methods
-  private createAlchemyProvider(chainId: number): AlchemyProvider {
-    const chain = this.getChainById(chainId);
-    
-    return new AlchemyProvider({
-      apiKey: this.alchemyApiKey,
-      chain,
-      opts: {
-        txMaxRetries: 3,
-        txRetryIntervalMs: 2000,
-        minPriorityFeePerGas: BigInt(1000000000), // 1 gwei
-      },
-    });
-  }
-
   private getChainById(chainId: number) {
     switch (chainId) {
       case 1: return mainnet;
@@ -329,7 +292,7 @@ export class AlchemyWalletService {
       paymasterAndData: this.alchemyGasManagerPolicyId,
     };
 
-    return connection.provider.sendTransaction(sponsoredTx);
+    return connection.client.sendTransaction(sponsoredTx);
   }
 
   // Session Key Methods
@@ -374,7 +337,7 @@ export class AlchemyWalletService {
     }
 
     // Implementation would batch multiple transactions into one
-    return connection.provider.sendTransactionBatch(transactions);
+    return connection.client.sendTransactionBatch(transactions);
   }
 }
 

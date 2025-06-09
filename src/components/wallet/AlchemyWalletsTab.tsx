@@ -18,8 +18,8 @@ import {
   Gift,
   Key,
   Layers,
-  BatchTransactions,
-  GasCanister
+  Send,
+  Fuel
 } from "lucide-react";
 
 export const AlchemyWalletsTab = () => {
