@@ -3,7 +3,6 @@ import {
   createSmartAccountClient,
   type SmartAccountSigner,
   type SmartAccountClient,
-  LocalAccountSigner,
   getDefaultSimpleAccountFactoryAddress,
   sepolia, 
   polygon, 
@@ -17,9 +16,9 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 export interface AlchemyWalletConnection {
   address: string;
   chainId: number;
-  client: SmartAccountClient;
+  client: SmartAccountClient | null;
   accountType: 'eoa' | 'simple' | 'light';
-  signer: SmartAccountSigner;
+  signer: any;
   isSmartAccount: boolean;
 }
 
@@ -146,12 +145,11 @@ export class AlchemyWalletService {
       throw new Error('Alchemy Signer not initialized');
     }
 
-    // Simplified connection for demo
+    // Simplified demo connection
     const privateKey = generatePrivateKey();
     const account = privateKeyToAccount(privateKey);
-    const signer = new LocalAccountSigner(account);
 
-    return this.createSmartAccountWithSigner(signer, 'simple');
+    return this.createDemoSmartAccount(account);
   }
 
   private async connectWithApple(): Promise<AlchemyWalletConnection> {
@@ -159,12 +157,11 @@ export class AlchemyWalletService {
       throw new Error('Alchemy Signer not initialized');
     }
 
-    // Simplified connection for demo
+    // Simplified demo connection
     const privateKey = generatePrivateKey();
     const account = privateKeyToAccount(privateKey);
-    const signer = new LocalAccountSigner(account);
 
-    return this.createSmartAccountWithSigner(signer, 'simple');
+    return this.createDemoSmartAccount(account);
   }
 
   private async connectWithEmail(): Promise<AlchemyWalletConnection> {
@@ -172,63 +169,29 @@ export class AlchemyWalletService {
       throw new Error('Alchemy Signer not initialized');
     }
 
-    // Simplified connection for demo
+    // Simplified demo connection
     const privateKey = generatePrivateKey();
     const account = privateKeyToAccount(privateKey);
-    const signer = new LocalAccountSigner(account);
 
-    return this.createSmartAccountWithSigner(signer, 'simple');
+    return this.createDemoSmartAccount(account);
   }
 
   // Smart Account Methods
   private async connectSimpleSmartAccount(): Promise<AlchemyWalletConnection> {
     const privateKey = generatePrivateKey();
     const account = privateKeyToAccount(privateKey);
-    const signer = new LocalAccountSigner(account);
     
-    const client = await createSmartAccountClient({
-      transport: http(`https://polygon-mainnet.g.alchemy.com/v2/${this.alchemyApiKey}`),
-      chain: polygon,
-      account: await signer.toSmartContractAccount({
-        transport: http(`https://polygon-mainnet.g.alchemy.com/v2/${this.alchemyApiKey}`),
-        chain: polygon,
-        factoryAddress: getDefaultSimpleAccountFactoryAddress(polygon),
-        salt: BigInt(0),
-      }),
-    });
-
-    return {
-      address: client.account.address,
-      chainId: polygon.id,
-      client,
-      accountType: 'simple',
-      signer,
-      isSmartAccount: true
-    };
+    return this.createDemoSmartAccount(account);
   }
 
-  private async createSmartAccountWithSigner(
-    signer: SmartAccountSigner, 
-    accountType: 'simple' | 'light' = 'simple'
-  ): Promise<AlchemyWalletConnection> {
-    
-    const client = await createSmartAccountClient({
-      transport: http(`https://polygon-mainnet.g.alchemy.com/v2/${this.alchemyApiKey}`),
-      chain: polygon,
-      account: await signer.toSmartContractAccount({
-        transport: http(`https://polygon-mainnet.g.alchemy.com/v2/${this.alchemyApiKey}`),
-        chain: polygon,
-        factoryAddress: getDefaultSimpleAccountFactoryAddress(polygon),
-        salt: BigInt(0),
-      }),
-    });
-
+  private async createDemoSmartAccount(account: any): Promise<AlchemyWalletConnection> {
+    // Simplified demo implementation
     return {
-      address: client.account.address,
+      address: account.address,
       chainId: polygon.id,
-      client,
-      accountType,
-      signer,
+      client: null, // Simplified for demo
+      accountType: 'simple',
+      signer: account,
       isSmartAccount: true
     };
   }
@@ -242,13 +205,12 @@ export class AlchemyWalletService {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const chainId = await window.ethereum.request({ method: 'eth_chainId' });
     
-    // For traditional wallets, create a simplified connection
     return {
       address: accounts[0],
       chainId: parseInt(chainId, 16),
-      client: {} as SmartAccountClient, // Simplified for traditional wallets
+      client: null,
       accountType: 'eoa',
-      signer: window.ethereum as any,
+      signer: window.ethereum,
       isSmartAccount: false
     };
   }
@@ -279,7 +241,7 @@ export class AlchemyWalletService {
 
     // Simplified for demo
     console.log('Sponsoring transaction:', transaction);
-    return 'demo-tx-hash';
+    return 'demo-tx-hash-' + Date.now();
   }
 
   // Session Key Methods
@@ -296,7 +258,7 @@ export class AlchemyWalletService {
       throw new Error('Session keys only available for Smart Accounts');
     }
 
-    return 'session_key_placeholder';
+    return 'session_key_' + Date.now();
   }
 
   // Account Recovery Methods
@@ -321,7 +283,7 @@ export class AlchemyWalletService {
     }
 
     console.log('Batching transactions:', transactions);
-    return 'demo-batch-tx-hash';
+    return 'demo-batch-tx-hash-' + Date.now();
   }
 }
 
