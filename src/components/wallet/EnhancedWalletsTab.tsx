@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { GlassCard } from "@/components/ui/glass-card";
 import { GradientButton } from "@/components/ui/gradient-button";
@@ -7,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { WalletConnectionModal } from "./WalletConnectionModal";
 import { useEnhancedWallet } from "@/hooks/useEnhancedWallet";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useWalletBalance } from "@/hooks/useWalletData";
 import { Plus, Settings, ExternalLink, Zap, Shield, Smartphone } from "lucide-react";
 
@@ -19,6 +19,8 @@ export const EnhancedWalletsTab = () => {
     switchNetwork,
     isConnecting
   } = useEnhancedWallet();
+  
+  const { connectWallet } = useWalletConnection();
 
   return (
     <div className="space-y-6">
@@ -79,6 +81,8 @@ export const EnhancedWalletsTab = () => {
       <WalletConnectionModal 
         isOpen={showConnectionModal}
         onClose={() => setShowConnectionModal(false)}
+        onConnect={connectWallet}
+        isConnecting={isConnecting}
       />
     </div>
   );

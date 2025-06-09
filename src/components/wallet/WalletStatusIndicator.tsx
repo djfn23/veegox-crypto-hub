@@ -4,12 +4,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useEnhancedWallet } from '@/hooks/useEnhancedWallet';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { WalletConnectionModal } from './WalletConnectionModal';
 import { Wallet, ChevronDown, Zap, AlertCircle } from 'lucide-react';
 
 export const WalletStatusIndicator = () => {
   const [showConnectionModal, setShowConnectionModal] = useState(false);
   const { connectedWallets, disconnectWallet, switchNetwork } = useEnhancedWallet();
+  const { connectWallet, isConnecting } = useWalletConnection();
 
   const primaryWallet = connectedWallets[0];
   const totalWallets = connectedWallets.length;
@@ -29,6 +31,8 @@ export const WalletStatusIndicator = () => {
         <WalletConnectionModal 
           isOpen={showConnectionModal}
           onClose={() => setShowConnectionModal(false)}
+          onConnect={connectWallet}
+          isConnecting={isConnecting}
         />
       </>
     );
@@ -127,6 +131,8 @@ export const WalletStatusIndicator = () => {
       <WalletConnectionModal 
         isOpen={showConnectionModal}
         onClose={() => setShowConnectionModal(false)}
+        onConnect={connectWallet}
+        isConnecting={isConnecting}
       />
     </>
   );
