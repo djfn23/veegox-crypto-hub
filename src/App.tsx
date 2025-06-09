@@ -21,6 +21,9 @@ import Tokens from './pages/Tokens';
 import Credit from './pages/Credit';
 import Crowdfunding from './pages/Crowdfunding';
 import Settings from './pages/Settings';
+import Profile from './pages/Profile';
+import Wallet from './pages/Wallet';
+import AIAssistant from './pages/AIAssistant';
 
 const queryClient = new QueryClient();
 
@@ -45,6 +48,9 @@ function App() {
                 <Route path="/credit" element={<Credit />} />
                 <Route path="/crowdfunding" element={<Crowdfunding />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/wallet" element={<Wallet />} />
+                <Route path="/ai-assistant" element={<AIAssistant />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
