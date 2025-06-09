@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { AuthModal } from "@/components/auth/AuthModal";
 import Dashboard from "@/components/Dashboard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,30 +8,30 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { CTASection } from "@/components/home/CTASection";
 import { AppFooter } from "@/components/home/AppFooter";
+import { LoginModal } from "@/components/auth/LoginModal";
+import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 
 const Index = () => {
   const [showAuth, setShowAuth] = useState(false);
-  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const { isAuthenticated, loading } = useUnifiedAuth();
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      return user;
-    },
-  });
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900 flex items-center justify-center">
+        <div className="text-white text-lg">Chargement...</div>
+      </div>
+    );
+  }
 
-  if (user) {
+  if (isAuthenticated) {
     return <Dashboard />;
   }
 
   const handleLoginClick = () => {
-    setAuthMode("login");
     setShowAuth(true);
   };
 
   const handleSignupClick = () => {
-    setAuthMode("signup");
     setShowAuth(true);
   };
 
@@ -51,7 +50,7 @@ const Index = () => {
 
       <AppFooter />
 
-      <AuthModal
+      <LoginModal
         isOpen={showAuth}
         onClose={() => setShowAuth(false)}
       />

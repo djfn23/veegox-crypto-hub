@@ -1,93 +1,50 @@
 
-import React from "react"
-import { Search, Bell, Menu, User } from "lucide-react"
-import { TouchTarget } from "@/components/ui/mobile-touch-target"
-import { MobileContainer, MobileBadge } from "@/components/ui/mobile-components"
-import { cn } from "@/lib/utils"
-import { texts } from "@/lib/constants/texts"
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { SidebarNavigation } from "./SidebarNavigation";
+import { UserMenu } from "./UserMenu";
+import { texts } from "@/lib/constants/texts";
+import { Badge } from "@/components/ui/badge";
 
-interface MobileHeaderProps {
-  onToggleSidebar: () => void
-  notificationCount?: number
-  className?: string
-}
+export const MobileHeader = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
-export const MobileHeader: React.FC<MobileHeaderProps> = ({
-  onToggleSidebar,
-  notificationCount = 0,
-  className
-}) => {
   return (
-    <div className={cn(
-      "lg:hidden sticky top-0 z-30 bg-black/20 backdrop-blur-xl border-b border-white/10",
-      className
-    )}>
-      <div className="px-3 sm:px-4">
-        <div className="flex items-center justify-between py-3 min-h-[64px]">
-          {/* Menu burger */}
-          <TouchTarget
-            size="lg"
-            variant="ghost"
-            shape="circle"
-            onClick={onToggleSidebar}
-            className="animate-mobile-scale flex-shrink-0"
-          >
-            <Menu className="h-6 w-6 text-white" />
-          </TouchTarget>
-
-          {/* Logo central - optimisé pour petits écrans */}
-          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1 justify-center">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0">
-              <span className="text-white font-bold text-sm sm:text-base">V</span>
-            </div>
-            <span className="text-white font-bold text-base sm:text-lg font-heading truncate">{texts.app.name}</span>
-          </div>
-
-          {/* Actions rapides - optimisé pour mobile */}
-          <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
-            {/* Recherche - caché sur très petits écrans */}
-            <TouchTarget
-              size="lg"
-              variant="ghost"
-              shape="circle"
-              className="relative hidden xs:flex"
-            >
-              <Search className="h-5 w-5 text-white" />
-            </TouchTarget>
-
-            {/* Notifications avec badge */}
-            <TouchTarget
-              size="lg"
-              variant="ghost"
-              shape="circle"
-              className="relative"
-            >
-              <Bell className="h-5 w-5 text-white" />
-              {notificationCount > 0 && (
-                <MobileBadge
-                  variant="error"
-                  size="sm"
-                  className="absolute -top-1 -right-1 min-w-4 h-4 text-xs flex items-center justify-center px-1"
-                >
-                  {notificationCount > 9 ? "9+" : notificationCount}
-                </MobileBadge>
-              )}
-            </TouchTarget>
-
-            {/* Avatar utilisateur */}
-            <TouchTarget
-              size="lg"
-              variant="ghost"
-              shape="circle"
-              className="ml-1"
-            >
-              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-                <User className="h-4 w-4 text-white" />
+    <header className="lg:hidden bg-slate-900 border-b border-slate-700 px-4 py-3 sticky top-0 z-40">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm" className="text-white p-2">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 bg-slate-900 border-slate-700 p-0">
+              <div className="flex flex-col h-full">
+                <div className="p-4 border-b border-slate-700">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex-shrink-0"></div>
+                    <span className="text-lg font-bold text-white">{texts.app.name}</span>
+                    <Badge variant="secondary" className="text-xs">{texts.app.beta}</Badge>
+                  </div>
+                </div>
+                <div className="flex-1 py-4">
+                  <SidebarNavigation />
+                </div>
               </div>
-            </TouchTarget>
+            </SheetContent>
+          </Sheet>
+          
+          <div className="flex items-center space-x-2">
+            <div className="w-7 h-7 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg"></div>
+            <span className="text-lg font-bold text-white">{texts.app.name}</span>
           </div>
         </div>
+
+        <UserMenu />
       </div>
-    </div>
-  )
-}
+    </header>
+  );
+};
