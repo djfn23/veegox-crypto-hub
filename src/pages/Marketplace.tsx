@@ -1,16 +1,16 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
-import { NFTMarketplaceModule } from "@/components/modules/marketplace/NFTMarketplaceModule";
-import { ShoppingBag } from "lucide-react";
+import { EnhancedNFTMarketplace } from "@/components/modules/marketplace/EnhancedNFTMarketplace";
+import VeegoxLogo from "@/components/ui/veegox-logo";
 
 const Marketplace = () => {
   return (
     <PageLayout
-      title="NFT Marketplace"
-      subtitle="Découvrez, achetez et vendez des NFTs uniques"
-      icon={<ShoppingBag className="h-6 w-6 text-purple-400" />}
+      title="NFT Marketplace Veegox"
+      subtitle="Découvrez, achetez et vendez des NFTs avec vos tokens"
+      icon={<VeegoxLogo size="md" />}
     >
-      <NFTMarketplaceModule />
+      <EnhancedNFTMarketplace />
     </PageLayout>
   );
 };
