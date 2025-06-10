@@ -4,14 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowUpDown, Bridge as BridgeIcon, AlertCircle } from "lucide-react";
+import { ArrowUpDown, ArrowLeftRight, AlertCircle } from "lucide-react";
 
 const Bridge = () => {
   return (
     <PageLayout
       title="Bridge"
       subtitle="Transférez vos actifs entre différentes blockchains"
-      icon={<BridgeIcon className="h-6 w-6" />}
+      icon={<ArrowLeftRight className="h-6 w-6" />}
     >
       <div className="max-w-2xl mx-auto space-y-6">
         <Card className="bg-slate-900/50 border-slate-700">

@@ -17,7 +17,7 @@ import {
   HelpCircle,
   Shield,
   Sprout,
-  Bridge,
+  ArrowLeftRight,
   Vote
 } from "lucide-react";
 
@@ -32,7 +32,7 @@ const navigationItems = [
   { name: "Tokens", href: "/tokens", icon: Coins },
   { name: "Crédit", href: "/credit", icon: CreditCard },
   { name: "Crowdfunding", href: "/crowdfunding", icon: Heart },
-  { name: "Bridge", href: "/bridge", icon: Bridge },
+  { name: "Bridge", href: "/bridge", icon: ArrowLeftRight },
   { name: "Gouvernance", href: "/governance", icon: Vote },
   { name: "Communauté", href: "/community", icon: Users },
   { name: "IA Assistant", href: "/ai-assistant", icon: Bot },
