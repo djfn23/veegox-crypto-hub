@@ -1,6 +1,6 @@
 
 import { ReactNode } from "react";
-import { SidebarNavigation } from "./SidebarNavigation";
+import { SimplifiedNavigation } from "./SimplifiedNavigation";
 import { MobileHeader } from "./MobileHeader";
 import { UserMenu } from "./UserMenu";
 import { texts } from "@/lib/constants/texts";
@@ -28,7 +28,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
             </div>
           </div>
           <div className="py-4">
-            <SidebarNavigation />
+            <SimplifiedNavigation />
           </div>
         </div>
 

@@ -25,6 +25,35 @@ import Profile from './pages/Profile';
 import Wallet from './pages/Wallet';
 import AIAssistant from './pages/AIAssistant';
 
+// Import new main pages
+import Help from './pages/Help';
+import Security from './pages/Security';
+import YieldFarming from './pages/YieldFarming';
+import Bridge from './pages/Bridge';
+import Governance from './pages/Governance';
+
+// Import crowdfunding sub-pages
+import CreateCrowdfundingCampaign from './pages/crowdfunding/CreateCrowdfundingCampaign';
+import CrowdfundingCampaigns from './pages/crowdfunding/CrowdfundingCampaigns';
+import CrowdfundingFeatured from './pages/crowdfunding/CrowdfundingFeatured';
+import CrowdfundingTrending from './pages/crowdfunding/CrowdfundingTrending';
+import MyCampaigns from './pages/crowdfunding/MyCampaigns';
+import MyContributions from './pages/crowdfunding/MyContributions';
+
+// Import tokens sub-pages
+import CreateToken from './pages/tokens/CreateToken';
+import TokenAnalytics from './pages/tokens/TokenAnalytics';
+import ManageTokens from './pages/tokens/ManageTokens';
+import TokenMarketplace from './pages/tokens/TokenMarketplace';
+
+// Import trading sub-pages
+import TradingSpot from './pages/trading/TradingSpot';
+import TradingFutures from './pages/trading/TradingFutures';
+import TradingOptions from './pages/trading/TradingOptions';
+
+// Import credit sub-pages
+import CreditScore from './pages/credit/CreditScore';
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -37,6 +66,7 @@ function App() {
             <Sonner />
             <BrowserRouter>
               <Routes>
+                {/* Main routes */}
                 <Route path="/" element={<Index />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/staking" element={<Staking />} />
@@ -51,6 +81,36 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/wallet" element={<Wallet />} />
                 <Route path="/ai-assistant" element={<AIAssistant />} />
+                
+                {/* New main pages */}
+                <Route path="/help" element={<Help />} />
+                <Route path="/security" element={<Security />} />
+                <Route path="/yield-farming" element={<YieldFarming />} />
+                <Route path="/bridge" element={<Bridge />} />
+                <Route path="/governance" element={<Governance />} />
+                
+                {/* Crowdfunding sub-routes */}
+                <Route path="/crowdfunding/create" element={<CreateCrowdfundingCampaign />} />
+                <Route path="/crowdfunding/campaigns" element={<CrowdfundingCampaigns />} />
+                <Route path="/crowdfunding/featured" element={<CrowdfundingFeatured />} />
+                <Route path="/crowdfunding/trending" element={<CrowdfundingTrending />} />
+                <Route path="/crowdfunding/my-campaigns" element={<MyCampaigns />} />
+                <Route path="/crowdfunding/my-contributions" element={<MyContributions />} />
+                
+                {/* Tokens sub-routes */}
+                <Route path="/tokens/create" element={<CreateToken />} />
+                <Route path="/tokens/analytics" element={<TokenAnalytics />} />
+                <Route path="/tokens/manage" element={<ManageTokens />} />
+                <Route path="/tokens/marketplace" element={<TokenMarketplace />} />
+                
+                {/* Trading sub-routes */}
+                <Route path="/trading/spot" element={<TradingSpot />} />
+                <Route path="/trading/futures" element={<TradingFutures />} />
+                <Route path="/trading/options" element={<TradingOptions />} />
+                
+                {/* Credit sub-routes */}
+                <Route path="/credit/score" element={<CreditScore />} />
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
