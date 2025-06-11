@@ -53,6 +53,81 @@ export type Database = {
           },
         ]
       }
+      bank_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          exchange_rate: number | null
+          fee_amount: number | null
+          from_account_id: string | null
+          from_address: string | null
+          id: string
+          metadata: Json | null
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
+          status: Database["public"]["Enums"]["transaction_status"] | null
+          to_account_id: string | null
+          to_address: string | null
+          token_address: string
+          transaction_hash: string | null
+          transaction_type: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          exchange_rate?: number | null
+          fee_amount?: number | null
+          from_account_id?: string | null
+          from_address?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          status?: Database["public"]["Enums"]["transaction_status"] | null
+          to_account_id?: string | null
+          to_address?: string | null
+          token_address: string
+          transaction_hash?: string | null
+          transaction_type: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          exchange_rate?: number | null
+          fee_amount?: number | null
+          from_account_id?: string | null
+          from_address?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          status?: Database["public"]["Enums"]["transaction_status"] | null
+          to_account_id?: string | null
+          to_address?: string | null
+          token_address?: string
+          transaction_hash?: string | null
+          transaction_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_transactions_from_account_id_fkey"
+            columns: ["from_account_id"]
+            isOneToOne: false
+            referencedRelation: "crypto_bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transactions_to_account_id_fkey"
+            columns: ["to_account_id"]
+            isOneToOne: false
+            referencedRelation: "crypto_bank_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bridge_transactions: {
         Row: {
           actual_time: number | null
@@ -305,6 +380,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      crypto_bank_accounts: {
+        Row: {
+          account_name: string
+          account_type: Database["public"]["Enums"]["account_type"]
+          balance: number
+          created_at: string
+          id: string
+          interest_rate: number | null
+          is_active: boolean | null
+          is_primary: boolean | null
+          token_address: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_name: string
+          account_type?: Database["public"]["Enums"]["account_type"]
+          balance?: number
+          created_at?: string
+          id?: string
+          interest_rate?: number | null
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          token_address: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_name?: string
+          account_type?: Database["public"]["Enums"]["account_type"]
+          balance?: number
+          created_at?: string
+          id?: string
+          interest_rate?: number | null
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          token_address?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       dao_proposals: {
         Row: {
@@ -1152,6 +1269,48 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_requests: {
+        Row: {
+          amount: number
+          created_at: string
+          creator_id: string
+          description: string | null
+          expires_at: string | null
+          id: string
+          is_used: boolean | null
+          paid_at: string | null
+          paid_by: string | null
+          qr_code_data: string
+          token_address: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_used?: boolean | null
+          paid_at?: string | null
+          paid_by?: string | null
+          qr_code_data: string
+          token_address: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_used?: boolean | null
+          paid_at?: string | null
+          paid_by?: string | null
+          qr_code_data?: string
+          token_address?: string
+        }
+        Relationships: []
+      }
       platform_metrics: {
         Row: {
           category: string
@@ -1214,6 +1373,62 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      recurring_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          frequency_days: number
+          from_account_id: string
+          id: string
+          is_active: boolean | null
+          max_payments: number | null
+          next_payment_date: string
+          to_address: string
+          token_address: string
+          total_payments: number | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          frequency_days?: number
+          from_account_id: string
+          id?: string
+          is_active?: boolean | null
+          max_payments?: number | null
+          next_payment_date: string
+          to_address: string
+          token_address: string
+          total_payments?: number | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          frequency_days?: number
+          from_account_id?: string
+          id?: string
+          is_active?: boolean | null
+          max_payments?: number | null
+          next_payment_date?: string
+          to_address?: string
+          token_address?: string
+          total_payments?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_payments_from_account_id_fkey"
+            columns: ["from_account_id"]
+            isOneToOne: false
+            referencedRelation: "crypto_bank_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       referral_system: {
         Row: {
@@ -1283,6 +1498,62 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      savings_plans: {
+        Row: {
+          account_id: string
+          apy_rate: number | null
+          auto_deposit_enabled: boolean | null
+          created_at: string
+          current_amount: number | null
+          id: string
+          is_active: boolean | null
+          monthly_deposit: number | null
+          plan_name: string
+          target_amount: number
+          target_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          apy_rate?: number | null
+          auto_deposit_enabled?: boolean | null
+          created_at?: string
+          current_amount?: number | null
+          id?: string
+          is_active?: boolean | null
+          monthly_deposit?: number | null
+          plan_name: string
+          target_amount: number
+          target_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          apy_rate?: number | null
+          auto_deposit_enabled?: boolean | null
+          created_at?: string
+          current_amount?: number | null
+          id?: string
+          is_active?: boolean | null
+          monthly_deposit?: number | null
+          plan_name?: string
+          target_amount?: number
+          target_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "savings_plans_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "crypto_bank_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       staking_pools: {
         Row: {
@@ -1766,6 +2037,53 @@ export type Database = {
           },
         ]
       }
+      virtual_cards: {
+        Row: {
+          account_id: string
+          card_name: string
+          card_number: string
+          created_at: string
+          daily_limit: number | null
+          expires_at: string
+          id: string
+          is_active: boolean | null
+          spending_limit: number | null
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          card_name: string
+          card_number: string
+          created_at?: string
+          daily_limit?: number | null
+          expires_at: string
+          id?: string
+          is_active?: boolean | null
+          spending_limit?: number | null
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          card_name?: string
+          card_number?: string
+          created_at?: string
+          daily_limit?: number | null
+          expires_at?: string
+          id?: string
+          is_active?: boolean | null
+          spending_limit?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "virtual_cards_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "crypto_bank_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wallets: {
         Row: {
           address: string
@@ -1866,11 +2184,14 @@ export type Database = {
       }
     }
     Enums: {
+      account_type: "checking" | "savings" | "term_deposit" | "business"
       app_role: "admin" | "developer" | "user"
       chain_type: "ethereum" | "polygon" | "base" | "arbitrum"
       loan_status: "pending" | "active" | "repaid" | "defaulted"
+      payment_method: "transfer" | "qr_code" | "card" | "recurring"
       proposal_status: "active" | "passed" | "rejected" | "executed"
       token_type: "ERC20" | "ERC721" | "ERC1155"
+      transaction_status: "pending" | "completed" | "failed" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1986,11 +2307,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      account_type: ["checking", "savings", "term_deposit", "business"],
       app_role: ["admin", "developer", "user"],
       chain_type: ["ethereum", "polygon", "base", "arbitrum"],
       loan_status: ["pending", "active", "repaid", "defaulted"],
+      payment_method: ["transfer", "qr_code", "card", "recurring"],
       proposal_status: ["active", "passed", "rejected", "executed"],
       token_type: ["ERC20", "ERC721", "ERC1155"],
+      transaction_status: ["pending", "completed", "failed", "cancelled"],
     },
   },
 } as const
