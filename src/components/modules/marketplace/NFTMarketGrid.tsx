@@ -11,6 +11,7 @@ interface FiltersState {
   minPrice: string;
   maxPrice: string;
   status: string;
+  paymentToken: string;
 }
 
 interface NFTMarketGridProps {
@@ -58,6 +59,10 @@ export const NFTMarketGrid = ({ filters }: NFTMarketGridProps) => {
 
       if (filters.maxPrice) {
         query = query.lte('price', parseFloat(filters.maxPrice));
+      }
+
+      if (filters.paymentToken) {
+        query = query.eq('currency_address', filters.paymentToken);
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });

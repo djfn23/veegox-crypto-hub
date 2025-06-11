@@ -52,9 +52,9 @@ export class TokenEcosystemService {
   async getAllTokens(): Promise<CustomToken[]> {
     try {
       const { data, error } = await supabase
-        .from('user_tokens')
+        .from('tokens')
         .select('*')
-        .eq('is_active', true)
+        .eq('is_deployed', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -78,8 +78,8 @@ export class TokenEcosystemService {
       const balances: TokenBalance[] = [];
 
       // Ajouter Veegox en premier
-      const veegoxBalance = await VeegoxTokenService.getBalance(walletAddress);
-      const veegoxInfo = await VeegoxTokenService.getTokenInfo();
+      const veegoxBalance = await VeegoxTokenService.getUserVeegoxBalance(walletAddress);
+      const veegoxInfo = await VeegoxTokenService.getVeegoxTokenInfo();
       
       if (veegoxBalance && veegoxInfo) {
         const veegoxToken: CustomToken = {
@@ -194,18 +194,16 @@ export class TokenEcosystemService {
   private formatTokenFromDB(dbToken: any): CustomToken {
     return {
       id: dbToken.id,
-      address: dbToken.contract_address,
-      name: dbToken.token_name,
-      symbol: dbToken.token_symbol,
+      address: dbToken.contract_address || `token_${dbToken.id}`,
+      name: dbToken.name,
+      symbol: dbToken.symbol,
       decimals: dbToken.decimals || 18,
       totalSupply: dbToken.total_supply || '0',
       logo: dbToken.logo_url,
-      creatorId: dbToken.user_id,
-      isActive: dbToken.is_active,
+      creatorId: dbToken.creator_id,
+      isActive: dbToken.is_deployed,
       description: dbToken.description,
-      website: dbToken.website,
-      twitter: dbToken.twitter,
-      telegram: dbToken.telegram
+      website: dbToken.website_url
     };
   }
 
