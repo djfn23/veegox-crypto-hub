@@ -75,7 +75,16 @@ export class CryptoBankService {
   }
 
   // Account Management
-  async createBankAccount(accountData: Partial<BankAccount>): Promise<BankAccount> {
+  async createBankAccount(accountData: {
+    user_id: string;
+    account_name: string;
+    account_type: 'checking' | 'savings' | 'term_deposit' | 'business';
+    token_address: string;
+    balance?: number;
+    interest_rate?: number;
+    is_active?: boolean;
+    is_primary?: boolean;
+  }): Promise<BankAccount> {
     const { data, error } = await supabase
       .from('crypto_bank_accounts')
       .insert([accountData])
@@ -108,7 +117,22 @@ export class CryptoBankService {
   }
 
   // Transaction Management
-  async createTransaction(transactionData: Partial<BankTransaction>): Promise<BankTransaction> {
+  async createTransaction(transactionData: {
+    from_account_id?: string;
+    to_account_id?: string;
+    from_address?: string;
+    to_address?: string;
+    amount: number;
+    token_address: string;
+    transaction_type: string;
+    payment_method?: 'transfer' | 'qr_code' | 'card' | 'recurring';
+    status?: 'pending' | 'completed' | 'failed' | 'cancelled';
+    description?: string;
+    transaction_hash?: string;
+    fee_amount?: number;
+    exchange_rate?: number;
+    metadata?: any;
+  }): Promise<BankTransaction> {
     const { data, error } = await supabase
       .from('bank_transactions')
       .insert([transactionData])
@@ -186,7 +210,18 @@ export class CryptoBankService {
   }
 
   // Savings Plans
-  async createSavingsPlan(planData: Partial<SavingsPlan>): Promise<SavingsPlan> {
+  async createSavingsPlan(planData: {
+    user_id: string;
+    account_id: string;
+    plan_name: string;
+    target_amount: number;
+    current_amount?: number;
+    monthly_deposit?: number;
+    auto_deposit_enabled?: boolean;
+    target_date?: string;
+    apy_rate?: number;
+    is_active?: boolean;
+  }): Promise<SavingsPlan> {
     const { data, error } = await supabase
       .from('savings_plans')
       .insert([planData])
@@ -210,7 +245,15 @@ export class CryptoBankService {
   }
 
   // Virtual Cards
-  async createVirtualCard(cardData: Partial<VirtualCard>): Promise<VirtualCard> {
+  async createVirtualCard(cardData: {
+    user_id: string;
+    account_id: string;
+    card_name: string;
+    spending_limit?: number;
+    daily_limit?: number;
+    is_active?: boolean;
+    expires_at: string;
+  }): Promise<VirtualCard> {
     // Generate card number
     const cardNumber = this.generateCardNumber();
     
