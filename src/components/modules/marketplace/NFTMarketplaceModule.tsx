@@ -16,7 +16,8 @@ export const NFTMarketplaceModule = () => {
     collection: "",
     minPrice: "",
     maxPrice: "",
-    status: "active"
+    status: "active",
+    paymentToken: ""
   });
 
   return (
