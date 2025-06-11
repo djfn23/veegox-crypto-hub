@@ -280,7 +280,7 @@ export class CryptoBankService {
   }
 
   // Payment Requests (QR Codes)
-  async createPaymentRequest(amount: number, tokenAddress: string, description?: string): Promise<string> {
+  async createPaymentRequest(amount: number, tokenAddress: string, description?: string, creatorId?: string): Promise<string> {
     const qrData = JSON.stringify({
       amount,
       token: tokenAddress,
@@ -291,6 +291,7 @@ export class CryptoBankService {
     const { data, error } = await supabase
       .from('payment_requests')
       .insert([{
+        creator_id: creatorId || 'anonymous',
         amount,
         token_address: tokenAddress,
         description,

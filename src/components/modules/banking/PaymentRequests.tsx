@@ -34,7 +34,8 @@ export const PaymentRequests = ({ userId }: PaymentRequestsProps) => {
       const qrData = await cryptoBankService.createPaymentRequest(
         parseFloat(amount),
         "native", // MATIC native
-        description
+        description,
+        userId // Pass the userId as creatorId
       );
 
       setGeneratedQR(qrData);
