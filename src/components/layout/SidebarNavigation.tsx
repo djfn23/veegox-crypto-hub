@@ -11,7 +11,8 @@ import {
   CreditCard,
   Heart,
   Settings,
-  Bot
+  Bot,
+  Wallet
 } from "lucide-react";
 
 const navigation = [
@@ -21,6 +22,7 @@ const navigation = [
   { name: "Trading", href: "/trading", icon: TrendingUp },
   { name: "NFT Marketplace", href: "/marketplace", icon: Store },
   { name: "Tokens", href: "/tokens", icon: Coins },
+  { name: "Banque Crypto", href: "/crypto-bank", icon: Wallet },
   { name: "Crédit", href: "/credit", icon: CreditCard },
   { name: "Crowdfunding", href: "/crowdfunding", icon: Heart },
   { name: "Portfolio", href: "/portfolio", icon: Briefcase },

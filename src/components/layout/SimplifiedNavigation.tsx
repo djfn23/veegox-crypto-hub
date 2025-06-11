@@ -18,7 +18,8 @@ import {
   Shield,
   Sprout,
   ArrowLeftRight,
-  Vote
+  Vote,
+  Wallet
 } from "lucide-react";
 
 const navigationItems = [
@@ -30,6 +31,7 @@ const navigationItems = [
   { name: "NFT Marketplace", href: "/marketplace", icon: Store },
   { name: "Portfolio", href: "/portfolio", icon: Briefcase },
   { name: "Tokens", href: "/tokens", icon: Coins },
+  { name: "Banque Crypto", href: "/crypto-bank", icon: Wallet },
   { name: "Crédit", href: "/credit", icon: CreditCard },
   { name: "Crowdfunding", href: "/crowdfunding", icon: Heart },
   { name: "Bridge", href: "/bridge", icon: ArrowLeftRight },

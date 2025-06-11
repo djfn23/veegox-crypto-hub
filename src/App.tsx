@@ -24,6 +24,7 @@ import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import Wallet from './pages/Wallet';
 import AIAssistant from './pages/AIAssistant';
+import CryptoBankPage from './pages/CryptoBank';
 
 // Import new main pages
 import Help from './pages/Help';
@@ -77,6 +78,7 @@ function App() {
                 <Route path="/tokens" element={<Tokens />} />
                 <Route path="/credit" element={<Credit />} />
                 <Route path="/crowdfunding" element={<Crowdfunding />} />
+                <Route path="/crypto-bank" element={<CryptoBankPage />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/wallet" element={<Wallet />} />
