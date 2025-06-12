@@ -1608,6 +1608,90 @@ export type Database = {
           },
         ]
       }
+      swap_transactions: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          exchange_rate: number
+          from_amount: number
+          from_token_address: string
+          gas_fee: number | null
+          id: string
+          protocol_used: string | null
+          slippage_tolerance: number | null
+          status: string | null
+          to_amount: number
+          to_token_address: string
+          transaction_hash: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          exchange_rate: number
+          from_amount: number
+          from_token_address: string
+          gas_fee?: number | null
+          id?: string
+          protocol_used?: string | null
+          slippage_tolerance?: number | null
+          status?: string | null
+          to_amount: number
+          to_token_address: string
+          transaction_hash?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          exchange_rate?: number
+          from_amount?: number
+          from_token_address?: string
+          gas_fee?: number | null
+          id?: string
+          protocol_used?: string | null
+          slippage_tolerance?: number | null
+          status?: string | null
+          to_amount?: number
+          to_token_address?: string
+          transaction_hash?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      token_prices_cache: {
+        Row: {
+          id: string
+          last_updated: string | null
+          market_cap: number | null
+          price_change_24h: number | null
+          price_usd: number
+          token_address: string
+          token_symbol: string
+          volume_24h: number | null
+        }
+        Insert: {
+          id?: string
+          last_updated?: string | null
+          market_cap?: number | null
+          price_change_24h?: number | null
+          price_usd: number
+          token_address: string
+          token_symbol: string
+          volume_24h?: number | null
+        }
+        Update: {
+          id?: string
+          last_updated?: string | null
+          market_cap?: number | null
+          price_change_24h?: number | null
+          price_usd?: number
+          token_address?: string
+          token_symbol?: string
+          volume_24h?: number | null
+        }
+        Relationships: []
+      }
       tokens: {
         Row: {
           chain_id: number
@@ -1838,6 +1922,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_portfolios: {
+        Row: {
+          average_buy_price: number | null
+          balance: number
+          id: string
+          last_updated: string | null
+          token_address: string
+          token_name: string
+          token_symbol: string
+          user_id: string
+        }
+        Insert: {
+          average_buy_price?: number | null
+          balance?: number
+          id?: string
+          last_updated?: string | null
+          token_address: string
+          token_name: string
+          token_symbol: string
+          user_id: string
+        }
+        Update: {
+          average_buy_price?: number | null
+          balance?: number
+          id?: string
+          last_updated?: string | null
+          token_address?: string
+          token_name?: string
+          token_symbol?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_preferences: {
         Row: {

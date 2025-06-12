@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EnhancedSwapInterface } from '@/components/trading/EnhancedSwapInterface';
 import { RealTimePriceChart } from '@/components/trading/RealTimePriceChart';
+import { SwapHistoryCard } from './SwapHistoryCard';
+import { PortfolioCard } from './PortfolioCard';
 import { LiquidityPool } from '../credit/types';
 
 interface SwapInterfaceProps {
@@ -23,8 +25,8 @@ export const SwapInterface = ({ pools, userWallet }: SwapInterfaceProps) => {
   const [selectedToken, setSelectedToken] = useState('ethereum');
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="space-y-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2 space-y-6">
         <EnhancedSwapInterface />
         
         <Card className="bg-slate-900/50 border-slate-700">
@@ -65,14 +67,17 @@ export const SwapInterface = ({ pools, userWallet }: SwapInterfaceProps) => {
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      <div>
         <RealTimePriceChart 
           tokenId={selectedToken}
           symbol="ETH"
           days={7}
         />
+      </div>
+
+      <div className="space-y-6">
+        <PortfolioCard />
+        <SwapHistoryCard />
       </div>
     </div>
   );
