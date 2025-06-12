@@ -1,12 +1,25 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowUpDown } from 'lucide-react';
 import { EnhancedSwapInterface } from '@/components/trading/EnhancedSwapInterface';
 import { RealTimePriceChart } from '@/components/trading/RealTimePriceChart';
+import { LiquidityPool } from '../credit/types';
 
-export const SwapInterface = () => {
+interface SwapInterfaceProps {
+  pools: LiquidityPool[];
+  userWallet: {
+    address: string;
+    chain_id: number;
+    chain_type: "ethereum" | "polygon" | "base" | "arbitrum";
+    created_at: string;
+    id: string;
+    is_primary: boolean;
+    nickname: string;
+    user_id: string;
+  } | null;
+}
+
+export const SwapInterface = ({ pools, userWallet }: SwapInterfaceProps) => {
   const [selectedToken, setSelectedToken] = useState('ethereum');
 
   return (
@@ -37,6 +50,18 @@ export const SwapInterface = () => {
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-400">Volume 24h:</span>
               <span className="text-green-400">$50M+</span>
+            </div>
+
+            {userWallet && (
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-400">Wallet connecté:</span>
+                <span className="text-blue-400">{userWallet.address.slice(0, 6)}...{userWallet.address.slice(-4)}</span>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-400">Pools disponibles:</span>
+              <span className="text-white">{pools.length}</span>
             </div>
           </CardContent>
         </Card>
