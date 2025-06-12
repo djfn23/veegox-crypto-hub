@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SwapInterface from "./SwapInterface";
+import { SwapInterface } from "./SwapInterface";
 import PoolsList from "./PoolsList";
 import LiquidityForm from "./LiquidityForm";
 import { LiquidityPool } from "../credit/types";
