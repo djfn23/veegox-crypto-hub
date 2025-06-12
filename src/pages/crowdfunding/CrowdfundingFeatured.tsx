@@ -1,7 +1,7 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Star } from "lucide-react";
-import { FeaturedCampaigns } from "@/components/modules/crowdfunding/FeaturedCampaigns";
+import FeaturedCampaigns from "@/components/modules/crowdfunding/FeaturedCampaigns";
 
 const CrowdfundingFeatured = () => {
   return (

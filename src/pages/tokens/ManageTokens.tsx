@@ -1,7 +1,7 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Settings } from "lucide-react";
-import { TokenManagementModule } from "@/components/modules/tokens/TokenManagementModule";
+import TokenManagementModule from "@/components/modules/tokens/TokenManagementModule";
 
 const ManageTokens = () => {
   return (

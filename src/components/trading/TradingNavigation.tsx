@@ -1,7 +1,7 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, BarChart3, Options } from "lucide-react";
+import { TrendingUp, BarChart3, Settings } from "lucide-react";
 
 export const TradingNavigation = () => {
   const location = useLocation();
@@ -9,7 +9,7 @@ export const TradingNavigation = () => {
   const navigationItems = [
     { name: "Spot", href: "/trading/spot", icon: TrendingUp },
     { name: "Futures", href: "/trading/futures", icon: BarChart3 },
-    { name: "Options", href: "/trading/options", icon: Options }
+    { name: "Options", href: "/trading/options", icon: Settings }
   ];
 
   return (

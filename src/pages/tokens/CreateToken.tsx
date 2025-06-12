@@ -1,7 +1,7 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
-import { Coins, Plus } from "lucide-react";
-import { TokenCreationWizard } from "@/components/modules/tokens/TokenCreationWizard";
+import { Plus } from "lucide-react";
+import TokenCreationWizard from "@/components/modules/tokens/TokenCreationWizard";
 
 const CreateToken = () => {
   return (

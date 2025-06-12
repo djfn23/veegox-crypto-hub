@@ -1,7 +1,7 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Store } from "lucide-react";
-import { TokenMarketplaceModule } from "@/components/modules/tokens/TokenMarketplaceModule";
+import TokenMarketplaceModule from "@/components/modules/tokens/TokenMarketplaceModule";
 
 const TokenMarketplace = () => {
   return (

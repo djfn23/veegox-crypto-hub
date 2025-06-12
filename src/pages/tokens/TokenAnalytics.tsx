@@ -1,7 +1,7 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { BarChart3 } from "lucide-react";
-import { TokenAnalyticsModule } from "@/components/modules/tokens/TokenAnalyticsModule";
+import TokenAnalyticsModule from "@/components/modules/tokens/TokenAnalyticsModule";
 
 const TokenAnalytics = () => {
   return (
