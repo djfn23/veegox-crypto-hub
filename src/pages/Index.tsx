@@ -1,8 +1,5 @@
 
 import { useState } from "react";
-import Dashboard from "@/components/Dashboard";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { NavigationBar } from "@/components/home/NavigationBar";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
@@ -10,6 +7,8 @@ import { CTASection } from "@/components/home/CTASection";
 import { AppFooter } from "@/components/home/AppFooter";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
+import { AppLayout } from "@/components/layout/AppLayout";
+import ComprehensiveDashboard from "@/components/ComprehensiveDashboard";
 
 const Index = () => {
   const [showAuth, setShowAuth] = useState(false);
@@ -24,7 +23,11 @@ const Index = () => {
   }
 
   if (isAuthenticated) {
-    return <Dashboard />;
+    return (
+      <AppLayout>
+        <ComprehensiveDashboard />
+      </AppLayout>
+    );
   }
 
   const handleLoginClick = () => {
