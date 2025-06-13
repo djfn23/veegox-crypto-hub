@@ -11,7 +11,7 @@ export interface SwapTransaction {
   exchange_rate: number;
   slippage_tolerance: number;
   transaction_hash?: string;
-  status: 'pending' | 'completed' | 'failed';
+  status: string; // Changed from union type to string to match Supabase
   gas_fee?: number;
   protocol_used: string;
   created_at?: string;
