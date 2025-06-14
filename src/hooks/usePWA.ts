@@ -10,18 +10,19 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
-// Valeurs par défaut pour le rendu serveur
-const defaultPWAState = {
-  isInstallable: false,
-  isInstalled: false,
-  isOnline: true,
-  installPWA: async () => false,
-};
-
 export const usePWA = () => {
   const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
   
-  // TOUJOURS appeler useState - même côté serveur
+  // Check if React is available before using hooks
+  if (!React) {
+    return {
+      isInstallable: false,
+      isInstalled: false,
+      isOnline: true,
+      installPWA: async () => false,
+    };
+  }
+  
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
