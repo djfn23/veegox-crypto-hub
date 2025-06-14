@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useWalletBalance } from "@/hooks/useWalletData";
 import { useWeb3Wallet } from "@/hooks/useWeb3Wallet";
@@ -14,20 +15,18 @@ import { Link } from "react-router-dom";
 
 const ComprehensiveDashboard = () => {
   const [isClient, setIsClient] = useState(false);
+  
+  // TOUJOURS appeler les hooks - pas conditionnellement
+  const { connectedWallet } = useWeb3Wallet();
+  const { user } = useAuth();
+  const isMobile = useIsMobile();
+  const [copied, setCopied] = useState(false);
+  const [activeSection, setActiveSection] = useState('overview');
+  const { data: balanceData, refetch: refetchBalance } = useWalletBalance(connectedWallet?.address || '');
+
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  // Appeler les hooks custom UNIQUEMENT lorsque isClient est true
-  const { connectedWallet } = isClient ? useWeb3Wallet() : { connectedWallet: null };
-  const { user } = isClient ? useAuth() : { user: null };
-  const isMobile = isClient ? useIsMobile() : false;
-  const [copied, setCopied] = useState(false);
-  const [activeSection, setActiveSection] = useState('overview');
-  const { data: balanceData, refetch: refetchBalance } =
-    isClient && connectedWallet
-      ? useWalletBalance(connectedWallet?.address)
-      : { data: null, refetch: () => {} };
 
   useEffect(() => {
     if (copied) {

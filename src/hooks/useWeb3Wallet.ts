@@ -12,21 +12,19 @@ interface Web3Wallet {
   provider?: any;
 }
 
-// V2 : Ne pas appeler de hooks React côté serveur
-const canUseDOM = typeof window !== "undefined" && !!window.document && !!window.document.createElement;
+// Valeurs par défaut pour le rendu serveur
+const defaultWalletState = {
+  connectedWallet: null,
+  isConnecting: false,
+  connectMetaMask: async () => {},
+  disconnectWallet: () => {},
+  signTransaction: async () => { throw new Error("Unavailable on server"); },
+};
 
 export const useWeb3Wallet = () => {
-  // Guard: don't run this hook on server
-  if (!canUseDOM) {
-    return {
-      connectedWallet: null,
-      isConnecting: false,
-      connectMetaMask: async () => {},
-      disconnectWallet: () => {},
-      signTransaction: async () => { throw new Error("Unavailable on server"); },
-    };
-  }
+  const canUseDOM = typeof window !== "undefined" && !!window.document && !!window.document.createElement;
 
+  // TOUJOURS appeler useState - même côté serveur
   const [connectedWallet, setConnectedWallet] = useState<Web3Wallet | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
 
@@ -63,6 +61,8 @@ export const useWeb3Wallet = () => {
   };
 
   const connectMetaMask = useCallback(async () => {
+    if (!canUseDOM) return;
+    
     setIsConnecting(true);
     try {
       if (typeof window.ethereum !== 'undefined') {
@@ -94,7 +94,7 @@ export const useWeb3Wallet = () => {
     } finally {
       setIsConnecting(false);
     }
-  }, []);
+  }, [canUseDOM]);
 
   const disconnectWallet = useCallback(() => {
     setConnectedWallet(null);
@@ -150,7 +150,7 @@ export const useWeb3Wallet = () => {
         window.ethereum.removeListener('chainChanged', handleChainChanged);
       }
     };
-  }, [connectedWallet, disconnectWallet]);
+  }, [connectedWallet, disconnectWallet, canUseDOM]);
 
   return {
     connectedWallet,

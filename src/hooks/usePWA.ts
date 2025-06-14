@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -9,24 +10,26 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
-const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
+// Valeurs par défaut pour le rendu serveur
+const defaultPWAState = {
+  isInstallable: false,
+  isInstalled: false,
+  isOnline: true,
+  installPWA: async () => false,
+};
 
 export const usePWA = () => {
-  if (!canUseDOM) {
-    return {
-      isInstallable: false,
-      isInstalled: false,
-      isOnline: true,
-      installPWA: async () => false,
-    };
-  }
-
+  const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
+  
+  // TOUJOURS appeler useState - même côté serveur
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(() => canUseDOM ? navigator.onLine : true);
 
   useEffect(() => {
+    if (!canUseDOM) return;
+    
     // Vérifier si l'app est déjà installée
     const checkIfInstalled = () => {
       if (window.matchMedia('(display-mode: standalone)').matches || 
@@ -70,7 +73,7 @@ export const usePWA = () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, [canUseDOM]);
 
   const installPWA = async () => {
     if (!deferredPrompt) return false;

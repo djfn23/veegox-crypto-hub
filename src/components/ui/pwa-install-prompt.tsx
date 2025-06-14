@@ -8,16 +8,15 @@ import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 
 export const PWAInstallPrompt = () => {
   const [isClient, setIsClient] = useState(false);
-  useEffect(() => {
-    if (typeof window !== "undefined") setIsClient(true);
-  }, []);
-
-  // Les hooks doivent être appelés seulement côté client
-  const { isInstallable, isInstalled, installPWA } = isClient
-    ? usePWA()
-    : { isInstallable: false, isInstalled: false, installPWA: async () => false };
-  const { isMobile } = isClient ? useResponsiveLayout() : { isMobile: false };
+  
+  // TOUJOURS appeler les hooks - pas conditionnellement
+  const { isInstallable, isInstalled, installPWA } = usePWA();
+  const { isMobile } = useResponsiveLayout();
   const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   if (!isClient || !isInstallable || isInstalled || !isVisible) {
     return null;
