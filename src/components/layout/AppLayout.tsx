@@ -2,15 +2,19 @@
 import { ReactNode } from "react";
 import { SimplifiedNavigation } from "./SimplifiedNavigation";
 import { MobileHeader } from "./MobileHeader";
+import { MobileBottomNavigation } from "./MobileBottomNavigation";
 import { UserMenu } from "./UserMenu";
 import { texts } from "@/lib/constants/texts";
 import { Badge } from "@/components/ui/badge";
+import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
+  const { isMobile, isTablet } = useResponsiveLayout();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
       {/* Mobile Header */}
@@ -48,11 +52,16 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
       </div>
 
-      {/* Mobile Content */}
+      {/* Mobile/Tablet Content */}
       <div className="lg:hidden">
-        <main className="pb-4">
-          {children}
+        <main className={`${isMobile ? 'pb-20' : 'pb-4'} min-h-screen`}>
+          <div className="px-4 py-4">
+            {children}
+          </div>
         </main>
+        
+        {/* Mobile Bottom Navigation */}
+        {isMobile && <MobileBottomNavigation />}
       </div>
     </div>
   );
