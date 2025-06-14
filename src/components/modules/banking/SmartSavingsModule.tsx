@@ -171,7 +171,7 @@ export const SmartSavingsModule = ({ userId }: SmartSavingsModuleProps) => {
       </CardComponent>
 
       {/* Savings Goals */}
-      <MobileGrid mobileColumns={1} tabletColumns={2} desktopColumns={2}>
+      <MobileGrid mobileColumns={1} tabletColumns={2} desktopColumns={3}>
         {mockGoals.map((goal) => {
           const progress = calculateProgress(goal.currentAmount, goal.targetAmount);
           const weeksLeft = calculateWeeksToGoal(goal.currentAmount, goal.targetAmount, goal.weeklyContribution);

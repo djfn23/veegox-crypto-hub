@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -182,7 +181,7 @@ export const EnhancedBankingAnalytics = ({ userId }: EnhancedBankingAnalyticsPro
         </TabsContent>
 
         <TabsContent value="categories" className="space-y-4">
-          <MobileGrid mobileColumns={1} tabletColumns={2} desktopColumns={2}>
+          <MobileGrid mobileColumns={1} tabletColumns={2} desktopColumns={3}>
             <MobileGridItem>
               <CardComponent>
                 <CardHeaderComponent>
