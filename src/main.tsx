@@ -1,22 +1,19 @@
+
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Home from './pages/Home.tsx';
+import Index from './pages/Index.tsx';
 import Trading from './pages/Trading.tsx';
-import Banking from './pages/Banking.tsx';
 import Governance from './pages/Governance.tsx';
-import SettingsPage from './pages/SettingsPage.tsx';
+import Settings from './pages/Settings.tsx';
 import { UnifiedAuthProvider } from './components/auth/UnifiedAuthProvider.tsx';
 import { Toaster } from "@/components/ui/sonner"
-import Transactions from './pages/Transactions.tsx';
 import Notifications from './pages/Notifications.tsx';
 import APITest from "@/pages/APITest";
 import PaymentSuccess from "@/pages/PaymentSuccess";
 import CryptoBank from './pages/CryptoBank.tsx';
-
-React.StrictMode
 
 const router = createBrowserRouter([
   {
@@ -25,15 +22,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: <Index />,
       },
       {
         path: "/trading",
         element: <Trading />,
-      },
-      {
-        path: "/banking",
-        element: <Banking />,
       },
       {
         path: "/crypto-bank",
@@ -44,16 +37,12 @@ const router = createBrowserRouter([
         element: <Governance />,
       },
       {
-        path: "/transactions",
-        element: <Transactions />,
-      },
-      {
         path: "/notifications",
         element: <Notifications />,
       },
       {
         path: "/settings",
-        element: <SettingsPage />,
+        element: <Settings />,
       },
       {
         path: "/api-test",
