@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useWalletBalance } from "@/hooks/useWalletData";
@@ -14,7 +13,7 @@ import ExchangeModule from '@/components/modules/exchange/ExchangeModule';
 import { Link } from "react-router-dom";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 
-const ComprehensiveDashboard = () => {
+const ComprehensiveDashboard: React.FC = () => {
   console.log('ComprehensiveDashboard: Component rendering started');
   
   const [isClient, setIsClient] = useState(false);
@@ -324,4 +323,5 @@ const ComprehensiveDashboard = () => {
   }
 };
 
+// Export explicite par défaut
 export default ComprehensiveDashboard;
