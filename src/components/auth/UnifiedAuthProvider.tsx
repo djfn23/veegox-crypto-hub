@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import React, { useState, useEffect, useContext, createContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -25,10 +25,10 @@ interface UnifiedAuthContextType {
   isAuthenticated: boolean;
 }
 
-const UnifiedAuthContext = React.createContext<UnifiedAuthContextType | undefined>(undefined);
+const UnifiedAuthContext = createContext<UnifiedAuthContextType | undefined>(undefined);
 
 export const useUnifiedAuth = () => {
-  const context = React.useContext(UnifiedAuthContext);
+  const context = useContext(UnifiedAuthContext);
   if (!context) {
     throw new Error('useUnifiedAuth must be used within UnifiedAuthProvider');
   }
@@ -40,8 +40,8 @@ interface UnifiedAuthProviderProps {
 }
 
 export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ children }) => {
-  // Early return with fallback if React is not properly loaded
-  if (typeof React === 'undefined' || !React || !React.useState || !React.useEffect || !React.useContext) {
+  // Early return with fallback if React hooks are not available
+  if (typeof useState === 'undefined' || typeof useEffect === 'undefined' || typeof useContext === 'undefined') {
     console.error('React hooks are not available in UnifiedAuthProvider');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
@@ -52,11 +52,11 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
     );
   }
 
-  const [user, setUser] = React.useState<AuthUser | null>(null);
-  const [session, setSession] = React.useState<Session | null>(null);
-  const [loading, setLoading] = React.useState(true);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true;
 
     // Set up Supabase auth state listener
