@@ -10,6 +10,8 @@ import { AlchemySignerContainer } from "@/components/wallet/AlchemySignerContain
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 
+console.log('App: Application starting...');
+
 // Import existing pages
 import Analytics from './pages/Analytics';
 import Staking from './pages/Staking';
@@ -74,6 +76,8 @@ const handleGlobalError = (error: Error) => {
 };
 
 function App() {
+  console.log('App: Rendering application');
+  
   return (
     <EnhancedErrorBoundary onError={handleGlobalError}>
       <QueryClientProvider client={queryClient}>

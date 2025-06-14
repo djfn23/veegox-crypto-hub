@@ -10,6 +10,8 @@ import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { AppLayout } from "@/components/layout/AppLayout";
 import ComprehensiveDashboard from "@/components/ComprehensiveDashboard";
 
+console.log('Index: Page component loading...');
+
 const Index = () => {
   console.log('Index: Component mounting');
 
@@ -75,10 +77,12 @@ const AuthenticatedApp = ({ showAuth, setShowAuth }: {
   console.log('AuthenticatedApp: User not authenticated, showing landing page');
 
   const handleLoginClick = () => {
+    console.log('AuthenticatedApp: Login button clicked');
     setShowAuth(true);
   };
 
   const handleSignupClick = () => {
+    console.log('AuthenticatedApp: Signup button clicked');
     setShowAuth(true);
   };
 
