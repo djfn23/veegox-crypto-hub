@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ComprehensiveDashboard } from "@/components/ComprehensiveDashboard";
+import ComprehensiveDashboard from "@/components/ComprehensiveDashboard";
 import { QuickActionsWidget } from "@/components/dashboard/QuickActionsWidget";
 import { RecentActivityWidget } from "@/components/dashboard/RecentActivityWidget";
 
