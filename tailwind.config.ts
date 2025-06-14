@@ -80,19 +80,28 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			spacing: {
-				'touch': 'var(--touch-target-min)',
-				'touch-lg': 'var(--touch-target-comfortable)',
-				'mobile': 'var(--mobile-padding)',
-				'mobile-sm': 'var(--mobile-margin)',
-				'mobile-xs': 'var(--mobile-gap)',
+				'touch': '44px',
+				'touch-lg': '48px',
+				'mobile': '1rem',
+				'mobile-sm': '0.75rem',
+				'mobile-xs': '0.5rem',
+				'safe-top': 'env(safe-area-inset-top)',
+				'safe-bottom': 'env(safe-area-inset-bottom)',
+				'safe-left': 'env(safe-area-inset-left)',
+				'safe-right': 'env(safe-area-inset-right)',
 			},
 			minHeight: {
-				'touch': 'var(--touch-target-min)',
-				'touch-lg': 'var(--touch-target-comfortable)',
+				'touch': '44px',
+				'touch-lg': '48px',
+				'screen-safe': 'calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom))',
 			},
 			minWidth: {
-				'touch': 'var(--touch-target-min)',
-				'touch-lg': 'var(--touch-target-comfortable)',
+				'touch': '44px',
+				'touch-lg': '48px',
+			},
+			maxWidth: {
+				'mobile': '100vw',
+				'mobile-content': 'calc(100vw - 2rem)',
 			},
 			fontSize: {
 				'mobile-xs': ['0.75rem', { lineHeight: '1.2' }],
@@ -102,6 +111,7 @@ export default {
 				'mobile-xl': ['1.25rem', { lineHeight: '1.3' }],
 				'mobile-2xl': ['1.5rem', { lineHeight: '1.2' }],
 				'mobile-3xl': ['1.875rem', { lineHeight: '1.1' }],
+				'mobile-4xl': ['2.25rem', { lineHeight: '1.1' }],
 			},
 			keyframes: {
 				'accordion-down': {
@@ -181,6 +191,20 @@ export default {
             transform: 'scale(1.5)',
             opacity: '0'
           }
+        },
+        'touch-feedback': {
+          '0%': {
+            transform: 'scale(1)',
+            opacity: '1'
+          },
+          '50%': {
+            transform: 'scale(0.95)',
+            opacity: '0.8'
+          },
+          '100%': {
+            transform: 'scale(1)',
+            opacity: '1'
+          }
         }
 			},
 			animation: {
@@ -191,7 +215,8 @@ export default {
 				'mobile-scale': 'mobile-scale 0.2s ease-out',
 				'mobile-bounce': 'mobile-bounce 0.5s ease-out',
         'float': 'float 3s ease-in-out infinite',
-        'ripple': 'ripple 1.5s cubic-bezier(0, 0.2, 0.8, 1) infinite'
+        'ripple': 'ripple 1.5s cubic-bezier(0, 0.2, 0.8, 1) infinite',
+        'touch-feedback': 'touch-feedback 0.15s ease-out'
 			},
 			screens: {
 				'xs': '375px',
@@ -200,13 +225,16 @@ export default {
 				'lg': '1024px',
 				'xl': '1280px',
 				'2xl': '1536px',
-				'mobile-sm': { 'max': '374px' },
-				'mobile-md': { 'min': '375px', 'max': '413px' },
-				'mobile-lg': { 'min': '414px', 'max': '767px' },
+				'mobile-xs': { 'max': '359px' },
+				'mobile-sm': { 'min': '360px', 'max': '413px' },
+				'mobile-md': { 'min': '414px', 'max': '767px' },
+				'mobile-lg': { 'min': '768px', 'max': '1023px' },
 				'tablet': { 'min': '768px', 'max': '1023px' },
 				'desktop': { 'min': '1024px' },
 				'landscape': { 'raw': '(orientation: landscape)' },
 				'portrait': { 'raw': '(orientation: portrait)' },
+				'touch': { 'raw': '(hover: none) and (pointer: coarse)' },
+				'no-touch': { 'raw': '(hover: hover) and (pointer: fine)' },
 			},
 			zIndex: {
 				'modal': '50',

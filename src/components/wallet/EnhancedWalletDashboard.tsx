@@ -21,6 +21,8 @@ import { TradingInterface } from './TradingInterface';
 import { QuickActions } from './QuickActions';
 import { EnhancedTokenList } from './EnhancedTokenList';
 import { NotificationCenter } from './NotificationCenter';
+import { MobileWalletCard, MobileWalletCardHeader, MobileWalletCardContent } from '@/components/ui/mobile-wallet-card';
+import { MobileTouchButton } from '@/components/ui/mobile-touch-button';
 
 interface Token {
   symbol: string;
@@ -36,7 +38,7 @@ interface Token {
 
 const EnhancedWalletDashboard = () => {
   const { connectedWallets } = useEnhancedWallet();
-  const { isMobile } = useResponsiveLayout();
+  const { isMobile, isTablet, getFontSize, getDynamicSpacing } = useResponsiveLayout();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [hideSmallBalances, setHideSmallBalances] = useState(false);
@@ -67,7 +69,7 @@ const EnhancedWalletDashboard = () => {
         balanceUSD: 1250.00,
         price: 1.00,
         change24h: 0.02,
-        priceData: Array.from({ length: 24 }, (_, i) => ({
+        pr20iceData: Array.from({ length: 24 }, (_, i) => ({
           timestamp: new Date(Date.now() - (23 - i) * 60 * 60 * 1000).toISOString(),
           price: 1.00 + (Math.random() - 0.5) * 0.01
         }))
@@ -89,12 +91,11 @@ const EnhancedWalletDashboard = () => {
     setTokens(mockTokens);
     const total = mockTokens.reduce((sum, token) => sum + token.balanceUSD, 0);
     setPortfolioValue(total);
-    setPortfolioChange(3.45); // Mock change
+    setPortfolioChange(3.45);
   }, []);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // Simuler le refresh des données
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsRefreshing(false);
     toast.success('Portfolio mis à jour');
@@ -138,80 +139,82 @@ const EnhancedWalletDashboard = () => {
     : tokens;
 
   return (
-    <div className="space-y-6">
-      {/* Portfolio Overview */}
-      <Card className="bg-gradient-to-r from-slate-900/80 to-purple-900/40 border-slate-700">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Wallet className="h-6 w-6 text-purple-400" />
-              <CardTitle className="text-white">Portfolio Total</CardTitle>
+    <div className={`space-y-${isMobile ? '4' : '6'}`}>
+      {/* Portfolio Overview - Mobile Optimized */}
+      <MobileWalletCard variant="featured" padding={isMobile ? "default" : "lg"}>
+        <MobileWalletCardHeader>
+          <div className="flex items-center gap-3">
+            <div className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center`}>
+              <Wallet className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} text-white`} />
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowNotifications(true)}
-                className="text-gray-400 hover:text-white relative"
-              >
-                <Bell className="h-4 w-4" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                className="text-gray-400 hover:text-white"
-              >
-                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setHideSmallBalances(!hideSmallBalances)}
-                className="text-gray-400 hover:text-white"
-              >
-                {hideSmallBalances ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-              </Button>
+            <div>
+              <h2 className={cn("text-white font-bold", getFontSize(isMobile ? 'lg' : 'xl'))}>
+                Portfolio Total
+              </h2>
+              <p className={cn("text-purple-300", getFontSize('sm'))}>
+                {connectedWallets.length} wallet{connectedWallets.length > 1 ? 's' : ''} connecté{connectedWallets.length > 1 ? 's' : ''}
+              </p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-3xl font-bold text-white mb-2">
+          <div className="flex items-center gap-2">
+            <MobileTouchButton
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowNotifications(true)}
+              className="text-gray-400 hover:text-white relative"
+            >
+              <Bell className="h-4 w-4" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            </MobileTouchButton>
+            <MobileTouchButton
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="text-gray-400 hover:text-white"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </MobileTouchButton>
+            <MobileTouchButton
+              variant="ghost"
+              size="sm"
+              onClick={() => setHideSmallBalances(!hideSmallBalances)}
+              className="text-gray-400 hover:text-white"
+            >
+              {hideSmallBalances ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+            </MobileTouchButton>
+          </div>
+        </MobileWalletCardHeader>
+        
+        <MobileWalletCardContent>
+          <div className="space-y-4">
+            <div className="text-center">
+              <div className={cn("font-bold text-white mb-2", getFontSize(isMobile ? '3xl' : '4xl'))}>
                 ${portfolioValue.toLocaleString('fr-FR', { minimumFractionDigits: 2 })}
               </div>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant={portfolioChange >= 0 ? 'default' : 'destructive'}
-                  className={`${
-                    portfolioChange >= 0 
-                      ? 'bg-green-600/20 text-green-400 border-green-500/30' 
-                      : 'bg-red-600/20 text-red-400 border-red-500/30'
-                  }`}
-                >
-                  <span className="flex items-center gap-1">
-                    {portfolioChange >= 0 ? 
-                      <TrendingUp className="h-3 w-3" /> : 
-                      <TrendingDown className="h-3 w-3" />
-                    }
-                    {portfolioChange >= 0 ? '+' : ''}{portfolioChange.toFixed(2)}%
-                  </span>
-                </Badge>
-                <span className="text-gray-400 text-sm">24h</span>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-gray-400 text-sm">Wallets connectés</div>
-              <div className="text-white font-medium">{connectedWallets.length}</div>
+              <Badge
+                variant={portfolioChange >= 0 ? 'default' : 'destructive'}
+                className={cn(
+                  "text-center",
+                  portfolioChange >= 0 
+                    ? 'bg-green-600/20 text-green-400 border-green-500/30' 
+                    : 'bg-red-600/20 text-red-400 border-red-500/30'
+                )}
+              >
+                <span className="flex items-center gap-1">
+                  {portfolioChange >= 0 ? 
+                    <TrendingUp className="h-3 w-3" /> : 
+                    <TrendingDown className="h-3 w-3" />
+                  }
+                  {portfolioChange >= 0 ? '+' : ''}{portfolioChange.toFixed(2)}% (24h)
+                </span>
+              </Badge>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </MobileWalletCardContent>
+      </MobileWalletCard>
 
-      {/* Quick Actions */}
+      {/* Quick Actions - Mobile Optimized */}
       <QuickActions
         onSend={() => toast.info('Envoyer des tokens')}
         onReceive={() => toast.info('Recevoir des tokens')}
@@ -221,21 +224,33 @@ const EnhancedWalletDashboard = () => {
         onStake={() => toast.info('Staking')}
       />
 
-      {/* Main Content Tabs */}
-      <Tabs defaultValue="tokens" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 bg-slate-800">
-          <TabsTrigger value="tokens" className="data-[state=active]:bg-slate-700">
+      {/* Main Content Tabs - Mobile Optimized */}
+      <Tabs defaultValue="tokens" className={`space-y-${isMobile ? '4' : '6'}`}>
+        <TabsList className={cn(
+          "grid w-full grid-cols-3 bg-slate-800/50",
+          isMobile ? "h-12" : "h-10"
+        )}>
+          <TabsTrigger value="tokens" className={cn(
+            "data-[state=active]:bg-slate-700",
+            getFontSize('sm')
+          )}>
             Tokens
           </TabsTrigger>
-          <TabsTrigger value="trading" className="data-[state=active]:bg-slate-700">
+          <TabsTrigger value="trading" className={cn(
+            "data-[state=active]:bg-slate-700",
+            getFontSize('sm')
+          )}>
             Trading
           </TabsTrigger>
-          <TabsTrigger value="history" className="data-[state=active]:bg-slate-700">
+          <TabsTrigger value="history" className={cn(
+            "data-[state=active]:bg-slate-700",
+            getFontSize('sm')
+          )}>
             Historique
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="tokens" className="space-y-6">
+        <TabsContent value="tokens" className={`space-y-${isMobile ? '4' : '6'}`}>
           <EnhancedTokenList
             tokens={visibleTokens}
             onTokenSelect={handleTokenSelect}
@@ -245,24 +260,26 @@ const EnhancedWalletDashboard = () => {
           />
         </TabsContent>
 
-        <TabsContent value="trading" className="space-y-6">
+        <TabsContent value="trading" className={`space-y-${isMobile ? '4' : '6'}`}>
           <TradingInterface
             tokens={tokens}
             onSwap={handleSwap}
           />
         </TabsContent>
 
-        <TabsContent value="history" className="space-y-6">
-          <Card className="bg-slate-900/50 border-slate-700">
-            <CardHeader>
-              <CardTitle className="text-white">Historique des Transactions</CardTitle>
-            </CardHeader>
-            <CardContent>
+        <TabsContent value="history" className={`space-y-${isMobile ? '4' : '6'}`}>
+          <MobileWalletCard>
+            <MobileWalletCardHeader 
+              title="Historique des Transactions"
+            />
+            <MobileWalletCardContent>
               <div className="text-center py-8 text-gray-400">
-                Fonctionnalité d'historique en cours de développement
+                <p className={getFontSize('base')}>
+                  Fonctionnalité d'historique en cours de développement
+                </p>
               </div>
-            </CardContent>
-          </Card>
+            </MobileWalletCardContent>
+          </MobileWalletCard>
         </TabsContent>
       </Tabs>
 
@@ -276,3 +293,6 @@ const EnhancedWalletDashboard = () => {
 };
 
 export default EnhancedWalletDashboard;
+
+// Add missing import
+import { cn } from '@/lib/utils';

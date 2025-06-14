@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { MobileWalletCard } from '@/components/ui/mobile-wallet-card';
+import { QuickActionButton } from '@/components/ui/mobile-touch-button';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { 
   Send, 
   ArrowDownToLine, 
@@ -28,6 +29,8 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   onScanQR,
   onStake
 }) => {
+  const { isMobile, getColumns } = useResponsiveLayout();
+  
   const actions = [
     {
       icon: Send,
@@ -67,23 +70,23 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
     }
   ];
 
+  // Responsive grid: 2 columns on small mobile, 3 on mobile, 6 on desktop
+  const columns = getColumns(2, 3, 6);
+  const gridClass = `grid grid-cols-${columns} gap-${isMobile ? '3' : '4'}`;
+
   return (
-    <Card className="bg-slate-900/50 border-slate-700">
-      <CardContent className="p-4">
-        <div className="grid grid-cols-3 gap-4">
-          {actions.map((action, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              onClick={action.onClick}
-              className={`flex flex-col items-center gap-2 h-auto py-4 ${action.color} hover:bg-slate-800/50`}
-            >
-              <action.icon className="h-6 w-6" />
-              <span className="text-xs font-medium">{action.label}</span>
-            </Button>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <MobileWalletCard variant="default" padding="default">
+      <div className={gridClass}>
+        {actions.map((action, index) => (
+          <QuickActionButton
+            key={index}
+            icon={action.icon}
+            label={action.label}
+            onClick={action.onClick}
+            className={action.color}
+          />
+        ))}
+      </div>
+    </MobileWalletCard>
   );
 };

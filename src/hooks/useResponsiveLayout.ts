@@ -51,7 +51,7 @@ export const useResponsiveLayout = () => {
     let timeoutId: NodeJS.Timeout;
     const debouncedResize = () => {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(handleResize, 150);
+      timeoutId = setTimeout(handleResize, 100);
     };
 
     handleResize();
@@ -77,10 +77,9 @@ export const useResponsiveLayout = () => {
 
   const getDeviceType = (): DeviceType => {
     const width = windowSize.width;
-    // Breakpoints améliorés pour une meilleure détection
-    if (width < 768) return 'mobile'; // xs et sm
-    if (width < 1024) return 'tablet'; // md
-    return 'desktop'; // lg et plus
+    if (width < 768) return 'mobile';
+    if (width < 1024) return 'tablet';
+    return 'desktop';
   };
 
   const isBreakpoint = (breakpoint: BreakpointKey): boolean => {
@@ -119,11 +118,57 @@ export const useResponsiveLayout = () => {
     }
   };
 
-  // Nouvelles helpers pour transitions et responsive utilities
+  // Mobile-first utilities améliorées
   const isSmallMobile = (): boolean => windowSize.width < 375;
   const isLargeMobile = (): boolean => windowSize.width >= 414 && windowSize.width < 768;
   const isSmallTablet = (): boolean => windowSize.width >= 768 && windowSize.width < 900;
   const isLandscapePhone = (): boolean => orientation === 'landscape' && windowSize.width < 900;
+  
+  // Nouvelles utilités pour le responsive
+  const isExtraSmall = (): boolean => windowSize.width < 360;
+  const isCompact = (): boolean => windowSize.height < 700;
+  const canUseColumns = (minColumns: number): boolean => Math.floor(windowSize.width / 280) >= minColumns;
+  
+  // Utilitaire pour les espacements dynamiques
+  const getDynamicSpacing = (base: number = 4): string => {
+    const device = getDeviceType();
+    const multiplier = device === 'mobile' ? 1 : device === 'tablet' ? 1.25 : 1.5;
+    return `${base * multiplier}px`;
+  };
+
+  // Utilitaire pour les tailles de police dynamiques
+  const getFontSize = (base: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl'): string => {
+    const sizes = {
+      mobile: {
+        xs: 'text-xs',
+        sm: 'text-sm', 
+        base: 'text-base',
+        lg: 'text-lg',
+        xl: 'text-xl',
+        '2xl': 'text-2xl',
+        '3xl': 'text-3xl'
+      },
+      tablet: {
+        xs: 'text-sm',
+        sm: 'text-base',
+        base: 'text-lg', 
+        lg: 'text-xl',
+        xl: 'text-2xl',
+        '2xl': 'text-3xl',
+        '3xl': 'text-4xl'
+      },
+      desktop: {
+        xs: 'text-sm',
+        sm: 'text-base',
+        base: 'text-lg',
+        lg: 'text-xl', 
+        xl: 'text-2xl',
+        '2xl': 'text-3xl',
+        '3xl': 'text-4xl'
+      }
+    };
+    return sizes[getDeviceType()][base];
+  };
 
   return {
     windowSize,
@@ -139,10 +184,16 @@ export const useResponsiveLayout = () => {
     isBetweenBreakpoints,
     getColumns,
     getSpacing,
-    // Nouvelles utilities
+    // Utilities existantes
     isSmallMobile,
     isLargeMobile,
     isSmallTablet,
     isLandscapePhone,
+    // Nouvelles utilities
+    isExtraSmall,
+    isCompact,
+    canUseColumns,
+    getDynamicSpacing,
+    getFontSize,
   };
 };
