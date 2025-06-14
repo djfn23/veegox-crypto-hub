@@ -6,7 +6,10 @@ import { SavingsPlans } from "./SavingsPlans";
 import { VirtualCards } from "./VirtualCards";
 import { PaymentRequests } from "./PaymentRequests";
 import { BankingAnalytics } from "./BankingAnalytics";
-import { Wallet, CreditCard, PiggyBank, QrCode, BarChart3, Send, Shield } from "lucide-react";
+import { SmartSavingsModule } from "./SmartSavingsModule";
+import { EnhancedBankingAnalytics } from "./EnhancedBankingAnalytics";
+import { PaymentQRModule } from "./PaymentQRModule";
+import { Wallet, CreditCard, PiggyBank, QrCode, BarChart3, Send, Shield, Zap, Target } from "lucide-react";
 import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
@@ -69,10 +72,20 @@ export const CryptoBankModule = () => {
     { value: "accounts", label: "Comptes", icon: Wallet },
     { value: "transactions", label: "Transactions", icon: Send },
     { value: "savings", label: "Épargne", icon: PiggyBank },
+    { value: "smart-savings", label: "Épargne IA", icon: Target },
+    { value: "qr-payments", label: "QR Pay", icon: QrCode },
     { value: "cards", label: "Cartes", icon: CreditCard },
-    { value: "payments", label: "Paiements", icon: QrCode },
-    { value: "analytics", label: "Analyses", icon: BarChart3 }
+    { value: "analytics", label: "Analytics", icon: BarChart3 },
+    { value: "ai-insights", label: "Insights IA", icon: Zap }
   ];
+
+  // For mobile, show only 4 main tabs and group others
+  const mobileTabItems = isMobile ? [
+    { value: "accounts", label: "Comptes", icon: Wallet },
+    { value: "transactions", label: "Historique", icon: Send },
+    { value: "smart-savings", label: "Épargne IA", icon: Target },
+    { value: "qr-payments", label: "QR Pay", icon: QrCode }
+  ] : tabItems;
 
   return (
     <div className="space-y-6">
@@ -80,7 +93,7 @@ export const CryptoBankModule = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-white">Banque Crypto</h1>
-          <p className="text-gray-400 text-sm md:text-base">Gérez vos comptes et transactions crypto</p>
+          <p className="text-gray-400 text-sm md:text-base">Gérez vos comptes et transactions crypto avec l'IA</p>
         </div>
         
         {/* Security Badge */}
@@ -108,10 +121,10 @@ export const CryptoBankModule = () => {
       {/* Navigation Tabs */}
       <MobileTabs value={activeTab} onValueChange={setActiveTab}>
         <MobileTabsList 
-          className={isMobile ? "grid grid-cols-2 gap-2 p-2" : "grid grid-cols-6"}
-          orientation={isMobile ? "horizontal" : "horizontal"}
+          className={isMobile ? "grid grid-cols-2 gap-2 p-2" : "grid grid-cols-4 lg:grid-cols-8"}
+          orientation="horizontal"
         >
-          {tabItems.map((item) => (
+          {mobileTabItems.map((item) => (
             <MobileTabsTrigger
               key={item.value}
               value={item.value}
@@ -135,16 +148,25 @@ export const CryptoBankModule = () => {
           <SavingsPlans userId={user.id} />
         </MobileTabsContent>
 
+        <MobileTabsContent value="smart-savings">
+          <SmartSavingsModule userId={user.id} />
+        </MobileTab
+        </MobileTabsContent>
+
+        <MobileTabsContent value="qr-payments">
+          <PaymentQRModule userId={user.id} userAccounts={[]} />
+        </MobileTabsContent>
+
         <MobileTabsContent value="cards">
           <VirtualCards userId={user.id} />
         </MobileTabsContent>
 
-        <MobileTabsContent value="payments">
-          <PaymentRequests userId={user.id} />
-        </MobileTabsContent>
-
         <MobileTabsContent value="analytics">
           <BankingAnalytics userId={user.id} />
+        </MobileTabsContent>
+
+        <MobileTabsContent value="ai-insights">
+          <EnhancedBankingAnalytics userId={user.id} />
         </MobileTabsContent>
       </MobileTabs>
     </div>
