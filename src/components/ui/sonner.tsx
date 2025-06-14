@@ -17,6 +17,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
     return null;
   }
 
+  // Check if React hooks are available
+  if (typeof React.useState === 'undefined') {
+    console.error('React hooks are not available in Sonner component');
+    return null;
+  }
+
   try {
     return (
       <Sonner

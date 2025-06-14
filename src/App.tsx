@@ -23,8 +23,15 @@ const queryClient = new QueryClient({
 function App() {
   console.log('App: Rendering main application component');
   
+  const [isReactReady, setIsReactReady] = React.useState(false);
+
   React.useEffect(() => {
     console.log('App: Component mounted successfully');
+    
+    // Ensure React is fully ready before enabling toasters
+    const timer = setTimeout(() => {
+      setIsReactReady(true);
+    }, 100);
     
     const handleUnhandledError = (event: ErrorEvent) => {
       console.error('App: Unhandled error caught:', event.error);
@@ -33,6 +40,7 @@ function App() {
     window.addEventListener('error', handleUnhandledError);
     
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('error', handleUnhandledError);
     };
   }, []);
@@ -49,7 +57,7 @@ function App() {
               </div>
             </AppLayout>
             
-            <Sonner />
+            {isReactReady && <Sonner />}
             <AlchemySignerContainer />
           </ThemeProvider>
         </QueryClientProvider>
