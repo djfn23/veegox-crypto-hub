@@ -1,6 +1,4 @@
-
 import { ReactNode, useState, useEffect } from "react";
-// Je conserve les imports
 import { SimplifiedNavigation } from "./SimplifiedNavigation";
 import { MobileHeader } from "./MobileHeader";
 import { MobileBottomNavigation } from "./MobileBottomNavigation";
@@ -9,31 +7,55 @@ import { PWAInstallPrompt } from "@/components/ui/pwa-install-prompt";
 import { texts } from "@/lib/constants/texts";
 import { Badge } from "@/components/ui/badge";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
-// Supprimé l'import TooltipProvider ici
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
-  // Guard : hook only called client-side
+  // Guard: ensure hook only called client-side
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const { isMobile, isTablet } = isClient ? useResponsiveLayout() : { isMobile: false, isTablet: false };
+  // Always default non-mobile layout SSR
+  const { isMobile, isTablet } = isClient
+    ? useResponsiveLayout()
+    : { isMobile: false, isTablet: false };
 
-  // Fallback d'erreur UI très simple si une erreur inattendue survient
+  // State to possibly keep last error for diagnostics/debug
+  const [caughtError, setCaughtError] = useState<null | unknown>(null);
+
+  // Error boundary (sync only) to catch errors in the tree.
   try {
+    // If a previous error happened, display it (debug)
+    if (caughtError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+          <div className="text-white text-lg">
+            Une erreur technique est survenue.<br />
+            <span className="text-sm text-gray-300">
+              Veuillez recharger la page ou contacter le support.<br />
+              {typeof caughtError === "string"
+                ? caughtError
+                : (caughtError && (caughtError as { message?: string })?.message)
+                  ? (caughtError as { message?: string }).message
+                  : null}
+            </span>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
         {/* PWA Install Prompt */}
         <PWAInstallPrompt />
-        
+
         {/* Mobile Header */}
         <MobileHeader />
-        
+
         {/* Desktop Layout */}
         <div className="hidden lg:flex">
           {/* Sidebar */}
@@ -58,7 +80,6 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
                 <UserMenu />
               </div>
             </header>
-            
             {/* Content */}
             <main className="flex-1 overflow-auto">
               {children}
@@ -73,21 +94,27 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
               {children}
             </div>
           </main>
-          
-          {/* Mobile Bottom Navigation */}
           {isMobile && <MobileBottomNavigation />}
         </div>
       </div>
     );
   } catch (e) {
+    // set error in state for possible debug
+    if (!caughtError) setCaughtError(e);
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
         <div className="text-white text-lg">
           Une erreur technique est survenue.<br />
-          <span className="text-sm text-gray-300">Veuillez recharger la page ou contacter le support.</span>
+          <span className="text-sm text-gray-300">
+            Veuillez recharger la page ou contacter le support.<br />
+            {typeof e === "string"
+              ? e
+              : (e && (e as { message?: string })?.message)
+                ? (e as { message?: string }).message
+                : null}
+          </span>
         </div>
       </div>
     );
   }
 }
-
