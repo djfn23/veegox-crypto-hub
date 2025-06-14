@@ -59,7 +59,7 @@ export const RealTimePriceChart = ({ tokenId, symbol, days = 7 }: RealTimePriceC
       <CardHeader>
         <CardTitle className="text-white flex justify-between items-center">
           <span>{symbol.toUpperCase()} Prix</span>
-          <span className="text-green-400">${currentPrice.toLocaleString()}</span>
+          <span className="text-green-400">€{currentPrice.toLocaleString()}</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -74,7 +74,7 @@ export const RealTimePriceChart = ({ tokenId, symbol, days = 7 }: RealTimePriceC
             <YAxis 
               stroke="#9CA3AF"
               fontSize={12}
-              tickFormatter={(value) => `$${value.toLocaleString()}`}
+              tickFormatter={(value) => `€${value.toLocaleString()}`}
             />
             <Tooltip 
               contentStyle={{
@@ -83,7 +83,7 @@ export const RealTimePriceChart = ({ tokenId, symbol, days = 7 }: RealTimePriceC
                 borderRadius: '8px',
                 color: '#FFFFFF'
               }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, 'Prix']}
+              formatter={(value: number) => [`€${value.toLocaleString()}`, 'Prix']}
             />
             <Line 
               type="monotone" 

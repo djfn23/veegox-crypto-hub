@@ -1,5 +1,5 @@
-
 import { supabase } from "@/integrations/supabase/client";
+import { coinGeckoService } from "./coinGeckoService";
 
 export interface FiatBalance {
   id: string;
@@ -120,20 +120,13 @@ export class FiatBalanceService {
     if (balanceError) throw balanceError;
   }
 
-  // Get crypto rates (mock implementation)
+  // Get crypto rates using CoinGecko API
   async getCryptoRates(): Promise<Record<string, number>> {
     try {
-      // In production, this would fetch from a real API like CoinGecko
-      return {
-        'BTC': 45000,
-        'ETH': 3000,
-        'USDC': 1.00,
-        'USDT': 1.00,
-        'MATIC': 0.85,
-        'BNB': 350
-      };
+      return await coinGeckoService.getCryptoRates();
     } catch (error) {
       console.error('Error fetching crypto rates:', error);
+      // Fallback to mock data if CoinGecko fails
       return {
         'BTC': 45000,
         'ETH': 3000,
