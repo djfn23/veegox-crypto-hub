@@ -120,7 +120,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(mockUser));
       return true;
     } catch (error) {
-      console.error('Erreur d\'inscription:', error);
+      console.error('Erreur d inscription:', error);
       return false;
     } finally {
       setLoading(false);
