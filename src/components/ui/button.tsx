@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -24,6 +25,9 @@ const buttonVariants = cva(
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
+        // Mobile-optimized sizes
+        mobile: "h-12 px-6 py-3 text-base", // 48px height for better touch
+        "mobile-lg": "h-14 px-8 py-4 text-lg", // 56px height for primary actions
       },
     },
     defaultVariants: {

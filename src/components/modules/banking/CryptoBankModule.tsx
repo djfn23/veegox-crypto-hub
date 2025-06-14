@@ -9,6 +9,7 @@ import { BankingAnalytics } from "./BankingAnalytics";
 import { SmartSavingsModule } from "./SmartSavingsModule";
 import { EnhancedBankingAnalytics } from "./EnhancedBankingAnalytics";
 import { PaymentQRModule } from "./PaymentQRModule";
+import { MobileCryptoBankModule } from "./MobileCryptoBankModule";
 import { Wallet, CreditCard, PiggyBank, QrCode, BarChart3, Send, Shield, Zap, Target } from "lucide-react";
 import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
@@ -27,6 +28,11 @@ export const CryptoBankModule = () => {
   const { isSupported: isBiometricSupported, isEnrolled: isBiometricEnrolled, enrollBiometric } = useBiometricAuth();
   const [activeTab, setActiveTab] = useState("accounts");
   const { toast } = useToast();
+
+  // Use mobile-optimized version on mobile devices
+  if (isMobile) {
+    return <MobileCryptoBankModule />;
+  }
 
   const handleEnableBiometric = async () => {
     if (!user) return;
@@ -79,14 +85,6 @@ export const CryptoBankModule = () => {
     { value: "ai-insights", label: "Insights IA", icon: Zap }
   ];
 
-  // For mobile, show only 4 main tabs and group others
-  const mobileTabItems = isMobile ? [
-    { value: "accounts", label: "Comptes", icon: Wallet },
-    { value: "transactions", label: "Historique", icon: Send },
-    { value: "smart-savings", label: "Épargne IA", icon: Target },
-    { value: "qr-payments", label: "QR Pay", icon: QrCode }
-  ] : tabItems;
-
   return (
     <div className="space-y-6">
       {/* Header with security status */}
@@ -106,7 +104,7 @@ export const CryptoBankModule = () => {
               className="border-green-600 text-green-400 hover:bg-green-600 hover:text-white"
             >
               <Shield className="h-4 w-4 mr-2" />
-              {isMobile ? "Sécuriser" : "Activer Touch ID"}
+              Activer Touch ID
             </Button>
           )}
           {isBiometricEnrolled && (
@@ -120,18 +118,14 @@ export const CryptoBankModule = () => {
 
       {/* Navigation Tabs */}
       <MobileTabs value={activeTab} onValueChange={setActiveTab}>
-        <MobileTabsList 
-          className={isMobile ? "grid grid-cols-2 gap-2 p-2" : "grid grid-cols-4 lg:grid-cols-8"}
-          orientation="horizontal"
-        >
-          {mobileTabItems.map((item) => (
+        <MobileTabsList className="grid grid-cols-4 lg:grid-cols-8">
+          {tabItems.map((item) => (
             <MobileTabsTrigger
               key={item.value}
               value={item.value}
               icon={<item.icon className="h-4 w-4" />}
-              className={isMobile ? "flex-col py-3 px-2 text-xs" : ""}
             >
-              <span className={isMobile ? "mt-1" : ""}>{item.label}</span>
+              {item.label}
             </MobileTabsTrigger>
           ))}
         </MobileTabsList>
