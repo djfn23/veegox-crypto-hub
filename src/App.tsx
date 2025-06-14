@@ -1,12 +1,10 @@
 
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from "next-themes"
-import { Toaster } from '@/components/ui/toaster';
-import { Toaster as Sonner } from '@/components/ui/sonner';
+import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { UnifiedAuthProvider } from '@/components/auth/UnifiedAuthProvider';
-import { AlchemySignerContainer } from '@/components/wallet/AlchemySignerContainer';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 
@@ -71,8 +69,6 @@ function App() {
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <UnifiedAuthProvider>
             <BrowserRouter>
-              <Toaster />
-              <Sonner />
               <Routes>
                 {/* Main routes */}
                 <Route path="/" element={<Index />} />
@@ -122,7 +118,6 @@ function App() {
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              <AlchemySignerContainer />
             </BrowserRouter>
           </UnifiedAuthProvider>
         </ThemeProvider>

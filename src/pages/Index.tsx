@@ -9,6 +9,9 @@ import { LoginModal } from "@/components/auth/LoginModal";
 import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { AppLayout } from "@/components/layout/AppLayout";
 import ComprehensiveDashboard from "@/components/ComprehensiveDashboard";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { AlchemySignerContainer } from "@/components/wallet/AlchemySignerContainer";
 
 const Index = () => {
   const [showAuth, setShowAuth] = useState(false);
@@ -33,7 +36,14 @@ const Index = () => {
     );
   }
 
-  return <AuthenticatedApp showAuth={showAuth} setShowAuth={setShowAuth} />;
+  return (
+    <>
+      <AuthenticatedApp showAuth={showAuth} setShowAuth={setShowAuth} />
+      <Toaster />
+      <Sonner />
+      <AlchemySignerContainer />
+    </>
+  );
 };
 
 const AuthenticatedApp = ({ showAuth, setShowAuth }: { 
