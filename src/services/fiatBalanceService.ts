@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { coinGeckoService } from "./coinGeckoService";
+import { revenueService } from "./revenueService";
 
 export interface FiatBalance {
   id: string;
@@ -138,7 +139,7 @@ export class FiatBalanceService {
     }
   }
 
-  // Purchase crypto with fiat
+  // Purchase crypto with fiat - Enhanced with automatic fee calculation
   async purchaseCrypto(
     userId: string,
     fiatAmount: number,
@@ -159,8 +160,16 @@ export class FiatBalanceService {
       throw new Error('Solde insuffisant');
     }
 
-    const fees = fiatAmount * 0.02; // 2% fees
-    const cryptoAmount = (fiatAmount - fees) / cryptoRate;
+    // Calculate platform fees automatically
+    const platformFee = await revenueService.recordTransactionFee(
+      'crypto_purchase',
+      fiatAmount,
+      fiatCurrency,
+      userId
+    );
+
+    const totalFees = platformFee;
+    const cryptoAmount = (fiatAmount - totalFees) / cryptoRate;
 
     // Create purchase record
     const { data: purchase, error: purchaseError } = await supabase
@@ -174,7 +183,7 @@ export class FiatBalanceService {
         crypto_token_address: this.getTokenAddress(cryptoSymbol),
         exchange_rate: cryptoRate,
         status: 'pending' as const,
-        fees
+        fees: totalFees
       })
       .select()
       .single();
