@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -13,8 +13,9 @@ interface BeforeInstallPromptEvent extends Event {
 export const usePWA = () => {
   const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
   
-  // Check if React is available before using hooks
-  if (!React) {
+  // Check if React hooks are available
+  if (typeof useState === 'undefined' || typeof useEffect === 'undefined') {
+    console.error('React hooks are not available in usePWA');
     return {
       isInstallable: false,
       isInstalled: false,
