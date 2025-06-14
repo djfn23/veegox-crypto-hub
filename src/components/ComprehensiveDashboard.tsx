@@ -1,8 +1,8 @@
 
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useWalletBalance } from "@/hooks/useWalletData";
 import { useWeb3Wallet } from "@/hooks/useWeb3Wallet";
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Copy, Wallet, TrendingUp, Coins, ArrowRightLeft, Store, Heart, CreditCard } from "lucide-react";
@@ -16,14 +16,14 @@ import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 
 const ComprehensiveDashboard = () => {
   const [isClient, setIsClient] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [activeSection, setActiveSection] = useState('overview');
   
-  // TOUJOURS appeler les hooks - pas conditionnellement
+  // Appeler tous les hooks de manière cohérente
   const { connectedWallet } = useWeb3Wallet();
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const { isTablet, deviceType, getColumns, getSpacing } = useResponsiveLayout();
-  const [copied, setCopied] = useState(false);
-  const [activeSection, setActiveSection] = useState('overview');
   const { data: balanceData, refetch: refetchBalance } = useWalletBalance(connectedWallet?.address || '');
 
   useEffect(() => {
@@ -64,7 +64,6 @@ const ComprehensiveDashboard = () => {
 
   const containerPadding = getSpacing("p-4", "p-6", "p-6");
   const sectionSpacing = getSpacing("space-y-4", "space-y-6", "space-y-6");
-  const quickLinksColumns = getColumns(2, 3, 6);
 
   return (
     <div className={`${containerPadding} ${sectionSpacing} max-w-7xl mx-auto`}>
@@ -292,4 +291,5 @@ const ComprehensiveDashboard = () => {
     </div>
   );
 };
+
 export default ComprehensiveDashboard;
