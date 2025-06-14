@@ -1,6 +1,5 @@
 
-import * as React from 'react';
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useAlchemyWallet } from '@/hooks/useAlchemyWallet';
@@ -42,26 +41,25 @@ interface UnifiedAuthProviderProps {
 }
 
 export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ children }) => {
-  // Initialize state with proper error handling
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize wallet hook with error handling
-  let connectWallet: any;
-  let connectedWallets: any[] = [];
-  let disconnectAllWallets: any;
+  // Initialize wallet hook with proper error handling
+  const walletData = (() => {
+    try {
+      return useAlchemyWallet();
+    } catch (error) {
+      console.error('Error initializing wallet hook:', error);
+      return {
+        connectWallet: async () => {},
+        connectedWallets: [],
+        disconnectAllWallets: async () => {}
+      };
+    }
+  })();
 
-  try {
-    const walletHook = useAlchemyWallet();
-    connectWallet = walletHook.connectWallet;
-    connectedWallets = walletHook.connectedWallets || [];
-    disconnectAllWallets = walletHook.disconnectAllWallets;
-  } catch (error) {
-    console.error('Error initializing wallet hook:', error);
-    connectWallet = async () => {};
-    disconnectAllWallets = async () => {};
-  }
+  const { connectWallet, connectedWallets = [], disconnectAllWallets } = walletData;
 
   useEffect(() => {
     let mounted = true;
@@ -103,6 +101,10 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
         });
       }
       setLoading(false);
+    }).catch(() => {
+      if (mounted) {
+        setLoading(false);
+      }
     });
 
     return () => {
@@ -172,7 +174,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
   const signInWithWallet = async (walletId: string) => {
     try {
       if (disconnectAllWallets) {
-        await disconnectAllWallets(); // Clear existing connections
+        await disconnectAllWallets();
       }
       if (connectWallet) {
         const wallet = await connectWallet(walletId);
