@@ -1,19 +1,15 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from "next-themes";
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
-import { UnifiedAuthProvider } from '@/components/auth/UnifiedAuthProvider';
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { AlchemySignerContainer } from "@/components/wallet/AlchemySignerContainer";
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 
 console.log('App: Application starting...');
-
-// Debug: App initialization
-console.log('App: Starting application initialization at', new Date().toISOString());
-console.log('App: React version:', React.version);
 
 // Import existing pages
 import Analytics from './pages/Analytics';
@@ -37,6 +33,8 @@ import Security from './pages/Security';
 import YieldFarming from './pages/YieldFarming';
 import Bridge from './pages/Bridge';
 import Governance from './pages/Governance';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentCanceled from './pages/PaymentCanceled';
 
 // Import crowdfunding sub-pages
 import CreateCrowdfundingCampaign from './pages/crowdfunding/CreateCrowdfundingCampaign';
@@ -73,33 +71,14 @@ const queryClient = new QueryClient({
   },
 });
 
-// Global error handler for React Query
-const handleGlobalError = (error: Error) => {
-  console.error('App: Global error handler triggered:', error);
-  console.error('App: Error stack:', error.stack);
-};
-
-// Component error handler
-const handleComponentError = (error: Error, errorInfo: any) => {
-  console.error('App: Component error boundary triggered:', error);
-  console.error('App: Component error info:', errorInfo);
-};
-
 function App() {
   console.log('App: Rendering main application component');
   
   React.useEffect(() => {
     console.log('App: Component mounted successfully');
     
-    // Add global error handler for unhandled errors
     const handleUnhandledError = (event: ErrorEvent) => {
       console.error('App: Unhandled error caught:', event.error);
-      console.error('App: Error details:', {
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno
-      });
     };
 
     window.addEventListener('error', handleUnhandledError);
@@ -111,65 +90,65 @@ function App() {
   
   try {
     return (
-      <EnhancedErrorBoundary onError={handleComponentError}>
+      <EnhancedErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <UnifiedAuthProvider>
-              <BrowserRouter>
-                <Routes>
-                  {/* Main routes */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/staking" element={<Staking />} />
-                  <Route path="/trading" element={<Trading />} />
-                  <Route path="/marketplace" element={<Marketplace />} />
-                  <Route path="/community" element={<Community />} />
-                  <Route path="/portfolio" element={<Portfolio />} />
-                  <Route path="/tokens" element={<Tokens />} />
-                  <Route path="/credit" element={<Credit />} />
-                  <Route path="/crowdfunding" element={<Crowdfunding />} />
-                  <Route path="/crypto-bank" element={<CryptoBankPage />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/wallet" element={<Wallet />} />
-                  <Route path="/ai-assistant" element={<AIAssistant />} />
-                  
-                  {/* New main pages */}
-                  <Route path="/help" element={<Help />} />
-                  <Route path="/security" element={<Security />} />
-                  <Route path="/yield-farming" element={<YieldFarming />} />
-                  <Route path="/bridge" element={<Bridge />} />
-                  <Route path="/governance" element={<Governance />} />
-                  
-                  {/* Crowdfunding sub-routes */}
-                  <Route path="/crowdfunding/create" element={<CreateCrowdfundingCampaign />} />
-                  <Route path="/crowdfunding/campaigns" element={<CrowdfundingCampaigns />} />
-                  <Route path="/crowdfunding/featured" element={<CrowdfundingFeatured />} />
-                  <Route path="/crowdfunding/trending" element={<CrowdfundingTrending />} />
-                  <Route path="/crowdfunding/my-campaigns" element={<MyCampaigns />} />
-                  <Route path="/crowdfunding/my-contributions" element={<MyContributions />} />
-                  
-                  {/* Tokens sub-routes */}
-                  <Route path="/tokens/create" element={<CreateToken />} />
-                  <Route path="/tokens/analytics" element={<TokenAnalytics />} />
-                  <Route path="/tokens/manage" element={<ManageTokens />} />
-                  <Route path="/tokens/marketplace" element={<TokenMarketplace />} />
-                  
-                  {/* Trading sub-routes */}
-                  <Route path="/trading/spot" element={<TradingSpot />} />
-                  <Route path="/trading/futures" element={<TradingFutures />} />
-                  <Route path="/trading/options" element={<TradingOptions />} />
-                  
-                  {/* Credit sub-routes */}
-                  <Route path="/credit/score" element={<CreditScore />} />
-                  
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
+            <BrowserRouter>
+              <Routes>
+                {/* Main routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/staking" element={<Staking />} />
+                <Route path="/trading" element={<Trading />} />
+                <Route path="/marketplace" element={<Marketplace />} />
+                <Route path="/community" element={<Community />} />
+                <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/tokens" element={<Tokens />} />
+                <Route path="/credit" element={<Credit />} />
+                <Route path="/crowdfunding" element={<Crowdfunding />} />
+                <Route path="/crypto-bank" element={<CryptoBankPage />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/wallet" element={<Wallet />} />
+                <Route path="/ai-assistant" element={<AIAssistant />} />
                 
-                <Sonner />
-                <AlchemySignerContainer />
-              </BrowserRouter>
-            </UnifiedAuthProvider>
+                {/* New main pages */}
+                <Route path="/help" element={<Help />} />
+                <Route path="/security" element={<Security />} />
+                <Route path="/yield-farming" element={<YieldFarming />} />
+                <Route path="/bridge" element={<Bridge />} />
+                <Route path="/governance" element={<Governance />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
+                <Route path="/payment-canceled" element={<PaymentCanceled />} />
+                
+                {/* Crowdfunding sub-routes */}
+                <Route path="/crowdfunding/create" element={<CreateCrowdfundingCampaign />} />
+                <Route path="/crowdfunding/campaigns" element={<CrowdfundingCampaigns />} />
+                <Route path="/crowdfunding/featured" element={<CrowdfundingFeatured />} />
+                <Route path="/crowdfunding/trending" element={<CrowdfundingTrending />} />
+                <Route path="/crowdfunding/my-campaigns" element={<MyCampaigns />} />
+                <Route path="/crowdfunding/my-contributions" element={<MyContributions />} />
+                
+                {/* Tokens sub-routes */}
+                <Route path="/tokens/create" element={<CreateToken />} />
+                <Route path="/tokens/analytics" element={<TokenAnalytics />} />
+                <Route path="/tokens/manage" element={<ManageTokens />} />
+                <Route path="/tokens/marketplace" element={<TokenMarketplace />} />
+                
+                {/* Trading sub-routes */}
+                <Route path="/trading/spot" element={<TradingSpot />} />
+                <Route path="/trading/futures" element={<TradingFutures />} />
+                <Route path="/trading/options" element={<TradingOptions />} />
+                
+                {/* Credit sub-routes */}
+                <Route path="/credit/score" element={<CreditScore />} />
+                
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              
+              <Sonner />
+              <AlchemySignerContainer />
+            </BrowserRouter>
           </ThemeProvider>
         </QueryClientProvider>
       </EnhancedErrorBoundary>
@@ -192,7 +171,5 @@ function App() {
     );
   }
 }
-
-console.log('App: Component definition complete');
 
 export default App;

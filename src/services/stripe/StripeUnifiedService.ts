@@ -7,6 +7,8 @@ export interface StripePaymentIntent {
   currency: string;
   status: string;
   client_secret: string;
+  url?: string; // Add the missing url property
+  session_id?: string; // Add session_id for checkout sessions
   metadata?: Record<string, string>;
 }
 
