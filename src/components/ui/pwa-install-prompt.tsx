@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { usePWA } from "@/hooks/usePWA";
 import { Download, X, Smartphone, Monitor } from "lucide-react";
