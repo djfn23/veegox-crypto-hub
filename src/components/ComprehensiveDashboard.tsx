@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useWalletBalance } from "@/hooks/useWalletData";
@@ -8,7 +7,7 @@ import { toast } from "sonner";
 import { Copy, Wallet, TrendingUp, Coins, ArrowRightLeft, Store, Heart, CreditCard } from "lucide-react";
 import { shortenAddress } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useAuth } from "@/hooks/useAuth";
+import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { RealTimeMarketOverview } from '@/components/dashboard/RealTimeMarketOverview';
 import ExchangeModule from '@/components/modules/exchange/ExchangeModule';
 import { Link } from "react-router-dom";
@@ -21,7 +20,7 @@ const ComprehensiveDashboard = () => {
   
   // Appeler tous les hooks de manière cohérente
   const { connectedWallet } = useWeb3Wallet();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useUnifiedAuth();
   const isMobile = useIsMobile();
   const { isTablet, deviceType, getColumns, getSpacing } = useResponsiveLayout();
   const { data: balanceData, refetch: refetchBalance } = useWalletBalance(connectedWallet?.address || '');
