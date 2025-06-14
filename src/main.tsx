@@ -1,25 +1,75 @@
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Home from './pages/Home.tsx';
+import Trading from './pages/Trading.tsx';
+import Banking from './pages/Banking.tsx';
+import Governance from './pages/Governance.tsx';
+import SettingsPage from './pages/SettingsPage.tsx';
+import { UnifiedAuthProvider } from './components/auth/UnifiedAuthProvider.tsx';
+import { Toaster } from "@/components/ui/sonner"
+import Transactions from './pages/Transactions.tsx';
+import Notifications from './pages/Notifications.tsx';
+import APITest from "@/pages/APITest";
+import PaymentSuccess from "@/pages/PaymentSuccess";
+import CryptoBank from './pages/CryptoBank.tsx';
 
-import * as React from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
+React.StrictMode
 
-console.log('Main: React imported successfully:', !!React);
-console.log('Main: React version:', React.version);
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <UnifiedAuthProvider><App /></UnifiedAuthProvider>,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/trading",
+        element: <Trading />,
+      },
+      {
+        path: "/banking",
+        element: <Banking />,
+      },
+      {
+        path: "/crypto-bank",
+        element: <CryptoBank />,
+      },
+      {
+        path: "/governance",
+        element: <Governance />,
+      },
+      {
+        path: "/transactions",
+        element: <Transactions />,
+      },
+      {
+        path: "/notifications",
+        element: <Notifications />,
+      },
+      {
+        path: "/settings",
+        element: <SettingsPage />,
+      },
+      {
+        path: "/api-test",
+        element: <APITest />,
+      },
+      {
+        path: "/payment-success",
+        element: <PaymentSuccess />,
+      },
+    ],
+  },
+]);
 
-const rootElement = document.getElementById("root");
-if (!rootElement) {
-  throw new Error("Root element not found");
-}
-
-console.log('Main: Creating React root');
-const root = createRoot(rootElement);
-
-console.log('Main: Rendering App component');
-root.render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-
-console.log('Main: App rendered successfully');
+    <RouterProvider router={router} />
+    <Toaster />
+  </React.StrictMode>,
+)
