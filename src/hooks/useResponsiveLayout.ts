@@ -22,6 +22,7 @@ export const useResponsiveLayout = () => {
   // Guard anti SSR/absence de window
   const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
 
+  // TOUJOURS appeler useState - pas conditionnellement
   const [windowSize, setWindowSize] = useState(() =>
     canUseDOM
       ? { width: window.innerWidth, height: window.innerHeight }

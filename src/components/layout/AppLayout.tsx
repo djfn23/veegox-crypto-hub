@@ -1,3 +1,4 @@
+
 import { ReactNode, useState, useEffect } from "react";
 import { SimplifiedNavigation } from "./SimplifiedNavigation";
 import { MobileHeader } from "./MobileHeader";
@@ -15,18 +16,14 @@ interface AppLayoutProps {
 export const AppLayout = ({ children }: AppLayoutProps) => {
   // Guard: ensure hook only called client-side
   const [isClient, setIsClient] = useState(false);
+  
+  // IMPORTANT: Appeler TOUS les hooks AVANT tout return conditionnel
+  const { isMobile, isTablet } = useResponsiveLayout();
+  const [caughtError, setCaughtError] = useState<null | unknown>(null);
+
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  // IMPORTANT: Appeler TOUS les hooks AVANT tout return conditionnel
-  // Always default non-mobile layout SSR
-  const { isMobile, isTablet } = isClient
-    ? useResponsiveLayout()
-    : { isMobile: false, isTablet: false };
-
-  // State to possibly keep last error for diagnostics/debug
-  const [caughtError, setCaughtError] = useState<null | unknown>(null);
 
   // BLOQUE TOUT RENDU TANT QUE CLIENT PAS PRÊT (évite erreurs hooks Radix/React)
   if (!isClient) {
