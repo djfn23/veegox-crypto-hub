@@ -17,6 +17,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (email: string, password: string, name?: string) => Promise<boolean>;
+  signOut: () => void;
 }
 
 // Valeurs par défaut sécurisées pour le serveur
@@ -27,6 +28,7 @@ const defaultAuthState: AuthContextType = {
   login: async () => false,
   logout: () => {},
   register: async () => false,
+  signOut: () => {},
 };
 
 // Créer le contexte
@@ -99,6 +101,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('user');
   };
 
+  const signOut = () => {
+    logout();
+  };
+
   const register = async (email: string, password: string, name?: string): Promise<boolean> => {
     setLoading(true);
     try {
@@ -128,6 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     register,
+    signOut,
   };
 
   return (
