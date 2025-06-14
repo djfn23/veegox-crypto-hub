@@ -1,10 +1,10 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from "next-themes";
-import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
 import { UnifiedAuthProvider } from '@/components/auth/UnifiedAuthProvider';
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { AlchemySignerContainer } from "@/components/wallet/AlchemySignerContainer";
 import Index from './pages/Index';
@@ -58,15 +58,24 @@ import CreditScore from './pages/credit/CreditScore';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: 2,
       staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
     },
   },
 });
 
+// Global error handler for React Query
+const handleGlobalError = (error: Error) => {
+  console.error('Application Error:', error);
+};
+
 function App() {
   return (
-    <ErrorBoundary>
+    <EnhancedErrorBoundary onError={handleGlobalError}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <UnifiedAuthProvider>
@@ -121,14 +130,13 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               
-              {/* Remplacer le Toaster zustand par uniquement Sonner */}
               <Sonner />
               <AlchemySignerContainer />
             </BrowserRouter>
           </UnifiedAuthProvider>
         </ThemeProvider>
       </QueryClientProvider>
-    </ErrorBoundary>
+    </EnhancedErrorBoundary>
   );
 }
 

@@ -1,58 +1,45 @@
 
-import { useQuery } from "@tanstack/react-query";
-import { Web3Service } from "@/services/web3Service";
+import { useQuery } from '@tanstack/react-query';
+import { Web3Service } from '@/services/web3Service';
 
-export const useTokenBalances = (address: string | null, chainId: number = 1) => {
-  return useQuery({
-    queryKey: ['token-balances', address, chainId],
-    queryFn: () => Web3Service.getTokenBalances(address!, chainId),
-    enabled: !!address,
-    refetchInterval: 30000,
-  });
-};
-
-export const useTokenMetadata = (tokenAddress: string | null, chainId: number = 1) => {
-  return useQuery({
-    queryKey: ['token-metadata', tokenAddress, chainId],
-    queryFn: () => Web3Service.getTokenInfo(tokenAddress!, chainId),
-    enabled: !!tokenAddress,
-    staleTime: 300000, // 5 minutes - metadata doesn't change often
-  });
-};
-
-export const useNFTCollection = (address: string | null, chainId: number = 1) => {
-  return useQuery({
-    queryKey: ['nft-collection', address, chainId],
-    queryFn: () => Web3Service.getNFTsForWallet(address!, chainId),
-    enabled: !!address,
-    refetchInterval: 60000, // 1 minute
-  });
-};
-
-export const useTokenPrices = (tokenAddresses: string[], chainId: number = 1) => {
+export const useTokenPrices = (tokenAddresses: string[], chainId: number = 137) => {
   return useQuery({
     queryKey: ['token-prices', tokenAddresses, chainId],
     queryFn: () => Web3Service.getTokenPrices(tokenAddresses, chainId),
     enabled: tokenAddresses.length > 0,
-    refetchInterval: 30000,
+    staleTime: 1000 * 60 * 1, // 1 minute
   });
 };
 
-export const useWalletAssets = (address: string | null, chainId: number = 1) => {
-  const { data: balanceData, isLoading: isLoadingBalance } = useTokenBalances(address, chainId);
-  const { data: nftData, isLoading: isLoadingNFTs } = useNFTCollection(address, chainId);
-  const { data: ethBalance } = useQuery({
-    queryKey: ['eth-balance', address, chainId],
-    queryFn: () => Web3Service.getWalletBalance(address!, chainId),
-    enabled: !!address,
-  });
-
-  return {
-    assets: {
-      tokens: balanceData?.result || [],
-      nfts: nftData?.result || [],
-      ethBalance: ethBalance?.result?.balance || 0,
+export const useWalletAssets = (address: string | null, chainId: number = 137) => {
+  return useQuery({
+    queryKey: ['wallet-assets', address, chainId],
+    queryFn: async () => {
+      if (!address) return { tokens: [], nfts: [], ethBalance: 0 };
+      
+      // Mock wallet assets data
+      return {
+        tokens: [
+          {
+            address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+            name: 'Wrapped Ethereum',
+            symbol: 'WETH',
+            decimals: 18,
+            balance: '0.5'
+          },
+          {
+            address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+            name: 'USD Coin',
+            symbol: 'USDC',
+            decimals: 6,
+            balance: '1000'
+          }
+        ],
+        nfts: [],
+        ethBalance: Math.random() * 5
+      };
     },
-    isLoading: isLoadingBalance || isLoadingNFTs,
-  };
+    enabled: !!address,
+    staleTime: 1000 * 60 * 3, // 3 minutes
+  });
 };

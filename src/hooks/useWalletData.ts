@@ -1,72 +1,22 @@
 
-import { useQuery } from "@tanstack/react-query";
-import { Web3Service } from "@/services/web3Service";
-import { useAppStore } from "@/store/useAppStore";
+import { useQuery } from '@tanstack/react-query';
+import { Web3Service } from '@/services/web3Service';
 
-export const useWalletBalance = (address: string | null, chainId: number = 1) => {
-  const { setLoading, addNotification } = useAppStore();
-  
+export const useWalletBalance = (address: string | null, chainId: number = 137) => {
   return useQuery({
     queryKey: ['wallet-balance', address, chainId],
-    queryFn: async () => {
-      setLoading('wallets', true);
-      try {
-        const result = await Web3Service.getWalletBalance(address!, chainId);
-        return result;
-      } catch (error) {
-        setLoading('wallets', false);
-        throw error;
-      } finally {
-        setLoading('wallets', false);
-      }
-    },
+    queryFn: () => address ? Web3Service.getWalletBalance(address, chainId) : null,
     enabled: !!address,
-    refetchInterval: 30000,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    refetchInterval: 1000 * 30, // 30 seconds
   });
 };
 
-export const useTransactionHistory = (address: string | null, chainId: number = 1) => {
-  const { setLoading, addNotification } = useAppStore();
-  
+export const useTransactionHistory = (address: string | null, chainId: number = 137) => {
   return useQuery({
     queryKey: ['transaction-history', address, chainId],
-    queryFn: async () => {
-      setLoading('transactions', true);
-      try {
-        const result = await Web3Service.getTransactionHistory(address!, chainId);
-        return result;
-      } catch (error) {
-        setLoading('transactions', false);
-        addNotification({
-          title: 'Erreur de chargement',
-          message: 'Impossible de récupérer l\'historique des transactions',
-          type: 'error',
-          read: false,
-        });
-        throw error;
-      } finally {
-        setLoading('transactions', false);
-      }
-    },
+    queryFn: () => address ? Web3Service.getTransactionHistory(address, chainId) : null,
     enabled: !!address,
-    refetchInterval: 60000,
-  });
-};
-
-export const useWalletAge = (address: string | null, chainId: number = 1) => {
-  return useQuery({
-    queryKey: ['wallet-age', address, chainId],
-    queryFn: () => Web3Service.getWalletAge(address!, chainId),
-    enabled: !!address,
-    staleTime: 300000,
-  });
-};
-
-export const useCreditScoreData = (address: string | null, chainId: number = 1) => {
-  return useQuery({
-    queryKey: ['credit-score-data', address, chainId],
-    queryFn: () => Web3Service.getCreditScoreData(address!, chainId),
-    enabled: !!address,
-    refetchInterval: 300000,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

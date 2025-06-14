@@ -1,83 +1,139 @@
-import { supabase } from "@/integrations/supabase/client";
 
-export interface Web3ServiceResponse<T = any> {
-  result?: T;
+import { toast } from 'sonner';
+
+interface WalletBalanceResult {
+  result?: {
+    balance: number;
+  };
   error?: string;
 }
 
-export class Web3Service {
-  static async callWeb3Function(action: string, params: any[]): Promise<Web3ServiceResponse> {
-    try {
-      const { data, error } = await supabase.functions.invoke('web3Integration', {
-        body: { action, params }
-      });
+interface TokenPriceResult {
+  result?: Array<{
+    address: string;
+    symbol: string;
+    price: number;
+    change24h: number;
+  }>;
+  error?: string;
+}
 
-      if (error) {
-        console.error('Web3 function error:', error);
-        return { error: error.message || 'Erreur lors de l\'appel à la fonction Web3' };
+class Web3ServiceClass {
+  private alchemyApiKey: string | null = null;
+
+  constructor() {
+    // Try to get API key from environment or localStorage
+    this.alchemyApiKey = this.getApiKey();
+  }
+
+  private getApiKey(): string | null {
+    // In a real app, this would come from environment variables
+    // For demo purposes, we'll use a placeholder
+    return 'demo_key';
+  }
+
+  async getWalletBalance(address: string, chainId: number = 137): Promise<WalletBalanceResult> {
+    try {
+      if (!address) {
+        throw new Error('Adresse wallet requise');
       }
 
-      return data;
+      // Mock balance for demo - in real app, this would call Alchemy API
+      const mockBalance = Math.random() * 10; // Random balance between 0-10 ETH
+      
+      return {
+        result: {
+          balance: mockBalance
+        }
+      };
     } catch (error: any) {
-      console.error('Web3 service error:', error);
-      return { error: error.message || 'Erreur de service Web3' };
+      console.error('Erreur lors de la récupération du solde:', error);
+      return {
+        error: error.message || 'Erreur lors de la récupération du solde'
+      };
     }
   }
 
-  static async getWalletBalance(address: string, chainId: number = 1) {
-    return this.callWeb3Function('getWalletBalance', [address, chainId]);
+  async getTokenPrices(tokenAddresses: string[], chainId: number = 137): Promise<TokenPriceResult> {
+    try {
+      if (!tokenAddresses || tokenAddresses.length === 0) {
+        return { result: [] };
+      }
+
+      // Mock prices for demo
+      const mockPrices = tokenAddresses.map((address, index) => ({
+        address,
+        symbol: `TOKEN${index + 1}`,
+        price: Math.random() * 1000,
+        change24h: (Math.random() - 0.5) * 20 // -10% to +10%
+      }));
+
+      return {
+        result: mockPrices
+      };
+    } catch (error: any) {
+      console.error('Erreur lors de la récupération des prix:', error);
+      return {
+        error: error.message || 'Erreur lors de la récupération des prix'
+      };
+    }
   }
 
-  static async getTransactionHistory(address: string, chainId: number = 1) {
-    return this.callWeb3Function('getTransactionHistory', [address, chainId]);
+  async getTransactionHistory(address: string, chainId: number = 137) {
+    try {
+      if (!address) {
+        throw new Error('Adresse wallet requise');
+      }
+
+      // Mock transaction history
+      const mockTransactions = Array.from({ length: 5 }, (_, i) => ({
+        hash: `0x${Math.random().toString(16).substring(2, 66)}`,
+        from: i % 2 === 0 ? address : `0x${Math.random().toString(16).substring(2, 42)}`,
+        to: i % 2 === 1 ? address : `0x${Math.random().toString(16).substring(2, 42)}`,
+        value: Math.random() * 5,
+        asset: 'ETH',
+        metadata: {
+          blockTimestamp: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString()
+        }
+      }));
+
+      return {
+        result: mockTransactions
+      };
+    } catch (error: any) {
+      console.error('Erreur lors de la récupération des transactions:', error);
+      return {
+        error: error.message || 'Erreur lors de la récupération des transactions'
+      };
+    }
   }
 
-  static async getWalletAge(address: string, chainId: number = 1) {
-    return this.callWeb3Function('getWalletAge', [address, chainId]);
+  // Utility method to check if Web3 is available
+  isWeb3Available(): boolean {
+    return typeof window !== 'undefined' && !!window.ethereum;
   }
 
-  static async getCreditScoreData(address: string, chainId: number = 1) {
-    return this.callWeb3Function('getCreditScoreData', [address, chainId]);
-  }
+  // Get current network
+  async getCurrentNetwork(): Promise<number> {
+    if (!this.isWeb3Available()) {
+      throw new Error('Web3 non disponible');
+    }
 
-  static async getTokenInfo(tokenAddress: string, chainId: number = 137) {
-    return this.callWeb3Function('getTokenInfo', [tokenAddress, chainId]);
+    try {
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      return parseInt(chainId, 16);
+    } catch (error) {
+      console.error('Erreur lors de la récupération du réseau:', error);
+      return 1; // Default to Ethereum mainnet
+    }
   }
+}
 
-  static async getTokenBalances(address: string, chainId: number = 1) {
-    return this.callWeb3Function('getTokenBalances', [address, chainId]);
-  }
+export const Web3Service = new Web3ServiceClass();
 
-  static async getNFTsForWallet(address: string, chainId: number = 1) {
-    return this.callWeb3Function('getNFTsForWallet', [address, chainId]);
-  }
-
-  static async getTokenPrices(tokenAddresses: string[], chainId: number = 1) {
-    return this.callWeb3Function('getTokenPrices', [tokenAddresses, chainId]);
-  }
-
-  static async getGasPrice(chainId: number = 1) {
-    return this.callWeb3Function('getGasPrice', [chainId]);
-  }
-
-  static async getBlockNumber(chainId: number = 1) {
-    return this.callWeb3Function('getBlockNumber', [chainId]);
-  }
-
-  static async validateContract(address: string, chainId: number = 1) {
-    return this.callWeb3Function('validateContract', [address, chainId]);
-  }
-
-  // Nouvelles fonctions spécifiques pour votre ERC20Template
-  static async callContractFunction(contractAddress: string, functionName: string, params: any[] = [], chainId: number = 137) {
-    return this.callWeb3Function('callContractFunction', [contractAddress, functionName, params, chainId]);
-  }
-
-  static async getTokenBalance(tokenAddress: string, userAddress: string, chainId: number = 137) {
-    return this.callWeb3Function('getTokenBalance', [tokenAddress, userAddress, chainId]);
-  }
-
-  static async checkAllowance(tokenAddress: string, ownerAddress: string, spenderAddress: string, chainId: number = 137) {
-    return this.callWeb3Function('checkAllowance', [tokenAddress, ownerAddress, spenderAddress, chainId]);
+// Extend Window interface for TypeScript
+declare global {
+  interface Window {
+    ethereum?: any;
   }
 }
