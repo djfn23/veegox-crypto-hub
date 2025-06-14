@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { NavigationBar } from "@/components/home/NavigationBar";
 import { HeroSection } from "@/components/home/HeroSection";
@@ -11,19 +10,16 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import ComprehensiveDashboard from "@/components/ComprehensiveDashboard";
 
 const Index = () => {
-  const [showAuth, setShowAuth] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [showAuth, setShowAuth] = React.useState(false);
+  const [isInitialized, setIsInitialized] = React.useState(false);
   
-  useEffect(() => {
-    // Délai plus court pour l'initialisation
+  React.useEffect(() => {
     const timer = setTimeout(() => {
       setIsInitialized(true);
     }, 50);
-
     return () => clearTimeout(timer);
   }, []);
 
-  // Écran de chargement initial simplifié
   if (!isInitialized) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900 flex items-center justify-center">
@@ -44,7 +40,6 @@ const AuthenticatedApp = ({ showAuth, setShowAuth }: {
 }) => {
   const { isAuthenticated, loading } = useUnifiedAuth();
 
-  // Écran de chargement pour l'authentification
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900 flex items-center justify-center">
@@ -56,7 +51,6 @@ const AuthenticatedApp = ({ showAuth, setShowAuth }: {
     );
   }
 
-  // Interface utilisateur authentifié
   if (isAuthenticated) {
     return (
       <AppLayout>
@@ -65,7 +59,6 @@ const AuthenticatedApp = ({ showAuth, setShowAuth }: {
     );
   }
 
-  // Interface pour utilisateur non authentifié
   const handleLoginClick = () => {
     setShowAuth(true);
   };

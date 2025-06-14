@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -122,8 +121,7 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               
-              {/* Global components avec guards de sécurité */}
-              <Toaster />
+              {/* Remplacer le Toaster zustand par uniquement Sonner */}
               <Sonner />
               <AlchemySignerContainer />
             </BrowserRouter>

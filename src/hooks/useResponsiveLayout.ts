@@ -19,44 +19,37 @@ const defaultWindowSize = { width: 1024, height: 768 };
 const defaultOrientation: Orientation = 'landscape';
 
 export const useResponsiveLayout = () => {
-  const [windowSize, setWindowSize] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      };
-    }
-    return defaultWindowSize;
-  });
+  // Guard anti SSR/absence de window
+  const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
 
-  const [orientation, setOrientation] = useState<Orientation>(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
-    }
-    return defaultOrientation;
-  });
+  const [windowSize, setWindowSize] = useState(() =>
+    canUseDOM
+      ? { width: window.innerWidth, height: window.innerHeight }
+      : defaultWindowSize
+  );
+
+  const [orientation, setOrientation] = useState<Orientation>(() =>
+    canUseDOM
+      ? window.innerWidth > window.innerHeight ? 'landscape' : 'portrait'
+      : defaultOrientation
+  );
 
   useEffect(() => {
-    // Guard de sécurité pour s'assurer que window existe
-    if (typeof window === 'undefined') {
-      return;
-    }
+    if (!canUseDOM) return;
 
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      
+
       setWindowSize({ width, height });
       setOrientation(width > height ? 'landscape' : 'portrait');
     };
 
-    // Appel initial pour définir les valeurs
     handleResize();
-    
     window.addEventListener('resize', handleResize);
-    
+
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [canUseDOM]);
 
   const getCurrentBreakpoint = (): BreakpointKey => {
     const width = windowSize.width;
