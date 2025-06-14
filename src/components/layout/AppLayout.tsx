@@ -4,6 +4,7 @@ import { SimplifiedNavigation } from "./SimplifiedNavigation";
 import { MobileHeader } from "./MobileHeader";
 import { MobileBottomNavigation } from "./MobileBottomNavigation";
 import { UserMenu } from "./UserMenu";
+import { PWAInstallPrompt } from "@/components/ui/pwa-install-prompt";
 import { texts } from "@/lib/constants/texts";
 import { Badge } from "@/components/ui/badge";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
@@ -17,6 +18,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
+      
       {/* Mobile Header */}
       <MobileHeader />
       
