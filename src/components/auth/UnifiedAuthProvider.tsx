@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import * as React from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -25,10 +24,10 @@ interface UnifiedAuthContextType {
   isAuthenticated: boolean;
 }
 
-const UnifiedAuthContext = createContext<UnifiedAuthContextType | undefined>(undefined);
+const UnifiedAuthContext = React.createContext<UnifiedAuthContextType | undefined>(undefined);
 
 export const useUnifiedAuth = () => {
-  const context = useContext(UnifiedAuthContext);
+  const context = React.useContext(UnifiedAuthContext);
   if (!context) {
     throw new Error('useUnifiedAuth must be used within UnifiedAuthProvider');
   }
@@ -36,15 +35,21 @@ export const useUnifiedAuth = () => {
 };
 
 interface UnifiedAuthProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Safety check for React availability
+  if (!React || !React.useState || !React.useEffect) {
+    console.error('React hooks are not available in UnifiedAuthProvider');
+    return <div>Loading...</div>;
+  }
 
-  useEffect(() => {
+  const [user, setUser] = React.useState<AuthUser | null>(null);
+  const [session, setSession] = React.useState<Session | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
     let mounted = true;
 
     // Set up Supabase auth state listener
