@@ -1,8 +1,11 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import * as React from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+
+console.log('UnifiedAuthProvider: Module loading with React:', !!React);
 
 interface AuthUser {
   id: string;
@@ -40,19 +43,30 @@ interface UnifiedAuthProviderProps {
 }
 
 export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ children }) => {
+  console.log('UnifiedAuthProvider: Component initializing with React hooks');
+  
+  // Ensure React is available before using hooks
+  if (!React || !React.useState) {
+    console.error('UnifiedAuthProvider: React or React.useState is not available');
+    throw new Error('React is not properly initialized');
+  }
+
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  console.log('UnifiedAuthProvider: State initialized successfully');
+
   useEffect(() => {
     let mounted = true;
+    console.log('UnifiedAuthProvider: Setting up auth state listener');
 
     // Set up Supabase auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
         
-        console.log('Auth event:', event, 'Session:', session?.user?.email);
+        console.log('UnifiedAuthProvider: Auth event:', event, 'Session:', session?.user?.email);
         setSession(session);
         
         if (session?.user) {
@@ -74,6 +88,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       
+      console.log('UnifiedAuthProvider: Retrieved existing session:', !!session);
       setSession(session);
       if (session?.user) {
         setUser({
@@ -85,13 +100,14 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
       }
       setLoading(false);
     }).catch((error) => {
-      console.error('Error getting session:', error);
+      console.error('UnifiedAuthProvider: Error getting session:', error);
       if (mounted) {
         setLoading(false);
       }
     });
 
     return () => {
+      console.log('UnifiedAuthProvider: Cleanup');
       mounted = false;
       subscription.unsubscribe();
     };
@@ -99,6 +115,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
+      console.log('UnifiedAuthProvider: Signing in with email:', email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -111,13 +128,14 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
 
       toast.success('Connexion réussie!');
     } catch (error) {
-      console.error('Sign in error:', error);
+      console.error('UnifiedAuthProvider: Sign in error:', error);
       throw error;
     }
   };
 
   const signUpWithEmail = async (email: string, password: string) => {
     try {
+      console.log('UnifiedAuthProvider: Signing up with email:', email);
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -133,23 +151,24 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
 
       toast.success('Inscription réussie! Vérifiez votre email.');
     } catch (error) {
-      console.error('Sign up error:', error);
+      console.error('UnifiedAuthProvider: Sign up error:', error);
       throw error;
     }
   };
 
   const signInWithWallet = async (walletId: string) => {
     try {
-      console.log('Wallet sign in requested for:', walletId);
+      console.log('UnifiedAuthProvider: Wallet sign in requested for:', walletId);
       toast.success('Connexion wallet en cours...');
     } catch (error) {
-      console.error('Wallet sign in error:', error);
+      console.error('UnifiedAuthProvider: Wallet sign in error:', error);
       toast.error('Erreur de connexion wallet');
     }
   };
 
   const signOut = async () => {
     try {
+      console.log('UnifiedAuthProvider: Signing out');
       if (session) {
         await supabase.auth.signOut();
       }
@@ -157,7 +176,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
       setSession(null);
       toast.success('Déconnexion réussie');
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error('UnifiedAuthProvider: Sign out error:', error);
     }
   };
 
@@ -171,6 +190,8 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
     signOut,
     isAuthenticated: !!user
   };
+
+  console.log('UnifiedAuthProvider: Rendering context provider');
 
   return (
     <UnifiedAuthContext.Provider value={value}>
