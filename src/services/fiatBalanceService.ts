@@ -108,11 +108,13 @@ export class FiatBalanceService {
 
     if (txError) throw txError;
 
-    // Update balance
-    const { error: balanceError } = await supabase.rpc('update_fiat_balance', {
-      p_user_id: userId,
-      p_currency: currency,
-      p_amount: amount
+    // Update balance using edge function
+    const { error: balanceError } = await supabase.functions.invoke('update-fiat-balance', {
+      body: {
+        user_id: userId,
+        currency: currency,
+        amount: amount
+      }
     });
 
     if (balanceError) throw balanceError;
@@ -178,7 +180,7 @@ export class FiatBalanceService {
         crypto_symbol: cryptoSymbol,
         crypto_token_address: this.getTokenAddress(cryptoSymbol),
         exchange_rate: cryptoRate,
-        status: 'pending',
+        status: 'pending' as const,
         fees
       })
       .select()
@@ -189,7 +191,7 @@ export class FiatBalanceService {
     // Process the purchase
     await this.processCryptoPurchase(purchase.id);
 
-    return purchase;
+    return purchase as CryptoPurchase;
   }
 
   // Process crypto purchase
@@ -208,10 +210,10 @@ export class FiatBalanceService {
         .from('fiat_transactions')
         .insert({
           user_id: purchase.user_id,
-          transaction_type: 'crypto_purchase',
+          transaction_type: 'crypto_purchase' as const,
           amount: -purchase.fiat_amount,
           currency: purchase.fiat_currency,
-          status: 'completed',
+          status: 'completed' as const,
           reference_id: purchase.id,
           description: `Achat de ${purchase.crypto_amount} ${purchase.crypto_symbol}`,
           completed_at: new Date().toISOString()
@@ -219,11 +221,13 @@ export class FiatBalanceService {
 
       if (txError) throw txError;
 
-      // Update fiat balance
-      await supabase.rpc('update_fiat_balance', {
-        p_user_id: purchase.user_id,
-        p_currency: purchase.fiat_currency,
-        p_amount: -purchase.fiat_amount
+      // Update fiat balance using edge function
+      await supabase.functions.invoke('update-fiat-balance', {
+        body: {
+          user_id: purchase.user_id,
+          currency: purchase.fiat_currency,
+          amount: -purchase.fiat_amount
+        }
       });
 
       // Update user portfolio
@@ -244,7 +248,7 @@ export class FiatBalanceService {
       await supabase
         .from('crypto_purchases')
         .update({
-          status: 'completed',
+          status: 'completed' as const,
           completed_at: new Date().toISOString()
         })
         .eq('id', purchaseId);
@@ -253,7 +257,7 @@ export class FiatBalanceService {
       // Mark purchase as failed
       await supabase
         .from('crypto_purchases')
-        .update({ status: 'failed' })
+        .update({ status: 'failed' as const })
         .eq('id', purchaseId);
       
       throw error;
@@ -270,7 +274,7 @@ export class FiatBalanceService {
       .limit(limit);
 
     if (error) throw error;
-    return data || [];
+    return (data || []) as CryptoPurchase[];
   }
 
   // Get user's fiat transactions
@@ -283,7 +287,7 @@ export class FiatBalanceService {
       .limit(limit);
 
     if (error) throw error;
-    return data || [];
+    return (data || []) as FiatTransaction[];
   }
 
   // Helper methods
