@@ -1,171 +1,99 @@
 
 import { Web3Service } from './web3Service';
 
-export interface ContractConfig {
-  address: string;
-  chainId: number;
-  abi?: any[];
+export interface ContractInfo {
+  tokenInfo: {
+    name: string;
+    symbol: string;
+    decimals: number;
+    totalSupply: string;
+    taxFee: number;
+    isAirdrop: boolean;
+  };
+  isContract: boolean;
+  contractType?: string;
+}
+
+export interface ContractValidationResult {
+  result?: ContractInfo;
+  error?: string;
 }
 
 export class ContractService {
-  private static readonly MAIN_CONTRACT: ContractConfig = {
-    address: '0xF3E1D80dA667D50641f0110F2Bb70882cd16343E',
-    chainId: 137, // Polygon Mainnet
-    abi: [
-      // Fonctions principales de votre ERC20Template
-      "function name() view returns (string)",
-      "function symbol() view returns (string)",
-      "function decimals() view returns (uint8)",
-      "function totalSupply() view returns (uint256)",
-      "function balanceOf(address account) view returns (uint256)",
-      "function transfer(address to, uint256 amount) returns (bool)",
-      "function allowance(address owner, address spender) view returns (uint256)",
-      "function approve(address spender, uint256 amount) returns (bool)",
-      "function transferFrom(address from, address to, uint256 amount) returns (bool)",
-      
-      // Fonctions spécifiques à votre contrat
-      "function owner() view returns (address)",
-      "function initialSupply() view returns (uint256)",
-      "function taxFee() view returns (uint256)",
-      "function taxAddress() view returns (address)",
-      "function isAirdrop() view returns (bool)",
-      "function blackList(address) view returns (bool)",
-      "function noTaxable(address) view returns (bool)",
-      "function isAntibotGlobalExemption(address) view returns (bool)",
-      "function isAntiwhaleGlobalExemption(address) view returns (bool)",
-      "function getOwner() view returns (address)",
-      
-      // Fonctions de gestion (owner only)
-      "function setNotTaxable(address _address, bool _taxable)",
-      "function setBlackList(address _address, bool _blackList)",
-      "function setTaxAddress(address _taxAddress)",
-      "function releaseAirdropMode()",
-      "function releaseAntibotGlobalExemption(address _address)",
-      "function releaseAntiwhaleGlobalExemption(address _address)",
-      "function pause()",
-      "function unpause()",
-      "function burn(uint256 amount)",
-      
-      // Événements
-      "event Transfer(address indexed from, address indexed to, uint256 value)",
-      "event Approval(address indexed owner, address indexed spender, uint256 value)",
-      "event Paused(address account)",
-      "event Unpaused(address account)"
-    ]
-  };
-
-  // Obtenir les informations du contrat principal
-  static async getMainContractInfo() {
-    const validation = await Web3Service.validateContract(
-      this.MAIN_CONTRACT.address, 
-      this.MAIN_CONTRACT.chainId
-    );
-    
-    if (validation.result?.isContract) {
-      // Obtenir les informations du token
-      const [name, symbol, decimals, totalSupply, taxFee, isAirdrop] = await Promise.all([
-        this.callContractFunction('name'),
-        this.callContractFunction('symbol'),
-        this.callContractFunction('decimals'),
-        this.callContractFunction('totalSupply'),
-        this.callContractFunction('taxFee'),
-        this.callContractFunction('isAirdrop')
-      ]);
+  static async getMainContractInfo(): Promise<ContractValidationResult> {
+    try {
+      // Mock contract info for demo
+      const contractInfo: ContractInfo = {
+        tokenInfo: {
+          name: 'Veegox Token',
+          symbol: 'VEEGOX',
+          decimals: 18,
+          totalSupply: '1000000000000000000000000',
+          taxFee: 5,
+          isAirdrop: false
+        },
+        isContract: true,
+        contractType: 'ERC20'
+      };
 
       return {
-        ...validation.result,
-        tokenInfo: {
-          name: name.result,
-          symbol: symbol.result,
-          decimals: decimals.result,
-          totalSupply: totalSupply.result,
-          taxFee: taxFee.result,
-          isAirdrop: isAirdrop.result
-        }
+        result: contractInfo
+      };
+    } catch (error: any) {
+      console.error('Error fetching contract info:', error);
+      return {
+        error: error.message || 'Error fetching contract info'
       };
     }
-    
-    return validation;
   }
 
-  // Appeler une fonction du contrat principal
-  static async callContractFunction(functionName: string, params: any[] = []) {
-    return await Web3Service.callWeb3Function('callContractFunction', [
-      this.MAIN_CONTRACT.address,
-      functionName,
-      params,
-      this.MAIN_CONTRACT.chainId
-    ]);
+  static async getUserBalance(address: string): Promise<{ result?: string; error?: string }> {
+    try {
+      const balanceResult = await Web3Service.getWalletBalance(address, 137);
+      return {
+        result: balanceResult.result?.balance?.toString() || '0'
+      };
+    } catch (error: any) {
+      console.error('Error fetching user balance:', error);
+      return {
+        error: error.message || 'Error fetching user balance'
+      };
+    }
   }
 
-  // Obtenir le solde d'un utilisateur pour le token
-  static async getUserBalance(userAddress: string) {
-    return await this.callContractFunction('balanceOf', [userAddress]);
+  static async validateContract(address: string, chainId: number = 137) {
+    try {
+      const validation = await Web3Service.validateContract(address, chainId);
+      return validation;
+    } catch (error: any) {
+      console.error('Error validating contract:', error);
+      return {
+        error: error.message || 'Error validating contract'
+      };
+    }
   }
 
-  // Vérifier si une adresse est dans la blacklist
-  static async isBlacklisted(address: string) {
-    return await this.callContractFunction('blackList', [address]);
+  static async executeContractFunction(functionName: string, params: any[]) {
+    try {
+      const result = await Web3Service.callWeb3Function(functionName, params);
+      return result;
+    } catch (error: any) {
+      console.error('Error executing contract function:', error);
+      return {
+        error: error.message || 'Error executing contract function'
+      };
+    }
   }
 
-  // Vérifier si une adresse est exemptée de taxes
-  static async isNotTaxable(address: string) {
-    return await this.callContractFunction('noTaxable', [address]);
-  }
-
-  // Vérifier les exemptions anti-bot
-  static async isAntibotExempt(address: string) {
-    return await this.callContractFunction('isAntibotGlobalExemption', [address]);
-  }
-
-  // Vérifier les exemptions anti-whale
-  static async isAntiwhaleExempt(address: string) {
-    return await this.callContractFunction('isAntiwhaleGlobalExemption', [address]);
-  }
-
-  // Obtenir l'allowance
-  static async getAllowance(owner: string, spender: string) {
-    return await this.callContractFunction('allowance', [owner, spender]);
-  }
-
-  // Obtenir les événements du contrat
-  static async getContractEvents(fromBlock: string = 'latest', toBlock: string = 'latest') {
-    return await Web3Service.callWeb3Function('getContractEvents', [
-      this.MAIN_CONTRACT.address,
-      fromBlock,
-      toBlock,
-      this.MAIN_CONTRACT.chainId
-    ]);
-  }
-
-  // Configuration du contrat principal
-  static getMainContractConfig(): ContractConfig {
-    return this.MAIN_CONTRACT;
-  }
-
-  // Fonctions de transaction (nécessitent une signature wallet)
-  static async transfer(to: string, amount: string) {
-    return await this.callContractFunction('transfer', [to, amount]);
-  }
-
-  static async approve(spender: string, amount: string) {
-    return await this.callContractFunction('approve', [spender, amount]);
-  }
-
-  static async burn(amount: string) {
-    return await this.callContractFunction('burn', [amount]);
-  }
-
-  // Fonctions de gestion (owner only)
-  static async setNotTaxable(address: string, taxable: boolean) {
-    return await this.callContractFunction('setNotTaxable', [address, taxable]);
-  }
-
-  static async setBlackList(address: string, blacklisted: boolean) {
-    return await this.callContractFunction('setBlackList', [address, blacklisted]);
-  }
-
-  static async releaseAirdropMode() {
-    return await this.callContractFunction('releaseAirdropMode');
+  static async stakeTokens(amount: string, duration: number, address: string) {
+    try {
+      const result = await Web3Service.callWeb3Function('stake', [amount, duration, address]);
+      return result;
+    } catch (error: any) {
+      console.error('Error staking tokens:', error);
+      return {
+        error: error.message || 'Error staking tokens'
+      };
+    }
   }
 }

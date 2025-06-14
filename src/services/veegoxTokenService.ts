@@ -28,13 +28,14 @@ export class VeegoxTokenService {
       const contractInfo = await ContractService.getMainContractInfo();
       
       if (contractInfo?.result?.tokenInfo) {
+        const tokenInfo = contractInfo.result.tokenInfo;
         return {
-          name: contractInfo.result.tokenInfo.name || this.VEEGOX_CONFIG.name,
-          symbol: contractInfo.result.tokenInfo.symbol || this.VEEGOX_CONFIG.symbol,
-          decimals: contractInfo.result.tokenInfo.decimals || this.VEEGOX_CONFIG.decimals,
-          totalSupply: contractInfo.result.tokenInfo.totalSupply || '0',
-          taxFee: contractInfo.result.tokenInfo.taxFee || 0,
-          isAirdrop: contractInfo.result.tokenInfo.isAirdrop || false,
+          name: tokenInfo.name || this.VEEGOX_CONFIG.name,
+          symbol: tokenInfo.symbol || this.VEEGOX_CONFIG.symbol,
+          decimals: tokenInfo.decimals || this.VEEGOX_CONFIG.decimals,
+          totalSupply: tokenInfo.totalSupply || '0',
+          taxFee: tokenInfo.taxFee || 0,
+          isAirdrop: tokenInfo.isAirdrop || false,
           contractAddress: this.VEEGOX_CONFIG.address,
           chainId: this.VEEGOX_CONFIG.chainId
         };
