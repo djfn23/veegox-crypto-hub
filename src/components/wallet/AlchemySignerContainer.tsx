@@ -2,25 +2,15 @@
 import React, { useEffect } from 'react';
 
 export const AlchemySignerContainer = () => {
-  console.log('AlchemySignerContainer: Component initializing');
-
   useEffect(() => {
-    console.log('AlchemySignerContainer: useEffect triggered');
-    
-    // Guard de sécurité pour s'assurer que document existe
     if (typeof document === 'undefined') {
-      console.log('AlchemySignerContainer: Document not available (SSR)');
       return;
     }
 
-    console.log('AlchemySignerContainer: Setting up iframe container');
-
-    // S'assurer que le container iframe existe pour Alchemy Signer
     const containerId = 'alchemy-signer-iframe-container';
     let container = document.getElementById(containerId);
     
     if (!container) {
-      console.log('AlchemySignerContainer: Creating new container');
       container = document.createElement('div');
       container.id = containerId;
       container.style.position = 'fixed';
@@ -31,13 +21,9 @@ export const AlchemySignerContainer = () => {
       container.style.zIndex = '9999';
       container.style.pointerEvents = 'none';
       document.body.appendChild(container);
-    } else {
-      console.log('AlchemySignerContainer: Container already exists');
     }
 
     return () => {
-      console.log('AlchemySignerContainer: Cleanup');
-      // Cleanup avec guard de sécurité
       if (typeof document !== 'undefined') {
         const existingContainer = document.getElementById(containerId);
         if (existingContainer && existingContainer.parentNode) {
@@ -47,6 +33,5 @@ export const AlchemySignerContainer = () => {
     };
   }, []);
 
-  console.log('AlchemySignerContainer: Rendering null component');
   return null;
 };
