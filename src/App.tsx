@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { UnifiedAuthProvider } from '@/components/auth/UnifiedAuthProvider';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { AlchemySignerContainer } from "@/components/wallet/AlchemySignerContainer";
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 
@@ -118,6 +121,11 @@ function App() {
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              
+              {/* Global components avec guards de sécurité */}
+              <Toaster />
+              <Sonner />
+              <AlchemySignerContainer />
             </BrowserRouter>
           </UnifiedAuthProvider>
         </ThemeProvider>

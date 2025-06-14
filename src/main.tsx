@@ -9,6 +9,11 @@ if (!rootElement) {
   throw new Error("Root element not found");
 }
 
+// S'assurer que React est disponible globalement
+if (typeof window !== 'undefined') {
+  (window as any).React = React;
+}
+
 const root = createRoot(rootElement);
 
 root.render(

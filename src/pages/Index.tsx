@@ -15,19 +15,21 @@ const Index = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   
   useEffect(() => {
+    // Délai plus court pour l'initialisation
     const timer = setTimeout(() => {
       setIsInitialized(true);
-    }, 100);
+    }, 50);
 
     return () => clearTimeout(timer);
   }, []);
 
+  // Écran de chargement initial simplifié
   if (!isInitialized) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900 flex items-center justify-center">
         <div className="text-white text-lg flex items-center gap-2">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-          Chargement...
+          Initialisation...
         </div>
       </div>
     );
@@ -42,6 +44,7 @@ const AuthenticatedApp = ({ showAuth, setShowAuth }: {
 }) => {
   const { isAuthenticated, loading } = useUnifiedAuth();
 
+  // Écran de chargement pour l'authentification
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900 flex items-center justify-center">
@@ -53,6 +56,7 @@ const AuthenticatedApp = ({ showAuth, setShowAuth }: {
     );
   }
 
+  // Interface utilisateur authentifié
   if (isAuthenticated) {
     return (
       <AppLayout>
@@ -61,6 +65,7 @@ const AuthenticatedApp = ({ showAuth, setShowAuth }: {
     );
   }
 
+  // Interface pour utilisateur non authentifié
   const handleLoginClick = () => {
     setShowAuth(true);
   };

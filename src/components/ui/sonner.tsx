@@ -1,12 +1,12 @@
 
 import React from "react";
 import { Toaster as Sonner, toast } from "sonner";
-import { useAppStore } from "@/store/useAppStore";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme } = useAppStore();
+  // Utilisation d'un thème par défaut sécurisé
+  const theme = 'dark';
 
   return (
     <Sonner
