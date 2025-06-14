@@ -1,6 +1,6 @@
+
 import { useState, useCallback } from 'react';
-import { oneInchService } from '@/services/oneInchService';
-import { SwapService } from '@/services/swapService';
+import { useAPIIntegration } from '@/hooks/useAPIIntegration';
 import { useSwapTransactions } from '@/hooks/useSwapTransactions';
 import { useUserPortfolio } from '@/hooks/useUserPortfolio';
 import { useUnifiedAuth } from '@/components/auth/UnifiedAuthProvider';
@@ -10,6 +10,7 @@ export const useSwapQuote = () => {
   const [quote, setQuote] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { executeSwap } = useAPIIntegration();
   const { createTransaction, updateTransaction } = useSwapTransactions();
   const { updatePortfolio } = useUserPortfolio();
   const { user } = useUnifiedAuth();
@@ -25,7 +26,8 @@ export const useSwapQuote = () => {
     setError(null);
 
     try {
-      const quoteData = await oneInchService.getQuote(fromToken, toToken, amount);
+      // Use the new API integration service for quotes
+      const { quote: quoteData } = await executeSwap(fromToken, toToken, amount, '', 1);
       setQuote(quoteData);
     } catch (error: any) {
       setError(error.message);
@@ -33,9 +35,9 @@ export const useSwapQuote = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [executeSwap]);
 
-  const executeSwap = useCallback(async (
+  const executeSwapTransaction = useCallback(async (
     fromToken: string,
     toToken: string,
     amount: string,
@@ -51,7 +53,7 @@ export const useSwapQuote = () => {
     setError(null);
 
     try {
-      // Créer la transaction en base de données
+      // Create transaction record
       const transaction = await createTransaction.mutateAsync({
         from_token_address: fromToken,
         to_token_address: toToken,
@@ -63,24 +65,18 @@ export const useSwapQuote = () => {
         protocol_used: '1inch'
       });
 
-      // Obtenir les données de swap de 1inch
-      const swapData = await oneInchService.getSwap(
-        fromToken,
-        toToken,
-        amount,
-        userAddress,
-        slippage
-      );
+      // Execute swap using new API integration
+      const { swapData } = await executeSwap(fromToken, toToken, amount, userAddress, slippage);
 
       if (swapData && window.ethereum && transaction) {
         try {
-          // Exécuter la transaction sur la blockchain
+          // Execute blockchain transaction
           const txHash = await window.ethereum.request({
             method: 'eth_sendTransaction',
             params: [swapData.tx],
           });
 
-          // Mettre à jour la transaction avec le hash
+          // Update transaction with hash
           await updateTransaction.mutateAsync({
             id: transaction.id!,
             updates: {
@@ -90,9 +86,8 @@ export const useSwapQuote = () => {
             }
           });
 
-          // Mettre à jour le portfolio
+          // Update portfolio
           if (quote?.fromToken && quote?.toToken) {
-            // Déduire le token source
             await updatePortfolio.mutateAsync({
               token_address: fromToken,
               token_symbol: quote.fromToken.symbol,
@@ -100,7 +95,6 @@ export const useSwapQuote = () => {
               balance: -parseFloat(amount)
             });
 
-            // Ajouter le token de destination
             await updatePortfolio.mutateAsync({
               token_address: toToken,
               token_symbol: quote.toToken.symbol,
@@ -112,7 +106,6 @@ export const useSwapQuote = () => {
           toast.success('Swap exécuté avec succès!');
           return txHash;
         } catch (txError: any) {
-          // Marquer la transaction comme échouée
           await updateTransaction.mutateAsync({
             id: transaction.id!,
             updates: { status: 'failed' }
@@ -126,13 +119,13 @@ export const useSwapQuote = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [quote, user, createTransaction, updateTransaction, updatePortfolio]);
+  }, [quote, user, createTransaction, updateTransaction, updatePortfolio, executeSwap]);
 
   return {
     quote,
     isLoading,
     error,
     getQuote,
-    executeSwap
+    executeSwap: executeSwapTransaction
   };
 };
