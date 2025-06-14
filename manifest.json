@@ -1,0 +1,172 @@
+{
+  "name": "CryptoFlow",
+  "short_name": "CryptoFlow",
+  "description": "Une plateforme complète pour la gestion des cryptomonnaies, le crowdfunding, la place de marché NFT, la création de jetons et les fonctionnalités IA",
+  "start_url": "/?source=pwa",
+  "id": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "browser"
+  ],
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "any",
+  "categories": [
+    "finance",
+    "cryptocurrency",
+    "blockchain",
+    "business",
+    "utilities"
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "CryptoFlow Dashboard"
+    },
+    {
+      "src": "/screenshots/screenshot2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "CryptoFlow Wallet"
+    },
+    {
+      "src": "/screenshots/screenshot3.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "CryptoFlow Mobile View"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Wallet",
+      "url": "/wallet",
+      "description": "Accédez à votre portefeuille de cryptomonnaies"
+    },
+    {
+      "name": "Marketplace",
+      "url": "/marketplace",
+      "description": "Parcourir la place de marché NFT"
+    },
+    {
+      "name": "Crowdfunding",
+      "url": "/crowdfunding",
+      "description": "Explorer les projets de crowdfunding"
+    },
+    {
+      "name": "Création de jetons",
+      "url": "/token-creation",
+      "description": "Créer vos propres jetons"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icons/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/favicon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "handle_links": "preferred",
+  "scope": "/",
+  "lang": "fr",
+  "dir": "ltr",
+  "share_target": {
+    "action": "/share-target",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "file_handlers": [
+    {
+      "action": "/open-file",
+      "accept": {
+        "application/json": [
+          ".json"
+        ]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+crypto",
+      "url": "/protocol?url=%s"
+    }
+  ],
+  "screenshots_with_dark": [
+    {
+      "src": "/screenshots/dark-screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "CryptoFlow Dashboard Dark Mode",
+      "form_factor": "wide"
+    }
+  ],
+  "capture_links": "new-client",
+  "features": [
+    "Gestion de portefeuille crypto",
+    "Échange de cryptomonnaies",
+    "Création de jetons personnalisés",
+    "Plateforme de crowdfunding",
+    "Marché NFT",
+    "IA pour analyse de crypto"
+  ],
+  "permissions_policy": {
+    "geolocation": [
+      "self"
+    ],
+    "camera": [
+      "self"
+    ],
+    "microphone": [
+      "self"
+    ]
+  },
+  "note": "Cette version inclut des améliorations de performance et de nouvelles fonctionnalités"
+}
