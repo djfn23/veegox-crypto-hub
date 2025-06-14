@@ -42,16 +42,35 @@ interface UnifiedAuthProviderProps {
 }
 
 export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ children }) => {
+  // Initialize state with proper error handling
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const { connectWallet, connectedWallets, disconnectAllWallets } = useAlchemyWallet();
+  // Initialize wallet hook with error handling
+  let connectWallet: any;
+  let connectedWallets: any[] = [];
+  let disconnectAllWallets: any;
+
+  try {
+    const walletHook = useAlchemyWallet();
+    connectWallet = walletHook.connectWallet;
+    connectedWallets = walletHook.connectedWallets || [];
+    disconnectAllWallets = walletHook.disconnectAllWallets;
+  } catch (error) {
+    console.error('Error initializing wallet hook:', error);
+    connectWallet = async () => {};
+    disconnectAllWallets = async () => {};
+  }
 
   useEffect(() => {
+    let mounted = true;
+
     // Set up Supabase auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
+        
         console.log('Auth event:', event, 'Session:', session?.user?.email);
         setSession(session);
         
@@ -72,6 +91,8 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      
       setSession(session);
       if (session?.user) {
         setUser({
@@ -84,7 +105,10 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [connectedWallets]);
 
   // Update user when wallets change
@@ -105,52 +129,77 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
   }, [connectedWallets, session]);
 
   const signInWithEmail = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      toast.error('Erreur de connexion: ' + error.message);
+      if (error) {
+        toast.error('Erreur de connexion: ' + error.message);
+        throw error;
+      }
+
+      toast.success('Connexion réussie!');
+    } catch (error) {
+      console.error('Sign in error:', error);
       throw error;
     }
-
-    toast.success('Connexion réussie!');
   };
 
   const signUpWithEmail = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`
-      }
-    });
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`
+        }
+      });
 
-    if (error) {
-      toast.error('Erreur d\'inscription: ' + error.message);
+      if (error) {
+        toast.error('Erreur d\'inscription: ' + error.message);
+        throw error;
+      }
+
+      toast.success('Inscription réussie! Vérifiez votre email.');
+    } catch (error) {
+      console.error('Sign up error:', error);
       throw error;
     }
-
-    toast.success('Inscription réussie! Vérifiez votre email.');
   };
 
   const signInWithWallet = async (walletId: string) => {
-    await disconnectAllWallets(); // Clear existing connections
-    const wallet = await connectWallet(walletId);
-    if (wallet) {
-      toast.success('Connexion wallet réussie!');
+    try {
+      if (disconnectAllWallets) {
+        await disconnectAllWallets(); // Clear existing connections
+      }
+      if (connectWallet) {
+        const wallet = await connectWallet(walletId);
+        if (wallet) {
+          toast.success('Connexion wallet réussie!');
+        }
+      }
+    } catch (error) {
+      console.error('Wallet sign in error:', error);
+      toast.error('Erreur de connexion wallet');
     }
   };
 
   const signOut = async () => {
-    if (session) {
-      await supabase.auth.signOut();
+    try {
+      if (session) {
+        await supabase.auth.signOut();
+      }
+      if (disconnectAllWallets) {
+        await disconnectAllWallets();
+      }
+      setUser(null);
+      setSession(null);
+      toast.success('Déconnexion réussie');
+    } catch (error) {
+      console.error('Sign out error:', error);
     }
-    await disconnectAllWallets();
-    setUser(null);
-    setSession(null);
-    toast.success('Déconnexion réussie');
   };
 
   const value: UnifiedAuthContextType = {

@@ -7,7 +7,6 @@ import { Toaster as Sonner } from '@/components/ui/sonner';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import { AlchemySignerContainer } from '@/components/wallet/AlchemySignerContainer';
-import { UnifiedAuthProvider } from '@/components/auth/UnifiedAuthProvider';
 
 // Import existing pages
 import Analytics from './pages/Analytics';
@@ -67,62 +66,60 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <UnifiedAuthProvider>
-          <BrowserRouter>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              {/* Main routes */}
-              <Route path="/" element={<Index />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/staking" element={<Staking />} />
-              <Route path="/trading" element={<Trading />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/community" element={<Community />} />
-              <Route path="/portfolio" element={<Portfolio />} />
-              <Route path="/tokens" element={<Tokens />} />
-              <Route path="/credit" element={<Credit />} />
-              <Route path="/crowdfunding" element={<Crowdfunding />} />
-              <Route path="/crypto-bank" element={<CryptoBankPage />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/wallet" element={<Wallet />} />
-              <Route path="/ai-assistant" element={<AIAssistant />} />
-              
-              {/* New main pages */}
-              <Route path="/help" element={<Help />} />
-              <Route path="/security" element={<Security />} />
-              <Route path="/yield-farming" element={<YieldFarming />} />
-              <Route path="/bridge" element={<Bridge />} />
-              <Route path="/governance" element={<Governance />} />
-              
-              {/* Crowdfunding sub-routes */}
-              <Route path="/crowdfunding/create" element={<CreateCrowdfundingCampaign />} />
-              <Route path="/crowdfunding/campaigns" element={<CrowdfundingCampaigns />} />
-              <Route path="/crowdfunding/featured" element={<CrowdfundingFeatured />} />
-              <Route path="/crowdfunding/trending" element={<CrowdfundingTrending />} />
-              <Route path="/crowdfunding/my-campaigns" element={<MyCampaigns />} />
-              <Route path="/crowdfunding/my-contributions" element={<MyContributions />} />
-              
-              {/* Tokens sub-routes */}
-              <Route path="/tokens/create" element={<CreateToken />} />
-              <Route path="/tokens/analytics" element={<TokenAnalytics />} />
-              <Route path="/tokens/manage" element={<ManageTokens />} />
-              <Route path="/tokens/marketplace" element={<TokenMarketplace />} />
-              
-              {/* Trading sub-routes */}
-              <Route path="/trading/spot" element={<TradingSpot />} />
-              <Route path="/trading/futures" element={<TradingFutures />} />
-              <Route path="/trading/options" element={<TradingOptions />} />
-              
-              {/* Credit sub-routes */}
-              <Route path="/credit/score" element={<CreditScore />} />
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <AlchemySignerContainer />
-          </BrowserRouter>
-        </UnifiedAuthProvider>
+        <BrowserRouter>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            {/* Main routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/staking" element={<Staking />} />
+            <Route path="/trading" element={<Trading />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/tokens" element={<Tokens />} />
+            <Route path="/credit" element={<Credit />} />
+            <Route path="/crowdfunding" element={<Crowdfunding />} />
+            <Route path="/crypto-bank" element={<CryptoBankPage />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/wallet" element={<Wallet />} />
+            <Route path="/ai-assistant" element={<AIAssistant />} />
+            
+            {/* New main pages */}
+            <Route path="/help" element={<Help />} />
+            <Route path="/security" element={<Security />} />
+            <Route path="/yield-farming" element={<YieldFarming />} />
+            <Route path="/bridge" element={<Bridge />} />
+            <Route path="/governance" element={<Governance />} />
+            
+            {/* Crowdfunding sub-routes */}
+            <Route path="/crowdfunding/create" element={<CreateCrowdfundingCampaign />} />
+            <Route path="/crowdfunding/campaigns" element={<CrowdfundingCampaigns />} />
+            <Route path="/crowdfunding/featured" element={<CrowdfundingFeatured />} />
+            <Route path="/crowdfunding/trending" element={<CrowdfundingTrending />} />
+            <Route path="/crowdfunding/my-campaigns" element={<MyCampaigns />} />
+            <Route path="/crowdfunding/my-contributions" element={<MyContributions />} />
+            
+            {/* Tokens sub-routes */}
+            <Route path="/tokens/create" element={<CreateToken />} />
+            <Route path="/tokens/analytics" element={<TokenAnalytics />} />
+            <Route path="/tokens/manage" element={<ManageTokens />} />
+            <Route path="/tokens/marketplace" element={<TokenMarketplace />} />
+            
+            {/* Trading sub-routes */}
+            <Route path="/trading/spot" element={<TradingSpot />} />
+            <Route path="/trading/futures" element={<TradingFutures />} />
+            <Route path="/trading/options" element={<TradingOptions />} />
+            
+            {/* Credit sub-routes */}
+            <Route path="/credit/score" element={<CreditScore />} />
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <AlchemySignerContainer />
+        </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
   );
