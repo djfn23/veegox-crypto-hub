@@ -12,50 +12,8 @@ import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import { useSidebar } from "@/hooks/useSidebar";
 
 export const MobileHeader = () => {
-  const { isOpen, isAnimating, toggle, close } = useSidebar();
+  const { isOpen, toggle, close } = useSidebar();
   const { isTablet, isSmallMobile, isLandscapePhone } = useResponsiveLayout();
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
-
-  // Gesture handling for swipe to open/close
-  useEffect(() => {
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartX.current = e.touches[0].clientX;
-      touchStartY.current = e.touches[0].clientY;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (touchStartX.current === null || touchStartY.current === null) return;
-
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchEndY = e.changedTouches[0].clientY;
-      const deltaX = touchEndX - touchStartX.current;
-      const deltaY = Math.abs(touchEndY - touchStartY.current);
-
-      // Only trigger if horizontal swipe is dominant
-      if (Math.abs(deltaX) > deltaY && Math.abs(deltaX) > 50) {
-        // Swipe right from left edge to open
-        if (deltaX > 0 && touchStartX.current < 50 && !isOpen) {
-          toggle();
-        }
-        // Swipe left when menu is open to close
-        else if (deltaX < 0 && isOpen) {
-          close();
-        }
-      }
-
-      touchStartX.current = null;
-      touchStartY.current = null;
-    };
-
-    document.addEventListener('touchstart', handleTouchStart, { passive: true });
-    document.addEventListener('touchend', handleTouchEnd, { passive: true });
-
-    return () => {
-      document.removeEventListener('touchstart', handleTouchStart);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [isOpen, toggle, close]);
 
   return (
     <header className={`
@@ -63,7 +21,6 @@ export const MobileHeader = () => {
       sticky top-0 z-50 transition-all duration-300
       ${isLandscapePhone ? 'px-6 py-2' : 'px-4 py-3'}
       ${isTablet ? 'px-6 py-4' : ''}
-      ${isAnimating ? 'pointer-events-none' : ''}
     `}>
       <div className="flex items-center justify-between max-w-6xl mx-auto">
         <div className="flex items-center space-x-3">
@@ -74,9 +31,8 @@ export const MobileHeader = () => {
                 className={`
                   text-white touch-target-lg transition-transform duration-200
                   ${isSmallMobile ? 'p-2 -ml-2' : 'p-3 -ml-3'}
-                  ${isAnimating ? 'scale-95' : 'hover:scale-105'}
+                  hover:scale-105
                 `}
-                disabled={isAnimating}
               >
                 <Menu className={`${isSmallMobile ? 'h-5 w-5' : 'h-6 w-6'} transition-transform duration-200`} />
               </Button>
@@ -89,22 +45,11 @@ export const MobileHeader = () => {
                 transition-transform duration-300 ease-in-out
               `}
             >
-              <SidebarErrorBoundary fallback={
-                <div className="p-6 text-center text-white">
-                  <p>Erreur de chargement du menu</p>
-                  <Button 
-                    onClick={() => window.location.reload()} 
-                    className="mt-4"
-                    variant="outline"
-                  >
-                    Recharger
-                  </Button>
-                </div>
-              }>
+              <SidebarErrorBoundary>
                 <div className="flex flex-col h-full">
                   <div className="p-6 border-b border-slate-700">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex-shrink-0 animate-pulse"></div>
+                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex-shrink-0"></div>
                       <div>
                         <span className="text-xl font-bold text-white block">{texts.app.name}</span>
                         <Badge variant="secondary" className="text-xs mt-1">{texts.app.beta}</Badge>

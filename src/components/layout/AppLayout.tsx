@@ -22,12 +22,11 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     setIsClient(true);
   }, []);
 
-  // Loading screen while client initializes
   if (!isClient) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
         <div className="text-white text-lg animate-pulse">
-          Initialisation de l'interface Veegox...
+          Chargement de l'interface Veegox...
         </div>
       </div>
     );
@@ -37,13 +36,10 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
       <PWAInstallPrompt />
 
-      {/* Mobile/Tablet Header */}
       {!isDesktop && <MobileHeader />}
 
-      {/* Desktop Layout */}
       {isDesktop && (
         <div className="flex min-h-screen">
-          {/* Desktop Sidebar */}
           <SidebarErrorBoundary>
             <div className="w-64 bg-slate-900/50 backdrop-blur-sm border-r border-slate-700 min-h-screen flex-shrink-0">
               <div className="p-4 border-b border-slate-700">
@@ -59,16 +55,13 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
             </div>
           </SidebarErrorBoundary>
 
-          {/* Main Content */}
           <div className="flex-1 flex flex-col min-w-0">
-            {/* Desktop Header */}
             <header className="bg-slate-900/50 backdrop-blur-sm border-b border-slate-700 px-6 py-4 flex-shrink-0">
               <div className="flex items-center justify-end">
                 <UserMenu />
               </div>
             </header>
             
-            {/* Content */}
             <main className="flex-1 overflow-auto">
               {children}
             </main>
@@ -76,7 +69,6 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
       )}
 
-      {/* Mobile/Tablet Content */}
       {!isDesktop && (
         <div className="flex flex-col min-h-screen">
           <main className={`flex-1 ${isMobile ? 'pb-20' : 'pb-4'} ${isLandscapePhone ? 'pb-16' : ''}`}>
