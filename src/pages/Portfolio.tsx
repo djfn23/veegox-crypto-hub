@@ -1,3 +1,4 @@
+
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,8 +50,8 @@ const performanceData = [
 ];
 
 const Portfolio = () => {
-  const { user } = useUnifiedAuth();
-  const isAdmin = user?.user_metadata?.role === 'admin';
+  const { session } = useUnifiedAuth();
+  const isAdmin = session?.user?.user_metadata?.role === 'admin';
 
   return (
     <PageLayout
