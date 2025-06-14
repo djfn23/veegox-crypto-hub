@@ -13,6 +13,17 @@ interface Web3Wallet {
 }
 
 export const useWeb3Wallet = () => {
+  // Guard: don't run this hook on server
+  if (typeof window === "undefined") {
+    return {
+      connectedWallet: null,
+      isConnecting: false,
+      connectMetaMask: async () => {},
+      disconnectWallet: () => {},
+      signTransaction: async () => { throw new Error("Unavailable on server"); },
+    };
+  }
+
   const [connectedWallet, setConnectedWallet] = useState<Web3Wallet | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
 
@@ -50,17 +61,13 @@ export const useWeb3Wallet = () => {
 
   const connectMetaMask = useCallback(async () => {
     setIsConnecting(true);
-    
     try {
       if (typeof window.ethereum !== 'undefined') {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-        
-        // Si pas sur Polygon, proposer de changer
         if (parseInt(chainId, 16) !== 137) {
           await switchToPolygon(window.ethereum);
         }
-
         if (accounts.length > 0) {
           const wallet: Web3Wallet = {
             id: 'metamask',
@@ -71,7 +78,6 @@ export const useWeb3Wallet = () => {
             icon: '🦊',
             provider: window.ethereum
           };
-          
           setConnectedWallet(wallet);
           toast.success('Wallet connecté avec succès sur Polygon!');
           return wallet;
@@ -96,7 +102,6 @@ export const useWeb3Wallet = () => {
     if (!connectedWallet?.provider) {
       throw new Error('Aucun wallet connecté');
     }
-
     try {
       const txHash = await connectedWallet.provider.request({
         method: 'eth_sendTransaction',
@@ -109,34 +114,37 @@ export const useWeb3Wallet = () => {
     }
   };
 
-  // Écouter les changements de compte/réseau
   useEffect(() => {
-    if (typeof window.ethereum !== 'undefined') {
-      window.ethereum.on('accountsChanged', (accounts: string[]) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else if (connectedWallet) {
-          setConnectedWallet({
-            ...connectedWallet,
-            address: accounts[0]
-          });
-        }
-      });
-
-      window.ethereum.on('chainChanged', (chainId: string) => {
-        if (connectedWallet) {
-          setConnectedWallet({
-            ...connectedWallet,
-            chainId: parseInt(chainId, 16)
-          });
-        }
-      });
+    if (typeof window === 'undefined' || typeof window.ethereum === 'undefined') {
+      return;
     }
+    const handleAccountsChanged = (accounts: string[]) => {
+      if (accounts.length === 0) {
+        disconnectWallet();
+      } else if (connectedWallet) {
+        setConnectedWallet({
+          ...connectedWallet,
+          address: accounts[0]
+        });
+      }
+    };
+
+    const handleChainChanged = (chainId: string) => {
+      if (connectedWallet) {
+        setConnectedWallet({
+          ...connectedWallet,
+          chainId: parseInt(chainId, 16)
+        });
+      }
+    };
+
+    window.ethereum.on('accountsChanged', handleAccountsChanged);
+    window.ethereum.on('chainChanged', handleChainChanged);
 
     return () => {
       if (typeof window.ethereum !== 'undefined') {
-        window.ethereum.removeAllListeners('accountsChanged');
-        window.ethereum.removeAllListeners('chainChanged');
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        window.ethereum.removeListener('chainChanged', handleChainChanged);
       }
     };
   }, [connectedWallet, disconnectWallet]);

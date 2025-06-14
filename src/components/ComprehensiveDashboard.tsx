@@ -14,12 +14,20 @@ import ExchangeModule from '@/components/modules/exchange/ExchangeModule';
 import { Link } from "react-router-dom";
 
 const ComprehensiveDashboard = () => {
-  const { connectedWallet } = useWeb3Wallet();
-  const { user } = useAuth();
-  const isMobile = useIsMobile();
+  // Sécuriser le rendu côté client uniquement
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const { connectedWallet } = isClient ? useWeb3Wallet() : { connectedWallet: null };
+  const { user } = isClient ? useAuth() : { user: null };
+  const isMobile = isClient ? useIsMobile() : false;
   const [copied, setCopied] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
-  const { data: balanceData, refetch: refetchBalance } = useWalletBalance(connectedWallet?.address);
+  const { data: balanceData, refetch: refetchBalance } = isClient && connectedWallet
+    ? useWalletBalance(connectedWallet?.address)
+    : { data: null, refetch: () => {} };
 
   useEffect(() => {
     if (copied) {
@@ -218,5 +226,4 @@ const ComprehensiveDashboard = () => {
     </div>
   );
 };
-
 export default ComprehensiveDashboard;

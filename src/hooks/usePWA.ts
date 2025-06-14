@@ -11,12 +11,17 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export const usePWA = () => {
+  // Guard: don't run this logic server-side
+  const canUseDOM = typeof window !== 'undefined';
+
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(canUseDOM ? navigator.onLine : true);
 
   useEffect(() => {
+    if (!canUseDOM) return;
+
     // Vérifier si l'app est déjà installée
     const checkIfInstalled = () => {
       if (window.matchMedia('(display-mode: standalone)').matches || 
@@ -60,7 +65,7 @@ export const usePWA = () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, [canUseDOM]);
 
   const installPWA = async () => {
     if (!deferredPrompt) return false;

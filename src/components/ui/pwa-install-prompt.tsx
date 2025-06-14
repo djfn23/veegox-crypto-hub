@@ -7,6 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 
 export const PWAInstallPrompt = () => {
+  // Guard: client only
+  if (typeof window === "undefined") return null;
+
   const { isInstallable, isInstalled, installPWA } = usePWA();
   const { isMobile } = useResponsiveLayout();
   const [isVisible, setIsVisible] = useState(true);
