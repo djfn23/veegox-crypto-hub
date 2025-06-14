@@ -1,4 +1,5 @@
 
+
 import * as React from 'react';
 
 console.log('AlchemySignerContainer: Module loading with React:', !!React);
@@ -7,9 +8,14 @@ export const AlchemySignerContainer = () => {
   console.log('AlchemySignerContainer: Component initializing');
   
   // Ensure React is available before using hooks
-  if (!React || !React.useEffect) {
-    console.error('AlchemySignerContainer: React or React.useEffect is not available');
+  if (!React) {
+    console.error('AlchemySignerContainer: React is not available');
     throw new Error('React is not properly initialized');
+  }
+
+  if (!React.useEffect) {
+    console.error('AlchemySignerContainer: React.useEffect is not available');
+    throw new Error('React.useEffect is not properly initialized');
   }
 
   React.useEffect(() => {
@@ -58,3 +64,4 @@ export const AlchemySignerContainer = () => {
   console.log('AlchemySignerContainer: Rendering null component');
   return null;
 };
+
