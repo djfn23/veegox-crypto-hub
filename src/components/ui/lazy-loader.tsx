@@ -26,13 +26,17 @@ export const LazyLoader: React.FC<LazyLoaderProps> = ({
   );
 };
 
-export const withLazyLoading = <T extends object>(
+export const withLazyLoading = <T extends Record<string, any>>(
   Component: ComponentType<T>,
   fallback?: React.ReactNode
 ) => {
-  return React.forwardRef<any, T>((props, ref) => (
+  const WrappedComponent = (props: T) => (
     <LazyLoader fallback={fallback}>
-      <Component {...props} ref={ref} />
+      <Component {...props} />
     </LazyLoader>
-  ));
+  );
+  
+  WrappedComponent.displayName = `withLazyLoading(${Component.displayName || Component.name})`;
+  
+  return WrappedComponent;
 };

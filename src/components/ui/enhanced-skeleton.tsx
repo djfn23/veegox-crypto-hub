@@ -26,17 +26,17 @@ export const EnhancedSkeleton: React.FC<EnhancedSkeletonProps> = ({
 }) => {
   const skeletonClass = cn(skeletonVariants[variant], className);
   
-  const shimmerAnimation = {
+  const shimmerAnimation = animate ? {
     initial: { backgroundPosition: '-200px 0' },
     animate: {
       backgroundPosition: '200px 0',
-      transition: {
-        duration: 1.5,
-        repeat: Infinity,
-        ease: 'linear',
-      },
     },
-  };
+    transition: {
+      duration: 1.5,
+      repeat: Infinity,
+      ease: "linear" as const,
+    },
+  } : {};
 
   if (variant === 'text' && lines > 1) {
     return (
@@ -49,7 +49,7 @@ export const EnhancedSkeleton: React.FC<EnhancedSkeletonProps> = ({
               i === lines - 1 && 'w-3/4', // Last line shorter
               animate && 'bg-gradient-to-r from-white/5 via-white/10 to-white/5 bg-[length:400px_100%]'
             )}
-            {...(animate ? shimmerAnimation : {})}
+            {...shimmerAnimation}
             style={animate ? {
               backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
             } : {}}
@@ -65,7 +65,7 @@ export const EnhancedSkeleton: React.FC<EnhancedSkeletonProps> = ({
         skeletonClass,
         animate && 'bg-gradient-to-r from-white/5 via-white/10 to-white/5 bg-[length:400px_100%]'
       )}
-      {...(animate ? shimmerAnimation : {})}
+      {...shimmerAnimation}
       style={animate ? {
         backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
       } : {}}
