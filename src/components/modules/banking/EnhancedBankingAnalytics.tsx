@@ -139,7 +139,7 @@ export const EnhancedBankingAnalytics = ({ userId }: EnhancedBankingAnalyticsPro
               <div className="text-2xl font-bold text-orange-400 mb-1">3</div>
               <p className="text-xs text-gray-400">Alertes budget</p>
             </CardContentComponent>
-          </CardContent>
+          </CardComponent>
         </MobileGridItem>
       </MobileGrid>
 

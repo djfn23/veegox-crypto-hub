@@ -150,7 +150,6 @@ export const CryptoBankModule = () => {
 
         <MobileTabsContent value="smart-savings">
           <SmartSavingsModule userId={user.id} />
-        </MobileTab
         </MobileTabsContent>
 
         <MobileTabsContent value="qr-payments">
