@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Wallet, TrendingUp, Coins, ArrowRightLeft } from "lucide-react";
 
 const ComprehensiveDashboard: React.FC = () => {
-  console.log('ComprehensiveDashboard: Rendering simplified version');
+  console.log('ComprehensiveDashboard: Rendering component');
 
   return (
     <div className="p-4 space-y-6 max-w-7xl mx-auto">
@@ -119,4 +119,5 @@ const ComprehensiveDashboard: React.FC = () => {
   );
 };
 
+// Explicit default export
 export default ComprehensiveDashboard;
