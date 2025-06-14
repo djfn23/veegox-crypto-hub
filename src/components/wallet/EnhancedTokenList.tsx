@@ -237,7 +237,7 @@ export const EnhancedTokenList: React.FC<EnhancedTokenListProps> = ({
                 size="sm" 
                 variant="outline" 
                 className="border-slate-600 text-white hover:bg-slate-800"
-                onClick={(e) => e.stopProp1agation()}
+                onClick={(e) => e.stopPropagation()}
               >
                 Envoyer
               </Button>
