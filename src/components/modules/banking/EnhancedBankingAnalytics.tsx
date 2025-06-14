@@ -8,7 +8,7 @@ import { BarChart3, TrendingUp, PieChart, AlertTriangle, Target, Calendar } from
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import { MobileCard, MobileCardContent, MobileCardHeader, MobileCardTitle } from "@/components/ui/mobile-card";
 import { MobileGrid, MobileGridItem } from "@/components/ui/mobile-grid";
-import { LineChart, Line, BarChart, Bar, PieChart as RechartsPieChart, Cell, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { LineChart, Line, BarChart, Bar, PieChart as RechartsPieChart, Cell, Pie, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 
 interface EnhancedBankingAnalyticsProps {
   userId: string;
@@ -73,7 +73,7 @@ export const EnhancedBankingAnalytics = ({ userId }: EnhancedBankingAnalyticsPro
   return (
     <div className="space-y-6">
       {/* Header */}
-      <CardComponent variant={isMobile ? "elevated" : undefined}>
+      <CardComponent>
         <CardHeaderComponent>
           <CardTitleComponent className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-purple-400" />

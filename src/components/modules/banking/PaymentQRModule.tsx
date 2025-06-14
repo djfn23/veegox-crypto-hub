@@ -112,7 +112,7 @@ export const PaymentQRModule = ({ userId, userAccounts }: PaymentQRModuleProps) 
     <>
       <div className="space-y-6">
         {/* Header */}
-        <CardComponent variant={isMobile ? "elevated" : undefined}>
+        <CardComponent>
           <CardHeaderComponent>
             <CardTitleComponent className="flex items-center gap-2">
               <QrCode className="h-5 w-5 text-purple-400" />

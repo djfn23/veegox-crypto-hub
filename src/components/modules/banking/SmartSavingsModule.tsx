@@ -114,7 +114,7 @@ export const SmartSavingsModule = ({ userId }: SmartSavingsModuleProps) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <CardComponent variant={isMobile ? "elevated" : undefined}>
+      <CardComponent>
         <CardHeaderComponent>
           <CardTitleComponent className="flex items-center gap-2">
             <PiggyBank className="h-5 w-5 text-purple-400" />
@@ -171,7 +171,7 @@ export const SmartSavingsModule = ({ userId }: SmartSavingsModuleProps) => {
       </CardComponent>
 
       {/* Savings Goals */}
-      <MobileGrid mobileColumns={1} tabletColumns={1} desktopColumns={2}>
+      <MobileGrid mobileColumns={1} tabletColumns={2} desktopColumns={2}>
         {mockGoals.map((goal) => {
           const progress = calculateProgress(goal.currentAmount, goal.targetAmount);
           const weeksLeft = calculateWeeksToGoal(goal.currentAmount, goal.targetAmount, goal.weeklyContribution);

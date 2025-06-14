@@ -68,7 +68,7 @@ export const AccountsOverview = ({ userId }: AccountsOverviewProps) => {
     const CardContentComponent = isMobile ? MobileCardContent : CardContent;
     
     return (
-      <CardComponent className={`${isMobile ? 'variant="default"' : 'bg-red-900/20 border-red-900'}`}>
+      <CardComponent className={`${isMobile ? '' : 'bg-red-900/20 border-red-900'}`}>
         <CardContentComponent className="p-6 text-center">
           <p className="text-red-400 mb-4">Erreur lors du chargement des comptes</p>
           <Button onClick={() => refetch()} variant="outline" size="sm">
@@ -89,7 +89,7 @@ export const AccountsOverview = ({ userId }: AccountsOverviewProps) => {
     <PullToRefresh onRefresh={handleRefresh}>
       <div className="space-y-6">
         {/* Total Balance Card */}
-        <CardComponent variant={isMobile ? "elevated" : undefined} className={`${isMobile ? '' : 'bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-purple-700'}`}>
+        <CardComponent className={`${isMobile ? '' : 'bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-purple-700'}`}>
           <CardHeaderComponent>
             <div className="flex items-center justify-between">
               <CardTitleComponent className="text-white">Solde Total</CardTitleComponent>
