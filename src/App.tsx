@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from "next-themes"
@@ -54,17 +55,24 @@ import TradingOptions from './pages/trading/TradingOptions';
 // Import credit sub-pages
 import CreditScore from './pages/credit/CreditScore';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+});
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <TooltipProvider>
-          <UnifiedAuthProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+        <BrowserRouter>
+          <TooltipProvider>
+            <UnifiedAuthProvider>
+              <Toaster />
+              <Sonner />
               <Routes>
                 {/* Main routes */}
                 <Route path="/" element={<Index />} />
@@ -114,10 +122,10 @@ function App() {
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </BrowserRouter>
-            <AlchemySignerContainer />
-          </UnifiedAuthProvider>
-        </TooltipProvider>
+              <AlchemySignerContainer />
+            </UnifiedAuthProvider>
+          </TooltipProvider>
+        </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
   );

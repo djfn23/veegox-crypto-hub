@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavigationBar } from "@/components/home/NavigationBar";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
@@ -9,24 +9,41 @@ import { LoginModal } from "@/components/auth/LoginModal";
 import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { AppLayout } from "@/components/layout/AppLayout";
 import ComprehensiveDashboard from "@/components/ComprehensiveDashboard";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 const Index = () => {
   const [showAuth, setShowAuth] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const { isAuthenticated, loading } = useUnifiedAuth();
 
-  if (loading) {
+  useEffect(() => {
+    // Add a small delay to ensure all providers are properly initialized
+    const timer = setTimeout(() => {
+      setIsInitialized(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Show loading screen while initializing
+  if (!isInitialized || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900 flex items-center justify-center">
-        <div className="text-white text-lg">Chargement...</div>
+        <div className="text-white text-lg flex items-center gap-2">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+          Chargement...
+        </div>
       </div>
     );
   }
 
   if (isAuthenticated) {
     return (
-      <AppLayout>
-        <ComprehensiveDashboard />
-      </AppLayout>
+      <ErrorBoundary>
+        <AppLayout>
+          <ComprehensiveDashboard />
+        </AppLayout>
+      </ErrorBoundary>
     );
   }
 
@@ -39,25 +56,27 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-      <NavigationBar 
-        onLoginClick={handleLoginClick}
-        onSignupClick={handleSignupClick}
-      />
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+        <NavigationBar 
+          onLoginClick={handleLoginClick}
+          onSignupClick={handleSignupClick}
+        />
 
-      <HeroSection onSignupClick={handleSignupClick} />
+        <HeroSection onSignupClick={handleSignupClick} />
 
-      <FeaturesSection />
+        <FeaturesSection />
 
-      <CTASection onSignupClick={handleSignupClick} />
+        <CTASection onSignupClick={handleSignupClick} />
 
-      <AppFooter />
+        <AppFooter />
 
-      <LoginModal
-        isOpen={showAuth}
-        onClose={() => setShowAuth(false)}
-      />
-    </div>
+        <LoginModal
+          isOpen={showAuth}
+          onClose={() => setShowAuth(false)}
+        />
+      </div>
+    </ErrorBoundary>
   );
 };
 
