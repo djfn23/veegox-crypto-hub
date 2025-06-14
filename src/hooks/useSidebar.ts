@@ -20,8 +20,8 @@ export const useSidebar = () => {
     setState({ isOpen: false })
   }, [])
 
-  const setIsOpen = useCallback((open: boolean) => {
-    setState({ isOpen: open })
+  const setIsOpen = useCallback((isOpen: boolean) => {
+    setState({ isOpen })
   }, [])
 
   return {

@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Menu, Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -9,11 +9,14 @@ import { SidebarErrorBoundary } from "@/components/ui/error-boundary-sidebar";
 import { texts } from "@/lib/constants/texts";
 import { Badge } from "@/components/ui/badge";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
-import { useSidebar } from "@/hooks/useSidebar";
 
 export const MobileHeader = () => {
-  const { isOpen, toggle, close } = useSidebar();
+  const [isOpen, setIsOpen] = useState(false);
   const { isTablet, isSmallMobile, isLandscapePhone } = useResponsiveLayout();
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+  };
 
   return (
     <header className={`
@@ -24,14 +27,14 @@ export const MobileHeader = () => {
     `}>
       <div className="flex items-center justify-between max-w-6xl mx-auto">
         <div className="flex items-center space-x-3">
-          <Sheet open={isOpen} onOpenChange={toggle}>
+          <Sheet open={isOpen} onOpenChange={handleOpenChange}>
             <SheetTrigger asChild>
               <Button 
                 variant="ghost" 
                 className={`
                   text-white touch-target-lg transition-transform duration-200
                   ${isSmallMobile ? 'p-2 -ml-2' : 'p-3 -ml-3'}
-                  hover:scale-105
+                  hover:scale-105 hover:bg-slate-800
                 `}
               >
                 <Menu className={`${isSmallMobile ? 'h-5 w-5' : 'h-6 w-6'} transition-transform duration-200`} />
@@ -40,7 +43,7 @@ export const MobileHeader = () => {
             <SheetContent 
               side="left" 
               className={`
-                bg-slate-900 border-slate-700 p-0 z-60
+                bg-slate-900 border-slate-700 p-0 z-[60]
                 ${isTablet ? 'w-96' : 'w-80'}
                 transition-transform duration-300 ease-in-out
               `}
@@ -89,7 +92,7 @@ export const MobileHeader = () => {
                 className={`
                   text-gray-400 hover:text-white touch-target transition-all duration-200
                   ${isTablet ? 'p-4' : 'p-3'}
-                  hover:scale-105 active:scale-95
+                  hover:scale-105 active:scale-95 hover:bg-slate-800
                 `}
               >
                 <Search className="h-5 w-5" />
@@ -99,7 +102,7 @@ export const MobileHeader = () => {
                 className={`
                   text-gray-400 hover:text-white touch-target relative transition-all duration-200
                   ${isTablet ? 'p-4' : 'p-3'}
-                  hover:scale-105 active:scale-95
+                  hover:scale-105 active:scale-95 hover:bg-slate-800
                 `}
               >
                 <Bell className="h-5 w-5" />
