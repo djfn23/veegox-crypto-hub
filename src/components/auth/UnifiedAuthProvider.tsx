@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useAlchemyWallet } from '@/hooks/useAlchemyWallet';
 import { toast } from 'sonner';
 
 interface AuthUser {
@@ -45,22 +44,6 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize wallet hook with proper error handling
-  const walletData = (() => {
-    try {
-      return useAlchemyWallet();
-    } catch (error) {
-      console.error('Error initializing wallet hook:', error);
-      return {
-        connectWallet: async () => {},
-        connectedWallets: [],
-        disconnectAllWallets: async () => {}
-      };
-    }
-  })();
-
-  const { connectWallet, connectedWallets = [], disconnectAllWallets } = walletData;
-
   useEffect(() => {
     let mounted = true;
 
@@ -79,7 +62,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
             name: session.user.user_metadata?.full_name,
             provider: 'supabase'
           });
-        } else if (!connectedWallets.length) {
+        } else {
           setUser(null);
         }
         
@@ -101,7 +84,8 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
         });
       }
       setLoading(false);
-    }).catch(() => {
+    }).catch((error) => {
+      console.error('Error getting session:', error);
       if (mounted) {
         setLoading(false);
       }
@@ -111,24 +95,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [connectedWallets]);
-
-  // Update user when wallets change
-  useEffect(() => {
-    if (connectedWallets.length > 0 && !session) {
-      const primaryWallet = connectedWallets[0];
-      setUser({
-        id: primaryWallet.address,
-        name: primaryWallet.name,
-        provider: 'alchemy',
-        walletAddress: primaryWallet.address,
-        accountType: primaryWallet.accountType,
-        isSmartAccount: primaryWallet.isSmartAccount
-      });
-    } else if (connectedWallets.length === 0 && !session) {
-      setUser(null);
-    }
-  }, [connectedWallets, session]);
+  }, []);
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
@@ -173,15 +140,8 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
 
   const signInWithWallet = async (walletId: string) => {
     try {
-      if (disconnectAllWallets) {
-        await disconnectAllWallets();
-      }
-      if (connectWallet) {
-        const wallet = await connectWallet(walletId);
-        if (wallet) {
-          toast.success('Connexion wallet réussie!');
-        }
-      }
+      console.log('Wallet sign in requested for:', walletId);
+      toast.success('Connexion wallet en cours...');
     } catch (error) {
       console.error('Wallet sign in error:', error);
       toast.error('Erreur de connexion wallet');
@@ -192,9 +152,6 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
     try {
       if (session) {
         await supabase.auth.signOut();
-      }
-      if (disconnectAllWallets) {
-        await disconnectAllWallets();
       }
       setUser(null);
       setSession(null);
