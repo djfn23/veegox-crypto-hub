@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 export type BreakpointKey = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
@@ -22,6 +21,35 @@ const defaultOrientation: Orientation = 'landscape';
 export const useResponsiveLayout = () => {
   // Guard anti SSR/absence de window
   const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
+
+  // Safety check for React hooks availability
+  if (typeof useState === 'undefined' || typeof useEffect === 'undefined') {
+    console.error('React hooks are not available in useResponsiveLayout');
+    return {
+      windowSize: defaultWindowSize,
+      orientation: defaultOrientation,
+      currentBreakpoint: 'lg' as BreakpointKey,
+      deviceType: 'desktop' as DeviceType,
+      isMobile: false,
+      isTablet: false,
+      isDesktop: true,
+      isPortrait: false,
+      isLandscape: true,
+      isBreakpoint: () => false,
+      isBetweenBreakpoints: () => false,
+      getColumns: () => 1,
+      getSpacing: () => '16px',
+      isSmallMobile: () => false,
+      isLargeMobile: () => false,
+      isSmallTablet: () => false,
+      isLandscapePhone: () => false,
+      isExtraSmall: () => false,
+      isCompact: () => false,
+      canUseColumns: () => false,
+      getDynamicSpacing: () => '16px',
+      getFontSize: () => 'text-base',
+    };
+  }
 
   // TOUJOURS appeler useState - pas conditionnellement
   const [windowSize, setWindowSize] = useState(() =>

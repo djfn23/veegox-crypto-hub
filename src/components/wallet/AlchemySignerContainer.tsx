@@ -1,14 +1,14 @@
 
-import * as React from 'react';
+import React, { useEffect } from 'react';
 
 export const AlchemySignerContainer = () => {
   // Safety check for React availability
-  if (!React || !React.useEffect) {
+  if (!React || typeof useEffect === 'undefined') {
     console.error('React or useEffect is not available in AlchemySignerContainer');
     return null;
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (typeof document === 'undefined') {
       return;
     }
