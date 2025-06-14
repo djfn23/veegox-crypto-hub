@@ -1,6 +1,6 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
-import { NotificationCenter } from "@/components/modules/notifications/NotificationCenter";
+import NotificationCenter from "@/components/modules/notifications/NotificationCenter";
 import { Bell } from "lucide-react";
 
 const Notifications = () => {

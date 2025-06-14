@@ -22,10 +22,12 @@ const WalletOverview = ({ wallets }: WalletOverviewProps) => {
   const connectedWallets = wallets.filter(w => w.connected);
   const primaryWallet = connectedWallets[0];
   
-  const { assets, isLoading } = useWalletAssets(
+  const { data: walletAssets, isLoading } = useWalletAssets(
     primaryWallet?.address || null,
     primaryWallet?.chainId || 1
   );
+
+  const assets = walletAssets || { tokens: [], nfts: [], ethBalance: 0 };
 
   const { data: transactionsData } = useTransactionHistory(
     primaryWallet?.address || null,

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Web3Service } from '@/services/web3Service';
@@ -56,7 +57,7 @@ export const useWeb3Integration = () => {
 
       // Get balance
       const balanceResult = await Web3Service.getWalletBalance(account, 137);
-      const balance = balanceResult.result?.balance || '0';
+      const balance = balanceResult.result?.balance?.toString() || '0';
 
       setWeb3State({
         isConnected: true,
@@ -131,7 +132,7 @@ export const useWeb3Integration = () => {
 
     try {
       const balanceResult = await Web3Service.getWalletBalance(web3State.account, 137);
-      const balance = balanceResult.result?.balance || '0';
+      const balance = balanceResult.result?.balance?.toString() || '0';
       
       setWeb3State(prev => ({ ...prev, balance }));
     } catch (error) {

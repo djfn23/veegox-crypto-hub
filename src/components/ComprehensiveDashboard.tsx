@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useWalletBalance } from "@/hooks/useWalletData";
@@ -23,7 +24,7 @@ const ComprehensiveDashboard = () => {
   const { user, isAuthenticated } = useUnifiedAuth();
   const isMobile = useIsMobile();
   const { isTablet, deviceType, getColumns, getSpacing } = useResponsiveLayout();
-  const { data: balanceData, refetch: refetchBalance } = useWalletBalance(connectedWallet?.address || '');
+  const { data: balanceData, refetch: refetchBalance } = useWalletBalance(connectedWallet?.address || null);
 
   useEffect(() => {
     setIsClient(true);
@@ -150,7 +151,7 @@ const ComprehensiveDashboard = () => {
                   <div className="flex items-center justify-between">
                     <p className="text-gray-400">Balance</p>
                     <p className="text-green-500 font-semibold">
-                      {balanceData?.result?.balance ? parseFloat(balanceData.result.balance).toFixed(4) : '0'} ETH
+                      {balanceData?.result?.balance ? parseFloat(balanceData.result.balance.toString()).toFixed(4) : '0'} ETH
                     </p>
                   </div>
                 </CardContent>

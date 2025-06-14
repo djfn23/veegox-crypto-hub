@@ -23,11 +23,12 @@ interface AssetsTabProps {
 
 const AssetsTab = ({ wallets }: AssetsTabProps) => {
   const primaryWallet = wallets.find(w => w.connected);
-  const { assets, isLoading } = useWalletAssets(
+  const { data: walletAssets, isLoading } = useWalletAssets(
     primaryWallet?.address || null,
     primaryWallet?.chainId || 1
   );
 
+  const assets = walletAssets || { tokens: [], nfts: [], ethBalance: 0 };
   const tokenAddresses = assets.tokens.map((token: any) => token.address);
   const { data: pricesData } = useTokenPrices(tokenAddresses, primaryWallet?.chainId || 1);
 

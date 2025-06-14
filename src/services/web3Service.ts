@@ -18,6 +18,14 @@ interface TokenPriceResult {
   error?: string;
 }
 
+interface ContractValidationResult {
+  result?: {
+    isContract: boolean;
+    contractType?: string;
+  };
+  error?: string;
+}
+
 class Web3ServiceClass {
   private alchemyApiKey: string | null = null;
 
@@ -104,6 +112,92 @@ class Web3ServiceClass {
       console.error('Erreur lors de la récupération des transactions:', error);
       return {
         error: error.message || 'Erreur lors de la récupération des transactions'
+      };
+    }
+  }
+
+  async getTokenBalances(address: string, chainId: number = 137) {
+    try {
+      if (!address) {
+        throw new Error('Adresse wallet requise');
+      }
+
+      // Mock token balances for demo
+      return {
+        result: [
+          {
+            address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+            name: 'Wrapped Ethereum',
+            symbol: 'WETH',
+            decimals: 18,
+            balance: '0.5'
+          },
+          {
+            address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+            name: 'USD Coin',
+            symbol: 'USDC',
+            decimals: 6,
+            balance: '1000'
+          }
+        ]
+      };
+    } catch (error: any) {
+      console.error('Erreur lors de la récupération des balances:', error);
+      return {
+        error: error.message || 'Erreur lors de la récupération des balances'
+      };
+    }
+  }
+
+  async getNFTsForWallet(address: string, chainId: number = 137) {
+    try {
+      if (!address) {
+        throw new Error('Adresse wallet requise');
+      }
+
+      // Mock NFTs for demo
+      return {
+        result: []
+      };
+    } catch (error: any) {
+      console.error('Erreur lors de la récupération des NFTs:', error);
+      return {
+        error: error.message || 'Erreur lors de la récupération des NFTs'
+      };
+    }
+  }
+
+  async validateContract(address: string, chainId: number = 137): Promise<ContractValidationResult> {
+    try {
+      if (!address) {
+        throw new Error('Adresse contract requise');
+      }
+
+      // Mock contract validation
+      return {
+        result: {
+          isContract: true,
+          contractType: 'ERC20'
+        }
+      };
+    } catch (error: any) {
+      console.error('Erreur lors de la validation du contrat:', error);
+      return {
+        error: error.message || 'Erreur lors de la validation du contrat'
+      };
+    }
+  }
+
+  async callWeb3Function(functionName: string, params: any[]) {
+    try {
+      // Mock web3 function call
+      return {
+        result: `Mock result for ${functionName}`
+      };
+    } catch (error: any) {
+      console.error('Erreur lors de l\'appel de fonction web3:', error);
+      return {
+        error: error.message || 'Erreur lors de l\'appel de fonction web3'
       };
     }
   }
