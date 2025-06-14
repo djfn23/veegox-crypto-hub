@@ -69,8 +69,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <BrowserRouter>
-          <TooltipProvider>
-            <UnifiedAuthProvider>
+          <UnifiedAuthProvider>
+            <TooltipProvider>
               <Toaster />
               <Sonner />
               <Routes>
@@ -123,8 +123,8 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <AlchemySignerContainer />
-            </UnifiedAuthProvider>
-          </TooltipProvider>
+            </TooltipProvider>
+          </UnifiedAuthProvider>
         </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>

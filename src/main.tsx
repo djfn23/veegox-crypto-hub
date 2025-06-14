@@ -1,11 +1,16 @@
 
 import { createRoot } from 'react-dom/client'
+import { StrictMode } from 'react'
 import App from './App.tsx'
 import './index.css'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
 
-createRoot(document.getElementById("root")!).render(
+const root = createRoot(document.getElementById("root")!);
+
+root.render(
   <ErrorBoundary>
-    <App />
+    <StrictMode>
+      <App />
+    </StrictMode>
   </ErrorBoundary>
 );

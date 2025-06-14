@@ -14,13 +14,25 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 const Index = () => {
   const [showAuth, setShowAuth] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const { isAuthenticated, loading } = useUnifiedAuth();
+  
+  // Safely get auth state with fallback
+  let isAuthenticated = false;
+  let loading = true;
+  
+  try {
+    const authState = useUnifiedAuth();
+    isAuthenticated = authState?.isAuthenticated || false;
+    loading = authState?.loading || false;
+  } catch (error) {
+    console.error('Error accessing auth state:', error);
+    loading = false;
+  }
 
   useEffect(() => {
-    // Add a small delay to ensure all providers are properly initialized
+    // Add a delay to ensure all providers are properly initialized
     const timer = setTimeout(() => {
       setIsInitialized(true);
-    }, 100);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, []);
