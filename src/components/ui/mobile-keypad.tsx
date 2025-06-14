@@ -2,7 +2,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Delete } from "lucide-react"
+import { Trash2 } from "lucide-react"
 
 interface MobileKeypadProps {
   value: string
@@ -14,7 +14,11 @@ interface MobileKeypadProps {
 
 export const MobileKeypad = React.forwardRef<HTMLDivElement, MobileKeypadProps>(
   ({ value, onChange, maxLength = 10, allowDecimal = true, className, ...props }, ref) => {
+    console.log('MobileKeypad rendered with value:', value);
+
     const handleKeyPress = (key: string) => {
+      console.log('Key pressed:', key);
+      
       if (key === 'backspace') {
         onChange(value.slice(0, -1))
         return
@@ -59,7 +63,7 @@ export const MobileKeypad = React.forwardRef<HTMLDivElement, MobileKeypadProps>(
               )}
             >
               {key === 'backspace' ? (
-                <Delete className="h-6 w-6" />
+                <Trash2 className="h-6 w-6" />
               ) : (
                 key
               )}

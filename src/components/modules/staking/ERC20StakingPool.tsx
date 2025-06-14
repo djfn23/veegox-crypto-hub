@@ -7,10 +7,24 @@ import { ERC20StakingForm } from "./ERC20StakingForm";
 import { ERC20ActiveStakes } from "./ERC20ActiveStakes";
 
 export const ERC20StakingPool = () => {
-  const { connectedWallet } = useWeb3Wallet();
-  const { data: contractInfo } = useMainContractInfo();
-  const { data: userBalance } = useUserContractBalance(connectedWallet?.address || null);
+  console.log('ERC20StakingPool: Component mounting');
 
+  const { connectedWallet } = useWeb3Wallet();
+  const { data: contractInfo, error: contractError } = useMainContractInfo();
+  const { data: userBalance, error: balanceError } = useUserContractBalance(connectedWallet?.address || null);
+
+  console.log('ERC20StakingPool: Contract data:', contractInfo);
+  console.log('ERC20StakingPool: User balance data:', userBalance);
+
+  if (contractError) {
+    console.error('ERC20StakingPool: Contract error:', contractError);
+  }
+
+  if (balanceError) {
+    console.error('ERC20StakingPool: Balance error:', balanceError);
+  }
+
+  // Accès sécurisé aux données via result
   const tokenInfo = contractInfo?.result?.tokenInfo;
   const balance = userBalance?.result || "0";
   

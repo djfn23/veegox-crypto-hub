@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,12 +7,42 @@ import { useMainContractInfo, useUserContractBalance } from "@/hooks/useMainCont
 import { useWeb3Wallet } from "@/hooks/useWeb3Wallet";
 
 const MainContractDashboard = () => {
-  const { connectedWallet } = useWeb3Wallet();
-  const { data: contractInfo, isLoading, error } = useMainContractInfo();
-  const { data: userBalance } = useUserContractBalance(connectedWallet?.address || null);
+  console.log('MainContractDashboard: Component mounting');
 
+  const { connectedWallet } = useWeb3Wallet();
+  const { data: contractInfo, isLoading: contractLoading, error: contractError } = useMainContractInfo();
+  const { data: userBalance, isLoading: balanceLoading, error: balanceError } = useUserContractBalance(connectedWallet?.address || null);
+
+  console.log('MainContractDashboard: Contract data:', contractInfo);
+  console.log('MainContractDashboard: User balance data:', userBalance);
+  console.log('MainContractDashboard: Connected wallet:', connectedWallet);
+
+  if (contractError) {
+    console.error('MainContractDashboard: Contract error:', contractError);
+  }
+
+  if (balanceError) {
+    console.error('MainContractDashboard: Balance error:', balanceError);
+  }
+
+  // Accès sécurisé aux données via result
   const tokenInfo = contractInfo?.result?.tokenInfo;
   const balance = userBalance?.result || "0";
+
+  console.log('MainContractDashboard: Token info:', tokenInfo);
+  console.log('MainContractDashboard: Balance:', balance);
+
+  if (contractLoading) {
+    return (
+      <div className="space-y-4">
+        <Card className="bg-slate-900/50 border-slate-700">
+          <CardContent className="p-6">
+            <div className="text-white">Chargement des informations du contrat...</div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -60,9 +91,13 @@ const MainContractDashboard = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-white font-semibold">
-            {balance}
-          </p>
+          {balanceLoading ? (
+            <p className="text-gray-400">Chargement du solde...</p>
+          ) : (
+            <p className="text-white font-semibold">
+              {balance}
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
