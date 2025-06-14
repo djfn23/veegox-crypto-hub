@@ -1,25 +1,10 @@
 
-import * as React from 'react';
-
-console.log('AlchemySignerContainer: Module loading with React:', !!React);
+import React, { useEffect } from 'react';
 
 export const AlchemySignerContainer = () => {
   console.log('AlchemySignerContainer: Component initializing');
-  
-  // Ensure React is available before using hooks
-  if (!React) {
-    console.error('AlchemySignerContainer: React is not available');
-    return <div>React not available</div>;
-  }
 
-  if (!React.useEffect) {
-    console.error('AlchemySignerContainer: React.useEffect is not available');
-    return <div>React.useEffect not available</div>;
-  }
-
-  console.log('AlchemySignerContainer: React and useEffect verified, proceeding with component');
-
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('AlchemySignerContainer: useEffect triggered');
     
     // Guard de sécurité pour s'assurer que document existe
