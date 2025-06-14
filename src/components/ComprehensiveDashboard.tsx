@@ -13,7 +13,6 @@ import ExchangeModule from '@/components/modules/exchange/ExchangeModule';
 import { Link } from "react-router-dom";
 
 const ComprehensiveDashboard = () => {
-  // Sécuriser le rendu côté client uniquement
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     setIsClient(true);
@@ -25,9 +24,10 @@ const ComprehensiveDashboard = () => {
   const isMobile = isClient ? useIsMobile() : false;
   const [copied, setCopied] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
-  const { data: balanceData, refetch: refetchBalance } = isClient && connectedWallet
-    ? useWalletBalance(connectedWallet?.address)
-    : { data: null, refetch: () => {} };
+  const { data: balanceData, refetch: refetchBalance } =
+    isClient && connectedWallet
+      ? useWalletBalance(connectedWallet?.address)
+      : { data: null, refetch: () => {} };
 
   useEffect(() => {
     if (copied) {
@@ -54,7 +54,6 @@ const ComprehensiveDashboard = () => {
   ];
 
   if (!isClient) {
-    // Optionnel: afficher un spinner de chargement pour éviter tout hydratation mismatch
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-white text-lg">Chargement du tableau de bord...</div>

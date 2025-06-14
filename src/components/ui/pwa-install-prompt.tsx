@@ -13,7 +13,9 @@ export const PWAInstallPrompt = () => {
   }, []);
 
   // Les hooks doivent être appelés seulement côté client
-  const { isInstallable, isInstalled, installPWA } = isClient ? usePWA() : { isInstallable: false, isInstalled: false, installPWA: async () => false };
+  const { isInstallable, isInstalled, installPWA } = isClient
+    ? usePWA()
+    : { isInstallable: false, isInstalled: false, installPWA: async () => false };
   const { isMobile } = isClient ? useResponsiveLayout() : { isMobile: false };
   const [isVisible, setIsVisible] = useState(true);
 

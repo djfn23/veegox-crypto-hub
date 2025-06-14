@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -13,7 +12,7 @@ interface Web3Wallet {
 }
 
 // V2 : Ne pas appeler de hooks React côté serveur
-const canUseDOM = typeof window !== "undefined";
+const canUseDOM = typeof window !== "undefined" && !!window.document && !!window.document.createElement;
 
 export const useWeb3Wallet = () => {
   // Guard: don't run this hook on server

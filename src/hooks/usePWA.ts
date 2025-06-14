@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -10,7 +9,7 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
-const canUseDOM = typeof window !== 'undefined';
+const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
 
 export const usePWA = () => {
   if (!canUseDOM) {
