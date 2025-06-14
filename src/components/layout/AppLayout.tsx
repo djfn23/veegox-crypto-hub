@@ -5,6 +5,7 @@ import { MobileHeader } from "./MobileHeader";
 import { MobileBottomNavigation } from "./MobileBottomNavigation";
 import { UserMenu } from "./UserMenu";
 import { PWAInstallPrompt } from "@/components/ui/pwa-install-prompt";
+import { SidebarErrorBoundary } from "@/components/ui/error-boundary-sidebar";
 import { texts } from "@/lib/constants/texts";
 import { Badge } from "@/components/ui/badge";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
@@ -14,61 +15,36 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
-  // Guard: ensure hook only called client-side
   const [isClient, setIsClient] = useState(false);
-  
-  // IMPORTANT: Appeler TOUS les hooks AVANT tout return conditionnel
-  const { isMobile, isTablet, isDesktop, isLandscapePhone, deviceType } = useResponsiveLayout();
-  const [caughtError, setCaughtError] = useState<null | unknown>(null);
+  const { isMobile, isTablet, isDesktop, isLandscapePhone } = useResponsiveLayout();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // BLOQUE TOUT RENDU TANT QUE CLIENT PAS PRÊT (évite erreurs hooks Radix/React)
+  // Loading screen while client initializes
   if (!isClient) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-        <div className="text-white text-lg">
+        <div className="text-white text-lg animate-pulse">
           Initialisation de l'interface Veegox...
         </div>
       </div>
     );
   }
 
-  // Error boundary (sync only) to catch errors in the tree.
-  try {
-    // If a previous error happened, display it (debug)
-    if (caughtError) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-          <div className="text-white text-lg">
-            Une erreur technique est survenue.<br />
-            <span className="text-sm text-gray-300">
-              Veuillez recharger la page ou contacter le support.<br />
-              {typeof caughtError === "string"
-                ? caughtError
-                : (caughtError && (caughtError as { message?: string })?.message)
-                  ? (caughtError as { message?: string }).message
-                  : null}
-            </span>
-          </div>
-        </div>
-      );
-    }
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+      <PWAInstallPrompt />
 
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-        {/* PWA Install Prompt */}
-        <PWAInstallPrompt />
+      {/* Mobile/Tablet Header */}
+      {!isDesktop && <MobileHeader />}
 
-        {/* Mobile Header - avec breakpoints améliorés */}
-        {(isMobile || isTablet) && <MobileHeader />}
-
-        {/* Desktop Layout */}
-        {isDesktop && (
-          <div className="flex min-h-screen">
-            {/* Sidebar */}
+      {/* Desktop Layout */}
+      {isDesktop && (
+        <div className="flex min-h-screen">
+          {/* Desktop Sidebar */}
+          <SidebarErrorBoundary>
             <div className="w-64 bg-slate-900/50 backdrop-blur-sm border-r border-slate-700 min-h-screen flex-shrink-0">
               <div className="p-4 border-b border-slate-700">
                 <div className="flex items-center space-x-2">
@@ -81,53 +57,36 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
                 <SimplifiedNavigation />
               </div>
             </div>
+          </SidebarErrorBoundary>
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col min-w-0">
-              {/* Desktop Header */}
-              <header className="bg-slate-900/50 backdrop-blur-sm border-b border-slate-700 px-6 py-4 flex-shrink-0">
-                <div className="flex items-center justify-end">
-                  <UserMenu />
-                </div>
-              </header>
-              {/* Content */}
-              <main className="flex-1 overflow-auto">
-                {children}
-              </main>
-            </div>
-          </div>
-        )}
-
-        {/* Mobile/Tablet Content - amélioré */}
-        {!isDesktop && (
-          <div className="flex flex-col min-h-screen">
-            <main className={`flex-1 ${isMobile ? 'pb-20' : 'pb-4'} ${isLandscapePhone ? 'pb-16' : ''}`}>
-              <div className={`px-4 py-4 ${isTablet ? 'px-6 py-6 max-w-6xl mx-auto' : ''}`}>
-                {children}
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Desktop Header */}
+            <header className="bg-slate-900/50 backdrop-blur-sm border-b border-slate-700 px-6 py-4 flex-shrink-0">
+              <div className="flex items-center justify-end">
+                <UserMenu />
               </div>
+            </header>
+            
+            {/* Content */}
+            <main className="flex-1 overflow-auto">
+              {children}
             </main>
-            {isMobile && <MobileBottomNavigation />}
           </div>
-        )}
-      </div>
-    );
-  } catch (e) {
-    // set error in state for possible debug
-    if (!caughtError) setCaughtError(e);
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-        <div className="text-white text-lg">
-          Une erreur technique est survenue.<br />
-          <span className="text-sm text-gray-300">
-            Veuillez recharger la page ou contacter le support.<br />
-            {typeof e === "string"
-              ? e
-              : (e && (e as { message?: string })?.message)
-                ? (e as { message?: string }).message
-                : null}
-          </span>
         </div>
-      </div>
-    );
-  }
+      )}
+
+      {/* Mobile/Tablet Content */}
+      {!isDesktop && (
+        <div className="flex flex-col min-h-screen">
+          <main className={`flex-1 ${isMobile ? 'pb-20' : 'pb-4'} ${isLandscapePhone ? 'pb-16' : ''}`}>
+            <div className={`px-4 py-4 ${isTablet ? 'px-6 py-6 max-w-6xl mx-auto' : ''}`}>
+              {children}
+            </div>
+          </main>
+          {isMobile && <MobileBottomNavigation />}
+        </div>
+      )}
+    </div>
+  );
 }
