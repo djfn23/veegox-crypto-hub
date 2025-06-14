@@ -6,19 +6,42 @@ import { SavingsPlans } from "./SavingsPlans";
 import { VirtualCards } from "./VirtualCards";
 import { PaymentRequests } from "./PaymentRequests";
 import { BankingAnalytics } from "./BankingAnalytics";
-import { Wallet, CreditCard, PiggyBank, QrCode, BarChart3, Send } from "lucide-react";
+import { Wallet, CreditCard, PiggyBank, QrCode, BarChart3, Send, Shield } from "lucide-react";
 import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
+import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import { MobileCard, MobileCardContent } from "@/components/ui/mobile-card";
 import { MobileTabs, MobileTabsList, MobileTabsTrigger, MobileTabsContent } from "@/components/ui/mobile-tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import VeegoxLogo from "@/components/ui/veegox-logo";
+import { useToast } from "@/hooks/use-toast";
 
 export const CryptoBankModule = () => {
   const { user, isAuthenticated } = useUnifiedAuth();
   const { isMobile } = useResponsiveLayout();
+  const { isSupported: isBiometricSupported, isEnrolled: isBiometricEnrolled, enrollBiometric } = useBiometricAuth();
   const [activeTab, setActiveTab] = useState("accounts");
+  const { toast } = useToast();
+
+  const handleEnableBiometric = async () => {
+    if (!user) return;
+    
+    const result = await enrollBiometric(user.id);
+    if (result.success) {
+      toast({
+        title: "Authentification biométrique activée",
+        description: "Votre empreinte digitale a été enregistrée avec succès",
+      });
+    } else {
+      toast({
+        title: "Erreur",
+        description: result.error || "Impossible d'activer l'authentification biométrique",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (!isAuthenticated || !user) {
     const CardComponent = isMobile ? MobileCard : Card;
@@ -53,23 +76,49 @@ export const CryptoBankModule = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header with security status */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-white">Banque Crypto</h1>
           <p className="text-gray-400 text-sm md:text-base">Gérez vos comptes et transactions crypto</p>
         </div>
+        
+        {/* Security Badge */}
+        <div className="flex items-center gap-2">
+          {isBiometricSupported && !isBiometricEnrolled && (
+            <Button
+              onClick={handleEnableBiometric}
+              size="sm"
+              variant="outline"
+              className="border-green-600 text-green-400 hover:bg-green-600 hover:text-white"
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              {isMobile ? "Sécuriser" : "Activer Touch ID"}
+            </Button>
+          )}
+          {isBiometricEnrolled && (
+            <Badge className="bg-green-500 text-white">
+              <Shield className="h-3 w-3 mr-1" />
+              Sécurisé
+            </Badge>
+          )}
+        </div>
       </div>
 
+      {/* Navigation Tabs */}
       <MobileTabs value={activeTab} onValueChange={setActiveTab}>
-        <MobileTabsList className={isMobile ? "flex-col space-y-1" : "grid grid-cols-6"}>
+        <MobileTabsList 
+          className={isMobile ? "grid grid-cols-2 gap-2 p-2" : "grid grid-cols-6"}
+          orientation={isMobile ? "horizontal" : "horizontal"}
+        >
           {tabItems.map((item) => (
             <MobileTabsTrigger
               key={item.value}
               value={item.value}
               icon={<item.icon className="h-4 w-4" />}
-              className={isMobile ? "w-full justify-start" : ""}
+              className={isMobile ? "flex-col py-3 px-2 text-xs" : ""}
             >
-              {item.label}
+              <span className={isMobile ? "mt-1" : ""}>{item.label}</span>
             </MobileTabsTrigger>
           ))}
         </MobileTabsList>
