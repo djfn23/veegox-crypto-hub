@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { RealTimeMarketOverview } from '@/components/dashboard/RealTimeMarketOverview';
 import ExchangeModule from '@/components/modules/exchange/ExchangeModule';
 import { Link } from "react-router-dom";
+import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 
 const ComprehensiveDashboard = () => {
   const [isClient, setIsClient] = useState(false);
@@ -20,6 +21,7 @@ const ComprehensiveDashboard = () => {
   const { connectedWallet } = useWeb3Wallet();
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const { isTablet, deviceType, getColumns, getSpacing } = useResponsiveLayout();
   const [copied, setCopied] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
   const { data: balanceData, refetch: refetchBalance } = useWalletBalance(connectedWallet?.address || '');
@@ -60,13 +62,30 @@ const ComprehensiveDashboard = () => {
     );
   }
 
+  const containerPadding = getSpacing("p-4", "p-6", "p-6");
+  const sectionSpacing = getSpacing("space-y-4", "space-y-6", "space-y-6");
+  const quickLinksColumns = getColumns(2, 3, 6);
+
   return (
-    <div className="p-4 lg:p-6 space-y-6">
+    <div className={`${containerPadding} ${sectionSpacing} max-w-7xl mx-auto`}>
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className={`
+        flex flex-col gap-4
+        ${isTablet ? 'lg:flex-row lg:items-center lg:justify-between' : 'lg:flex-row lg:items-center lg:justify-between'}
+      `}>
         <div>
-          <h1 className="text-3xl font-bold text-white">Tableau de Bord</h1>
-          <p className="text-gray-400">Bienvenue sur votre plateforme DeFi complète</p>
+          <h1 className={`
+            font-bold text-white
+            ${isMobile ? 'text-2xl' : isTablet ? 'text-3xl' : 'text-3xl'}
+          `}>
+            Tableau de Bord
+          </h1>
+          <p className={`
+            text-gray-400
+            ${isMobile ? 'text-sm' : 'text-base'}
+          `}>
+            Bienvenue sur votre plateforme DeFi complète
+          </p>
         </div>
         
         {/* Section Toggle */}
@@ -74,14 +93,14 @@ const ComprehensiveDashboard = () => {
           <Button 
             variant={activeSection === 'overview' ? 'default' : 'outline'}
             onClick={() => setActiveSection('overview')}
-            className="text-sm"
+            className={`text-sm ${isMobile ? 'px-3 py-2' : ''}`}
           >
             Vue d'ensemble
           </Button>
           <Button 
             variant={activeSection === 'exchange' ? 'default' : 'outline'}
             onClick={() => setActiveSection('exchange')}
-            className="text-sm"
+            className={`text-sm ${isMobile ? 'px-3 py-2' : ''}`}
           >
             <ArrowRightLeft className="h-4 w-4 mr-2" />
             Exchange
@@ -90,10 +109,15 @@ const ComprehensiveDashboard = () => {
       </div>
 
       {activeSection === 'overview' && (
-        <div className="space-y-6">
+        <div className={sectionSpacing}>
           {/* Real-time Market Overview */}
           <div>
-            <h2 className="text-2xl font-bold text-white mb-4">Aperçu du Marché</h2>
+            <h2 className={`
+              font-bold text-white mb-4
+              ${isMobile ? 'text-xl' : 'text-2xl'}
+            `}>
+              Aperçu du Marché
+            </h2>
             <RealTimeMarketOverview />
           </div>
 
@@ -138,11 +162,17 @@ const ComprehensiveDashboard = () => {
             </div>
           ) : (
             <Card className="bg-slate-900/50 border-slate-700">
-              <CardContent className="p-8 text-center">
-                <h3 className="text-lg font-medium text-white mb-2">
+              <CardContent className={`text-center ${isMobile ? 'p-6' : 'p-8'}`}>
+                <h3 className={`
+                  font-medium text-white mb-2
+                  ${isMobile ? 'text-base' : 'text-lg'}
+                `}>
                   Connectez votre Wallet
                 </h3>
-                <p className="text-gray-400 mb-6">
+                <p className={`
+                  text-gray-400 mb-6
+                  ${isMobile ? 'text-sm' : 'text-base'}
+                `}>
                   Connectez votre wallet pour voir votre balance et gérer vos actifs
                 </p>
                 <Button className="bg-purple-600 hover:bg-purple-700">
@@ -154,18 +184,39 @@ const ComprehensiveDashboard = () => {
 
           {/* Quick Access Links */}
           <div>
-            <h2 className="text-2xl font-bold text-white mb-4">Accès Rapide</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <h2 className={`
+              font-bold text-white mb-4
+              ${isMobile ? 'text-xl' : 'text-2xl'}
+            `}>
+              Accès Rapide
+            </h2>
+            <div className={`
+              grid gap-4
+              ${isMobile 
+                ? 'grid-cols-2' 
+                : isTablet 
+                  ? 'grid-cols-3' 
+                  : 'grid-cols-6'
+              }
+            `}>
               {quickLinks.map((link) => {
                 const Icon = link.icon;
                 return (
                   <Link key={link.name} to={link.href}>
                     <Card className="bg-slate-900/50 border-slate-700 hover:bg-slate-800/50 transition-colors cursor-pointer">
-                      <CardContent className="p-4 text-center">
-                        <div className={`w-12 h-12 ${link.color} rounded-lg flex items-center justify-center mx-auto mb-2`}>
-                          <Icon className="h-6 w-6 text-white" />
+                      <CardContent className={`text-center ${isMobile ? 'p-3' : 'p-4'}`}>
+                        <div className={`
+                          ${link.color} rounded-lg flex items-center justify-center mx-auto mb-2
+                          ${isMobile ? 'w-10 h-10' : 'w-12 h-12'}
+                        `}>
+                          <Icon className={`text-white ${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
                         </div>
-                        <p className="text-white text-sm font-medium">{link.name}</p>
+                        <p className={`
+                          text-white font-medium
+                          ${isMobile ? 'text-xs' : 'text-sm'}
+                        `}>
+                          {link.name}
+                        </p>
                       </CardContent>
                     </Card>
                   </Link>
@@ -175,13 +226,21 @@ const ComprehensiveDashboard = () => {
           </div>
 
           {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className={`
+            grid gap-4
+            ${isMobile 
+              ? 'grid-cols-1' 
+              : isTablet 
+                ? 'grid-cols-2' 
+                : 'grid-cols-4'
+            }
+          `}>
             <Card className="bg-slate-900/50 border-slate-700">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">Volume 24h</p>
-                    <p className="text-white text-xl font-bold">$2.4M</p>
+                    <p className={`text-white font-bold ${isMobile ? 'text-lg' : 'text-xl'}`}>$2.4M</p>
                   </div>
                   <TrendingUp className="h-8 w-8 text-green-500" />
                 </div>
@@ -193,7 +252,7 @@ const ComprehensiveDashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">Utilisateurs Actifs</p>
-                    <p className="text-white text-xl font-bold">12.5K</p>
+                    <p className={`text-white font-bold ${isMobile ? 'text-lg' : 'text-xl'}`}>12.5K</p>
                   </div>
                   <Wallet className="h-8 w-8 text-blue-500" />
                 </div>
@@ -205,7 +264,7 @@ const ComprehensiveDashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">TVL Total</p>
-                    <p className="text-white text-xl font-bold">$45.2M</p>
+                    <p className={`text-white font-bold ${isMobile ? 'text-lg' : 'text-xl'}`}>$45.2M</p>
                   </div>
                   <Coins className="h-8 w-8 text-purple-500" />
                 </div>
@@ -217,7 +276,7 @@ const ComprehensiveDashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">Récompenses</p>
-                    <p className="text-white text-xl font-bold">8.5%</p>
+                    <p className={`text-white font-bold ${isMobile ? 'text-lg' : 'text-xl'}`}>8.5%</p>
                   </div>
                   <Heart className="h-8 w-8 text-pink-500" />
                 </div>

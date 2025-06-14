@@ -5,6 +5,7 @@ export type BreakpointKey = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 export type DeviceType = 'mobile' | 'tablet' | 'desktop'
 export type Orientation = 'portrait' | 'landscape'
 
+// Breakpoints alignés avec Tailwind CSS
 const breakpoints = {
   xs: 0,
   sm: 640,
@@ -46,10 +47,22 @@ export const useResponsiveLayout = () => {
       setOrientation(width > height ? 'landscape' : 'portrait');
     };
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
+    // Debounce pour optimiser les performances
+    let timeoutId: NodeJS.Timeout;
+    const debouncedResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleResize, 150);
+    };
 
-    return () => window.removeEventListener('resize', handleResize);
+    handleResize();
+    window.addEventListener('resize', debouncedResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', debouncedResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
   }, [canUseDOM]);
 
   const getCurrentBreakpoint = (): BreakpointKey => {
@@ -64,9 +77,10 @@ export const useResponsiveLayout = () => {
 
   const getDeviceType = (): DeviceType => {
     const width = windowSize.width;
-    if (width < 768) return 'mobile';
-    if (width < 1024) return 'tablet';
-    return 'desktop';
+    // Breakpoints améliorés pour une meilleure détection
+    if (width < 768) return 'mobile'; // xs et sm
+    if (width < 1024) return 'tablet'; // md
+    return 'desktop'; // lg et plus
   };
 
   const isBreakpoint = (breakpoint: BreakpointKey): boolean => {
@@ -105,6 +119,12 @@ export const useResponsiveLayout = () => {
     }
   };
 
+  // Nouvelles helpers pour transitions et responsive utilities
+  const isSmallMobile = (): boolean => windowSize.width < 375;
+  const isLargeMobile = (): boolean => windowSize.width >= 414 && windowSize.width < 768;
+  const isSmallTablet = (): boolean => windowSize.width >= 768 && windowSize.width < 900;
+  const isLandscapePhone = (): boolean => orientation === 'landscape' && windowSize.width < 900;
+
   return {
     windowSize,
     orientation,
@@ -119,5 +139,10 @@ export const useResponsiveLayout = () => {
     isBetweenBreakpoints,
     getColumns,
     getSpacing,
+    // Nouvelles utilities
+    isSmallMobile,
+    isLargeMobile,
+    isSmallTablet,
+    isLandscapePhone,
   };
 };
