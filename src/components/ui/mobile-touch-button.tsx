@@ -2,8 +2,27 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { useResponsiveLayout } from "@/hooks/useResponsiveLayout"
 import { Slot } from "@radix-ui/react-slot"
+
+// Simple responsive check without useResponsiveLayout to avoid circular issues
+const useSimpleResponsive = () => {
+  const [isMobile, setIsMobile] = React.useState(false);
+  const [isTablet, setIsTablet] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkSize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
+    };
+
+    checkSize();
+    window.addEventListener('resize', checkSize);
+    return () => window.removeEventListener('resize', checkSize);
+  }, []);
+
+  return { isMobile, isTablet };
+};
 
 interface MobileTouchButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "primary" | "secondary" | "ghost" | "outline" | "destructive"
@@ -25,7 +44,7 @@ export const MobileTouchButton = React.forwardRef<HTMLButtonElement, MobileTouch
     children, 
     ...props 
   }, ref) => {
-    const { isMobile, isTablet } = useResponsiveLayout()
+    const { isMobile, isTablet } = useSimpleResponsive();
     
     // Enhanced sizes for better mobile touch experience
     const sizeClasses = {
@@ -99,7 +118,7 @@ interface QuickActionButtonProps extends Omit<MobileTouchButtonProps, 'children'
 
 export const QuickActionButton = React.forwardRef<HTMLButtonElement, QuickActionButtonProps>(
   ({ icon: Icon, label, badge, className, ...props }, ref) => {
-    const { isMobile, getFontSize } = useResponsiveLayout()
+    const { isMobile } = useSimpleResponsive();
     
     return (
       <MobileTouchButton
@@ -131,7 +150,7 @@ export const QuickActionButton = React.forwardRef<HTMLButtonElement, QuickAction
         </div>
         <span className={cn(
           "font-medium text-center leading-tight",
-          getFontSize('xs')
+          isMobile ? "text-sm" : "text-xs"
         )}>
           {label}
         </span>

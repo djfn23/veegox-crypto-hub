@@ -1,5 +1,5 @@
 
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 
 export type BreakpointKey = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 export type DeviceType = 'mobile' | 'tablet' | 'desktop'
@@ -20,52 +20,23 @@ const defaultWindowSize = { width: 1024, height: 768 };
 const defaultOrientation: Orientation = 'landscape';
 
 export const useResponsiveLayout = () => {
-  // Safety check for React availability
-  if (!React || !React.useState || !React.useEffect) {
-    console.error('React hooks are not available in useResponsiveLayout');
-    return {
-      windowSize: defaultWindowSize,
-      orientation: defaultOrientation,
-      currentBreakpoint: 'lg' as BreakpointKey,
-      deviceType: 'desktop' as DeviceType,
-      isMobile: false,
-      isTablet: false,
-      isDesktop: true,
-      isPortrait: false,
-      isLandscape: true,
-      isBreakpoint: () => false,
-      isBetweenBreakpoints: () => false,
-      getColumns: () => 1,
-      getSpacing: () => '16px',
-      isSmallMobile: () => false,
-      isLargeMobile: () => false,
-      isSmallTablet: () => false,
-      isLandscapePhone: () => false,
-      isExtraSmall: () => false,
-      isCompact: () => false,
-      canUseColumns: () => false,
-      getDynamicSpacing: () => '16px',
-      getFontSize: () => 'text-base',
-    };
-  }
-
   // Guard anti SSR/absence de window
   const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
 
   // TOUJOURS appeler useState - pas conditionnellement
-  const [windowSize, setWindowSize] = React.useState(() =>
+  const [windowSize, setWindowSize] = useState(() =>
     canUseDOM
       ? { width: window.innerWidth, height: window.innerHeight }
       : defaultWindowSize
   );
 
-  const [orientation, setOrientation] = React.useState<Orientation>(() =>
+  const [orientation, setOrientation] = useState<Orientation>(() =>
     canUseDOM
       ? window.innerWidth > window.innerHeight ? 'landscape' : 'portrait'
       : defaultOrientation
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!canUseDOM) return;
 
     const handleResize = () => {
