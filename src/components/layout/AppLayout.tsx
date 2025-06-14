@@ -19,6 +19,17 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     setIsClient(true);
   }, []);
 
+  // BLOQUE TOUT RENDU TANT QUE CLIENT PAS PRÊT (évite erreurs hooks Radix/React)
+  if (!isClient) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+        <div className="text-white text-lg">
+          Initialisation de l'interface Veegox...
+        </div>
+      </div>
+    );
+  }
+
   // Always default non-mobile layout SSR
   const { isMobile, isTablet } = isClient
     ? useResponsiveLayout()
