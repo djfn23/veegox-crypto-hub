@@ -8,59 +8,31 @@ type ToasterProps = {
 } & Record<string, any>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  // Comprehensive safety check for React availability
-  if (!React || typeof React.createElement === 'undefined') {
-    console.error('React is not available in Sonner component');
+  // Early safety check - if React is not available, return null immediately
+  if (typeof React === 'undefined' || React === null || typeof React.useState === 'undefined') {
+    console.warn('React hooks not available, skipping Sonner component');
     return null;
   }
 
-  // Check if React hooks are available
-  if (typeof React.useState === 'undefined') {
-    console.error('React hooks are not available in Sonner component');
-    return null;
-  }
-
-  // Use dynamic import to avoid loading Sonner until React is ready
-  const [SonnerComponent, setSonnerComponent] = React.useState<any>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    // Only import and use Sonner after React is confirmed to be available
-    const loadSonner = async () => {
-      try {
-        // Verify React is still available
-        if (!React || typeof React.useState === 'undefined') {
-          console.error('React became unavailable during Sonner loading');
-          setIsLoading(false);
-          return;
-        }
-
-        const { Toaster: SonnerToaster } = await import('sonner');
-        setSonnerComponent(() => SonnerToaster);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error loading Sonner component:', error);
-        setIsLoading(false);
-      }
-    };
-
-    // Add a small delay to ensure React is fully initialized
-    const timer = setTimeout(loadSonner, 150);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return null;
-  }
-
-  if (!SonnerComponent) {
-    console.error('Sonner component failed to load');
-    return null;
-  }
-
+  // Only proceed if we can safely use React hooks
   try {
-    return React.createElement(SonnerComponent, {
+    // Use a simple approach - import Sonner synchronously but with error handling
+    const SonnerToaster = React.useMemo(() => {
+      try {
+        // Try to import Sonner, but catch any errors
+        const { Toaster: ImportedToaster } = require('sonner');
+        return ImportedToaster;
+      } catch (error) {
+        console.warn('Failed to load Sonner:', error);
+        return null;
+      }
+    }, []);
+
+    if (!SonnerToaster) {
+      return null;
+    }
+
+    return React.createElement(SonnerToaster, {
       theme: "dark",
       className: "toaster group",
       toastOptions: {
@@ -77,67 +49,28 @@ const Toaster = ({ ...props }: ToasterProps) => {
       ...props,
     });
   } catch (error) {
-    console.error('Error rendering Sonner component:', error);
+    console.warn('Error in Sonner component:', error);
     return null;
   }
 };
 
-// Dynamic export of toast function
-let toastFunction: any = null;
-
-const getToast = async () => {
-  if (!toastFunction) {
-    try {
-      const { toast } = await import('sonner');
-      toastFunction = toast;
-    } catch (error) {
-      console.error('Error loading toast function:', error);
-      toastFunction = () => console.warn('Toast function not available');
-    }
+// Safe toast function that doesn't break if Sonner isn't available
+const createSafeToast = () => {
+  try {
+    const { toast: sonnerToast } = require('sonner');
+    return sonnerToast;
+  } catch (error) {
+    console.warn('Toast function not available:', error);
+    // Return a mock toast function that does nothing
+    const mockToast = () => {};
+    mockToast.success = () => {};
+    mockToast.error = () => {};
+    mockToast.info = () => {};
+    mockToast.warning = () => {};
+    return mockToast;
   }
-  return toastFunction;
 };
 
-// Create a safe toast wrapper
-const toast = (...args: any[]) => {
-  getToast().then(toastFn => {
-    if (toastFn && typeof toastFn === 'function') {
-      toastFn(...args);
-    }
-  });
-};
-
-// Add common toast methods
-toast.success = (...args: any[]) => {
-  getToast().then(toastFn => {
-    if (toastFn && typeof toastFn.success === 'function') {
-      toastFn.success(...args);
-    }
-  });
-};
-
-toast.error = (...args: any[]) => {
-  getToast().then(toastFn => {
-    if (toastFn && typeof toastFn.error === 'function') {
-      toastFn.error(...args);
-    }
-  });
-};
-
-toast.info = (...args: any[]) => {
-  getToast().then(toastFn => {
-    if (toastFn && typeof toastFn.info === 'function') {
-      toastFn.info(...args);
-    }
-  });
-};
-
-toast.warning = (...args: any[]) => {
-  getToast().then(toastFn => {
-    if (toastFn && typeof toastFn.warning === 'function') {
-      toastFn.warning(...args);
-    }
-  });
-};
+const toast = createSafeToast();
 
 export { Toaster, toast };
