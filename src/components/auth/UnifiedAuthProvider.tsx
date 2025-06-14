@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,10 +40,16 @@ interface UnifiedAuthProviderProps {
 }
 
 export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ children }) => {
-  // Safety check for React availability
-  if (!React || !React.useState || !React.useEffect) {
+  // Early return with fallback if React is not properly loaded
+  if (typeof React === 'undefined' || !React || !React.useState || !React.useEffect || !React.useContext) {
     console.error('React hooks are not available in UnifiedAuthProvider');
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+        <div className="text-white text-lg animate-pulse">
+          Chargement de l'authentification...
+        </div>
+      </div>
+    );
   }
 
   const [user, setUser] = React.useState<AuthUser | null>(null);
