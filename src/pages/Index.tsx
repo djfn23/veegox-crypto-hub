@@ -10,7 +10,6 @@ import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { AppLayout } from "@/components/layout/AppLayout";
 import ComprehensiveDashboard from "@/components/ComprehensiveDashboard";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { TooltipProvider } from "@/components/ui/tooltip";
 
 const Index = () => {
   const [showAuth, setShowAuth] = useState(false);
@@ -53,11 +52,9 @@ const Index = () => {
   if (isAuthenticated) {
     return (
       <ErrorBoundary>
-        <TooltipProvider>
-          <AppLayout>
-            <ComprehensiveDashboard />
-          </AppLayout>
-        </TooltipProvider>
+        <AppLayout>
+          <ComprehensiveDashboard />
+        </AppLayout>
       </ErrorBoundary>
     );
   }
@@ -72,27 +69,25 @@ const Index = () => {
 
   return (
     <ErrorBoundary>
-      <TooltipProvider>
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-          <NavigationBar 
-            onLoginClick={handleLoginClick}
-            onSignupClick={handleSignupClick}
-          />
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+        <NavigationBar 
+          onLoginClick={handleLoginClick}
+          onSignupClick={handleSignupClick}
+        />
 
-          <HeroSection onSignupClick={handleSignupClick} />
+        <HeroSection onSignupClick={handleSignupClick} />
 
-          <FeaturesSection />
+        <FeaturesSection />
 
-          <CTASection onSignupClick={handleSignupClick} />
+        <CTASection onSignupClick={handleSignupClick} />
 
-          <AppFooter />
+        <AppFooter />
 
-          <LoginModal
-            isOpen={showAuth}
-            onClose={() => setShowAuth(false)}
-          />
-        </div>
-      </TooltipProvider>
+        <LoginModal
+          isOpen={showAuth}
+          onClose={() => setShowAuth(false)}
+        />
+      </div>
     </ErrorBoundary>
   );
 };
