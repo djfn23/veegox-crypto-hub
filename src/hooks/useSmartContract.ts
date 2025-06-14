@@ -1,13 +1,12 @@
-
 import { useState, useCallback } from 'react';
 import { contractService, TransactionResult } from '@/services/smartContractService';
 import { notificationService } from '@/services/notificationService';
-import { useAuth } from './useAuth';
+import { useUnifiedAuth } from '@/components/auth/UnifiedAuthProvider';
 
 export const useSmartContract = () => {
   const [isExecuting, setIsExecuting] = useState(false);
   const [lastTransaction, setLastTransaction] = useState<TransactionResult | null>(null);
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
 
   const executeContract = useCallback(async (
     contractAddress: string,

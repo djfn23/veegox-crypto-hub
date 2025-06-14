@@ -7,12 +7,12 @@ import { toast } from "sonner";
 import { Copy, Wallet } from "lucide-react";
 import { shortenAddress } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useAuth } from "@/hooks/useAuth";
+import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { RealTimeMarketOverview } from '@/components/dashboard/RealTimeMarketOverview';
 
 const Dashboard = () => {
   const { connectedWallet } = useWeb3Wallet();
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
   const isMobile = useIsMobile();
   const [copied, setCopied] = useState(false);
   const { data: balanceData, refetch: refetchBalance } = useWalletBalance(connectedWallet?.address);

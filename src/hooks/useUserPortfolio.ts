@@ -1,11 +1,10 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SwapService, UserPortfolio } from '@/services/swapService';
-import { useAuth } from '@/hooks/useAuth';
+import { useUnifiedAuth } from '@/components/auth/UnifiedAuthProvider';
 import { toast } from 'sonner';
 
 export const useUserPortfolio = () => {
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
   const queryClient = useQueryClient();
 
   const { data: portfolio, isLoading } = useQuery({

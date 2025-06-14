@@ -1,14 +1,13 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoanData, CreditScore, Loan, Wallet } from "@/components/modules/credit/types";
 import { calculateLTV } from "@/components/modules/credit/utils";
-import { useAuth } from "./useAuth";
+import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 
 export const useCreditScore = () => {
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
   
   return useQuery({
     queryKey: ['credit-score', user?.id],
@@ -34,7 +33,7 @@ export const useCreditScore = () => {
 };
 
 export const useUserLoans = () => {
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
   
   return useQuery({
     queryKey: ['user-loans', user?.id],
@@ -55,7 +54,7 @@ export const useUserLoans = () => {
 };
 
 export const useUserWallet = () => {
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
   
   return useQuery({
     queryKey: ['user-primary-wallet', user?.id],
@@ -76,7 +75,7 @@ export const useUserWallet = () => {
 };
 
 export const useLoanSubmission = () => {
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -152,7 +151,7 @@ export const useCreditModuleState = () => {
 
 // New hook for calculating credit score
 export const useCreditScoreCalculation = () => {
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
   const queryClient = useQueryClient();
 
   return useMutation({

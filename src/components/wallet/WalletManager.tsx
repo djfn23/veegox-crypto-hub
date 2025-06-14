@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useAuth } from '@/hooks/useAuth';
+import { useUnifiedAuth } from '@/components/auth/UnifiedAuthProvider';
 import { Wallet, Plus, Star, Trash2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -22,7 +21,7 @@ interface WalletData {
 }
 
 export const WalletManager = () => {
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
   const [newWalletAddress, setNewWalletAddress] = useState('');

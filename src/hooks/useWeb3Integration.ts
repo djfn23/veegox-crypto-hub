@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Web3Service } from '@/services/web3Service';
-import { useAuth } from './useAuth';
+import { useUnifiedAuth } from '@/components/auth/UnifiedAuthProvider';
 
 interface Web3State {
   isConnected: boolean;
@@ -14,7 +13,7 @@ interface Web3State {
 }
 
 export const useWeb3Integration = () => {
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
   const [web3State, setWeb3State] = useState<Web3State>({
     isConnected: false,
     account: null,

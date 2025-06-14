@@ -1,13 +1,12 @@
-
 import CreditScoreCard from "./CreditScoreCard";
 import LoanCalculator from "./LoanCalculator";
 import { WalletManager } from "@/components/wallet/WalletManager";
 import { useCreditScore, useUserWallet, useLoanSubmission, useCreditModuleState } from "@/hooks/useCreditModule";
-import { useAuth } from "@/hooks/useAuth";
+import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { Card, CardContent } from "@/components/ui/card";
 
 const CreditOverview = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useUnifiedAuth();
   const { data: creditScore, isLoading: isLoadingScore } = useCreditScore();
   const { data: userWallet } = useUserWallet();
   const { loanData, setLoanData, resetLoanData } = useCreditModuleState();

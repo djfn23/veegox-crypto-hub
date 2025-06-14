@@ -1,10 +1,9 @@
-
 import { useState, useCallback } from 'react';
 import { oneInchService } from '@/services/oneInchService';
 import { SwapService } from '@/services/swapService';
 import { useSwapTransactions } from '@/hooks/useSwapTransactions';
 import { useUserPortfolio } from '@/hooks/useUserPortfolio';
-import { useAuth } from '@/hooks/useAuth';
+import { useUnifiedAuth } from '@/components/auth/UnifiedAuthProvider';
 import { toast } from 'sonner';
 
 export const useSwapQuote = () => {
@@ -13,7 +12,7 @@ export const useSwapQuote = () => {
   const [error, setError] = useState<string | null>(null);
   const { createTransaction, updateTransaction } = useSwapTransactions();
   const { updatePortfolio } = useUserPortfolio();
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
 
   const getQuote = useCallback(async (
     fromToken: string,

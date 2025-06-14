@@ -1,12 +1,11 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SwapService, SwapTransaction } from '@/services/swapService';
-import { useAuth } from '@/hooks/useAuth';
+import { useUnifiedAuth } from '@/components/auth/UnifiedAuthProvider';
 import { toast } from 'sonner';
 
 export const useSwapTransactions = () => {
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
   const queryClient = useQueryClient();
 
   const { data: transactions, isLoading } = useQuery({

@@ -1,13 +1,12 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { AuthModal } from '@/components/auth/AuthModal';
-import { useAuth } from '@/hooks/useAuth';
+import { useUnifiedAuth } from '@/components/auth/UnifiedAuthProvider';
 import { User, LogOut } from 'lucide-react';
 
 const CreditModuleHeader = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const { user, signOut, isAuthenticated } = useAuth();
+  const { user, signOut, isAuthenticated } = useUnifiedAuth();
 
   return (
     <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4 lg:gap-0">
