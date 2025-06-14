@@ -1,24 +1,32 @@
 
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
+// Je conserve les imports
 import { SimplifiedNavigation } from "./SimplifiedNavigation";
 import { MobileHeader } from "./MobileHeader";
 import { MobileBottomNavigation } from "./MobileBottomNavigation";
 import { UserMenu } from "./UserMenu";
 import { PWAInstallPrompt } from "@/components/ui/pwa-install-prompt";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { texts } from "@/lib/constants/texts";
 import { Badge } from "@/components/ui/badge";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
+// Supprimé l'import TooltipProvider ici
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
-  const { isMobile, isTablet } = useResponsiveLayout();
+  // Guard : hook only called client-side
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-  return (
-    <TooltipProvider>
+  const { isMobile, isTablet } = isClient ? useResponsiveLayout() : { isMobile: false, isTablet: false };
+
+  // Fallback d'erreur UI très simple si une erreur inattendue survient
+  try {
+    return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
         {/* PWA Install Prompt */}
         <PWAInstallPrompt />
@@ -70,6 +78,16 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           {isMobile && <MobileBottomNavigation />}
         </div>
       </div>
-    </TooltipProvider>
-  );
-};
+    );
+  } catch (e) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+        <div className="text-white text-lg">
+          Une erreur technique est survenue.<br />
+          <span className="text-sm text-gray-300">Veuillez recharger la page ou contacter le support.</span>
+        </div>
+      </div>
+    );
+  }
+}
+
