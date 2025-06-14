@@ -1,6 +1,6 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
-import { MainContractDashboard } from "@/components/contract/MainContractDashboard";
+import MainContractDashboard from "@/components/contract/MainContractDashboard";
 import { FileText } from "lucide-react";
 
 const Contract = () => {
