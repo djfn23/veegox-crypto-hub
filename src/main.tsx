@@ -8,9 +8,9 @@ import { ErrorBoundary } from '@/components/ui/error-boundary'
 const root = createRoot(document.getElementById("root")!);
 
 root.render(
-  <ErrorBoundary>
-    <StrictMode>
+  <StrictMode>
+    <ErrorBoundary>
       <App />
-    </StrictMode>
-  </ErrorBoundary>
+    </ErrorBoundary>
+  </StrictMode>
 );

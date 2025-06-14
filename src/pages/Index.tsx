@@ -10,6 +10,7 @@ import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { AppLayout } from "@/components/layout/AppLayout";
 import ComprehensiveDashboard from "@/components/ComprehensiveDashboard";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const Index = () => {
   const [showAuth, setShowAuth] = useState(false);
@@ -32,7 +33,7 @@ const Index = () => {
     // Add a delay to ensure all providers are properly initialized
     const timer = setTimeout(() => {
       setIsInitialized(true);
-    }, 200);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, []);
@@ -52,9 +53,11 @@ const Index = () => {
   if (isAuthenticated) {
     return (
       <ErrorBoundary>
-        <AppLayout>
-          <ComprehensiveDashboard />
-        </AppLayout>
+        <TooltipProvider>
+          <AppLayout>
+            <ComprehensiveDashboard />
+          </AppLayout>
+        </TooltipProvider>
       </ErrorBoundary>
     );
   }
@@ -69,25 +72,27 @@ const Index = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-        <NavigationBar 
-          onLoginClick={handleLoginClick}
-          onSignupClick={handleSignupClick}
-        />
+      <TooltipProvider>
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+          <NavigationBar 
+            onLoginClick={handleLoginClick}
+            onSignupClick={handleSignupClick}
+          />
 
-        <HeroSection onSignupClick={handleSignupClick} />
+          <HeroSection onSignupClick={handleSignupClick} />
 
-        <FeaturesSection />
+          <FeaturesSection />
 
-        <CTASection onSignupClick={handleSignupClick} />
+          <CTASection onSignupClick={handleSignupClick} />
 
-        <AppFooter />
+          <AppFooter />
 
-        <LoginModal
-          isOpen={showAuth}
-          onClose={() => setShowAuth(false)}
-        />
-      </div>
+          <LoginModal
+            isOpen={showAuth}
+            onClose={() => setShowAuth(false)}
+          />
+        </div>
+      </TooltipProvider>
     </ErrorBoundary>
   );
 };
