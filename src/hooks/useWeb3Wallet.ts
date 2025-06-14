@@ -12,9 +12,12 @@ interface Web3Wallet {
   provider?: any;
 }
 
+// V2 : Ne pas appeler de hooks React côté serveur
+const canUseDOM = typeof window !== "undefined";
+
 export const useWeb3Wallet = () => {
   // Guard: don't run this hook on server
-  if (typeof window === "undefined") {
+  if (!canUseDOM) {
     return {
       connectedWallet: null,
       isConnecting: false,
@@ -115,7 +118,7 @@ export const useWeb3Wallet = () => {
   };
 
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.ethereum === 'undefined') {
+    if (!canUseDOM || typeof window.ethereum === 'undefined') {
       return;
     }
     const handleAccountsChanged = (accounts: string[]) => {

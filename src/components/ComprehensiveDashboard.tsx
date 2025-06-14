@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useWalletBalance } from "@/hooks/useWalletData";
 import { useWeb3Wallet } from "@/hooks/useWeb3Wallet";
@@ -20,6 +19,7 @@ const ComprehensiveDashboard = () => {
     setIsClient(true);
   }, []);
 
+  // Appeler les hooks custom UNIQUEMENT lorsque isClient est true
   const { connectedWallet } = isClient ? useWeb3Wallet() : { connectedWallet: null };
   const { user } = isClient ? useAuth() : { user: null };
   const isMobile = isClient ? useIsMobile() : false;
@@ -52,6 +52,15 @@ const ComprehensiveDashboard = () => {
     { name: "Crédit", href: "/credit", icon: CreditCard, color: "bg-orange-500" },
     { name: "Banque Crypto", href: "/crypto-bank", icon: Wallet, color: "bg-indigo-500" }
   ];
+
+  if (!isClient) {
+    // Optionnel: afficher un spinner de chargement pour éviter tout hydratation mismatch
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white text-lg">Chargement du tableau de bord...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 lg:p-6 space-y-6">

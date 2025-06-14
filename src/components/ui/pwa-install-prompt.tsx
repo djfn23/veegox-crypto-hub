@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { usePWA } from "@/hooks/usePWA";
 import { Download, X, Smartphone, Monitor } from "lucide-react";
@@ -7,14 +7,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 
 export const PWAInstallPrompt = () => {
-  // Guard: client only
-  if (typeof window === "undefined") return null;
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") setIsClient(true);
+  }, []);
 
-  const { isInstallable, isInstalled, installPWA } = usePWA();
-  const { isMobile } = useResponsiveLayout();
+  // Les hooks doivent être appelés seulement côté client
+  const { isInstallable, isInstalled, installPWA } = isClient ? usePWA() : { isInstallable: false, isInstalled: false, installPWA: async () => false };
+  const { isMobile } = isClient ? useResponsiveLayout() : { isMobile: false };
   const [isVisible, setIsVisible] = useState(true);
 
-  if (!isInstallable || isInstalled || !isVisible) {
+  if (!isClient || !isInstallable || isInstalled || !isVisible) {
     return null;
   }
 
