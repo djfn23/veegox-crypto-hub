@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/sonner"
 import Notifications from './pages/Notifications.tsx';
 import APITest from "@/pages/APITest";
 import PaymentSuccess from "@/pages/PaymentSuccess";
+import PaymentCanceled from "@/pages/PaymentCanceled";
 import CryptoBank from './pages/CryptoBank.tsx';
 
 const router = createBrowserRouter([
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
       {
         path: "/payment-success",
         element: <PaymentSuccess />,
+      },
+      {
+        path: "/payment-canceled",
+        element: <PaymentCanceled />,
       },
     ],
   },

@@ -4,6 +4,7 @@ import { PageLayout } from '@/components/layout/PageLayout';
 import { StripePaymentTest } from '@/components/test/StripePaymentTest';
 import { ResendEmailTest } from '@/components/test/ResendEmailTest';
 import { APIStatusWidget } from '@/components/dashboard/APIStatusWidget';
+import { APITestingTools } from '@/components/test/APITestingTools';
 import { Settings } from 'lucide-react';
 
 const APITest = () => {
@@ -16,6 +17,9 @@ const APITest = () => {
       <div className="space-y-6">
         {/* Statut des APIs */}
         <APIStatusWidget />
+        
+        {/* Outils de test avancés */}
+        <APITestingTools />
         
         {/* Tests des APIs */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -42,6 +46,14 @@ const APITest = () => {
                 <li>Entrez votre adresse email pour recevoir le test</li>
                 <li>Choisissez le type de notification à tester</li>
                 <li>Optionnel: ajoutez des données JSON personnalisées</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-purple-400 font-medium">Outils de Test:</h4>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>Testez la connectivité de chaque API</li>
+                <li>Surveillez les performances et la latence</li>
+                <li>Consultez les logs de test en temps réel</li>
               </ul>
             </div>
           </div>
