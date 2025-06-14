@@ -19,6 +19,15 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     setIsClient(true);
   }, []);
 
+  // IMPORTANT: Appeler TOUS les hooks AVANT tout return conditionnel
+  // Always default non-mobile layout SSR
+  const { isMobile, isTablet } = isClient
+    ? useResponsiveLayout()
+    : { isMobile: false, isTablet: false };
+
+  // State to possibly keep last error for diagnostics/debug
+  const [caughtError, setCaughtError] = useState<null | unknown>(null);
+
   // BLOQUE TOUT RENDU TANT QUE CLIENT PAS PRÊT (évite erreurs hooks Radix/React)
   if (!isClient) {
     return (
@@ -29,14 +38,6 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       </div>
     );
   }
-
-  // Always default non-mobile layout SSR
-  const { isMobile, isTablet } = isClient
-    ? useResponsiveLayout()
-    : { isMobile: false, isTablet: false };
-
-  // State to possibly keep last error for diagnostics/debug
-  const [caughtError, setCaughtError] = useState<null | unknown>(null);
 
   // Error boundary (sync only) to catch errors in the tree.
   try {
