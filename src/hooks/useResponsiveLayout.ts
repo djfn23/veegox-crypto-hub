@@ -136,7 +136,7 @@ export const useResponsiveLayout = () => {
     return `${base * multiplier}px`;
   };
 
-  // Utilitaire pour les tailles de police dynamiques
+  // Utilitaire pour les tailles de police dynamiques - fixed to include all valid sizes
   const getFontSize = (base: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl'): string => {
     const sizes = {
       mobile: {

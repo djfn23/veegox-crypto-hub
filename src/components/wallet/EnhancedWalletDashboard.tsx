@@ -1,298 +1,362 @@
-
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Wallet, 
-  TrendingUp, 
-  TrendingDown, 
-  Bell, 
-  Settings, 
-  RefreshCw,
-  Eye,
-  EyeOff
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { useEnhancedWallet } from '@/hooks/useEnhancedWallet';
+import React, { useState } from 'react';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
-import { TradingInterface } from './TradingInterface';
-import { QuickActions } from './QuickActions';
-import { EnhancedTokenList } from './EnhancedTokenList';
-import { NotificationCenter } from './NotificationCenter';
-import { MobileWalletCard, MobileWalletCardHeader, MobileWalletCardContent } from '@/components/ui/mobile-wallet-card';
+import { MobileWalletCard } from '@/components/ui/mobile-wallet-card';
 import { MobileTouchButton } from '@/components/ui/mobile-touch-button';
+import { QuickActions } from './QuickActions';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { MobilePriceChart } from './MobilePriceChart';
 
 interface Token {
+  id: string;
   symbol: string;
   name: string;
-  balance: string;
-  balanceUSD: number;
+  balance: number;
+  value: number;
   price: number;
   change24h: number;
-  priceData: Array<{ timestamp: string; price: number; }>;
-  isFavorite?: boolean;
-  isHidden?: boolean;
+  priceData: { timestamp: string; price: number }[];
+}
+
+interface Transaction {
+  id: string;
+  type: 'in' | 'out';
+  token: string;
+  amount: number;
+  timestamp: string;
+  status: 'pending' | 'completed' | 'failed';
 }
 
 const EnhancedWalletDashboard = () => {
-  const { connectedWallets } = useEnhancedWallet();
-  const { isMobile, isTablet, getFontSize, getDynamicSpacing } = useResponsiveLayout();
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [hideSmallBalances, setHideSmallBalances] = useState(false);
-  const [tokens, setTokens] = useState<Token[]>([]);
-  const [portfolioValue, setPortfolioValue] = useState(0);
-  const [portfolioChange, setPortfolioChange] = useState(0);
+  const { isMobile, isTablet, getFontSize } = useResponsiveLayout();
+  const [activeTab, setActiveTab] = useState('overview');
 
-  // Données mockées pour la démo
-  useEffect(() => {
-    const mockTokens: Token[] = [
-      {
-        symbol: 'ETH',
-        name: 'Ethereum',
-        balance: '2.456',
-        balanceUSD: 4920.50,
-        price: 2003.45,
-        change24h: 5.67,
-        priceData: Array.from({ length: 24 }, (_, i) => ({
-          timestamp: new Date(Date.now() - (23 - i) * 60 * 60 * 1000).toISOString(),
-          price: 2000 + Math.random() * 100 - 50
-        })),
-        isFavorite: true
-      },
-      {
-        symbol: 'USDC',
-        name: 'USD Coin',
-        balance: '1,250.00',
-        balanceUSD: 1250.00,
-        price: 1.00,
-        change24h: 0.02,
-        pr20iceData: Array.from({ length: 24 }, (_, i) => ({
-          timestamp: new Date(Date.now() - (23 - i) * 60 * 60 * 1000).toISOString(),
-          price: 1.00 + (Math.random() - 0.5) * 0.01
-        }))
-      },
-      {
-        symbol: 'MATIC',
-        name: 'Polygon',
-        balance: '850.25',
-        balanceUSD: 680.20,
-        price: 0.80,
-        change24h: -2.34,
-        priceData: Array.from({ length: 24 }, (_, i) => ({
-          timestamp: new Date(Date.now() - (23 - i) * 60 * 60 * 1000).toISOString(),
-          price: 0.80 + (Math.random() - 0.5) * 0.1
-        }))
-      }
-    ];
-    
-    setTokens(mockTokens);
-    const total = mockTokens.reduce((sum, token) => sum + token.balanceUSD, 0);
-    setPortfolioValue(total);
-    setPortfolioChange(3.45);
-  }, []);
+  // Mock data with corrected property name
+  const mockTokens: Token[] = [
+    {
+      id: '1',
+      symbol: 'VGX',
+      name: 'Veegox Token',
+      balance: 1250.5,
+      value: 3125.25,
+      price: 2.5,
+      change24h: 5.2,
+      priceData: [
+        { timestamp: '2024-01-01', price: 2.3 },
+        { timestamp: '2024-01-02', price: 2.4 },
+        { timestamp: '2024-01-03', price: 2.5 },
+      ]
+    },
+    {
+      id: '2',
+      symbol: 'ETH',
+      name: 'Ethereum',
+      balance: 2.75,
+      value: 8250.00,
+      price: 3000.00,
+      change24h: -1.5,
+      priceData: [
+        { timestamp: '2024-01-01', price: 2950 },
+        { timestamp: '2024-01-02', price: 3050 },
+        { timestamp: '2024-01-03', price: 3000 },
+      ]
+    },
+    {
+      id: '3',
+      symbol: 'BTC',
+      name: 'Bitcoin',
+      balance: 0.1,
+      value: 4500.00,
+      price: 45000.00,
+      change24h: 2.8,
+      priceData: [
+        { timestamp: '2024-01-01', price: 44000 },
+        { timestamp: '2024-01-02', price: 46000 },
+        { timestamp: '2024-01-03', price: 45000 },
+      ]
+    },
+  ];
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsRefreshing(false);
-    toast.success('Portfolio mis à jour');
+  const mockTransactions: Transaction[] = [
+    {
+      id: 'tx-1',
+      type: 'in',
+      token: 'VGX',
+      amount: 500,
+      timestamp: '2024-01-03T10:30:00',
+      status: 'completed',
+    },
+    {
+      id: 'tx-2',
+      type: 'out',
+      token: 'ETH',
+      amount: 0.5,
+      timestamp: '2024-01-02T15:45:00',
+      status: 'completed',
+    },
+    {
+      id: 'tx-3',
+      type: 'in',
+      token: 'BTC',
+      amount: 0.05,
+      timestamp: '2024-01-01T08:00:00',
+      status: 'pending',
+    },
+  ];
+
+  const handleSend = () => {
+    toast.success('Fonction Envoyer');
   };
 
-  const handleSwap = async (fromToken: string, toToken: string, amount: string) => {
-    toast.success(`Échange de ${amount} ${fromToken} vers ${toToken} initié`);
+  const handleReceive = () => {
+    toast.success('Fonction Recevoir');
   };
 
-  const handleTokenSelect = (token: Token) => {
-    toast.info(`Token sélectionné: ${token.name}`);
+  const handleSwap = () => {
+    toast.success('Fonction Échanger');
   };
 
-  const handleToggleFavorite = (symbol: string) => {
-    setTokens(prev => 
-      prev.map(token => 
-        token.symbol === symbol 
-          ? { ...token, isFavorite: !token.isFavorite }
-          : token
-      )
-    );
-    toast.success('Favoris mis à jour');
+  const handleBuy = () => {
+    toast.success('Fonction Acheter');
   };
 
-  const handleToggleHidden = (symbol: string) => {
-    setTokens(prev => 
-      prev.map(token => 
-        token.symbol === symbol 
-          ? { ...token, isHidden: !token.isHidden }
-          : token
-      )
-    );
+  const handleScanQR = () => {
+    toast.success('Scanner QR');
   };
 
-  const handleQuickSwap = (fromToken: string) => {
-    toast.info(`Échange rapide pour ${fromToken}`);
+  const handleStake = () => {
+    toast.success('Fonction Staking');
   };
 
-  const visibleTokens = hideSmallBalances 
-    ? tokens.filter(token => token.balanceUSD >= 1)
-    : tokens;
+  const WalletHeader = () => (
+    <MobileWalletCard variant="featured" className="mb-4">
+      <div className="text-center space-y-2">
+        <p className={cn("text-gray-300", getFontSize('sm'))}>Solde Total</p>
+        <h1 className={cn("font-bold text-white", getFontSize('3xl'))}>
+          $12,847.32
+        </h1>
+        <div className="flex items-center justify-center gap-2">
+          <Badge className="bg-green-600/20 text-green-400 border-green-500/30">
+            +$284.12 (2.34%)
+          </Badge>
+          <span className={cn("text-gray-400", getFontSize('sm'))}>24h</span>
+        </div>
+      </div>
+    </MobileWalletCard>
+  );
 
-  return (
-    <div className={`space-y-${isMobile ? '4' : '6'}`}>
-      {/* Portfolio Overview - Mobile Optimized */}
-      <MobileWalletCard variant="featured" padding={isMobile ? "default" : "lg"}>
-        <MobileWalletCardHeader>
-          <div className="flex items-center gap-3">
-            <div className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center`}>
-              <Wallet className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} text-white`} />
-            </div>
-            <div>
-              <h2 className={cn("text-white font-bold", getFontSize(isMobile ? 'lg' : 'xl'))}>
-                Portfolio Total
-              </h2>
-              <p className={cn("text-purple-300", getFontSize('sm'))}>
-                {connectedWallets.length} wallet{connectedWallets.length > 1 ? 's' : ''} connecté{connectedWallets.length > 1 ? 's' : ''}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <MobileTouchButton
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowNotifications(true)}
-              className="text-gray-400 hover:text-white relative"
-            >
-              <Bell className="h-4 w-4" />
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-            </MobileTouchButton>
-            <MobileTouchButton
-              variant="ghost"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="text-gray-400 hover:text-white"
-            >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            </MobileTouchButton>
-            <MobileTouchButton
-              variant="ghost"
-              size="sm"
-              onClick={() => setHideSmallBalances(!hideSmallBalances)}
-              className="text-gray-400 hover:text-white"
-            >
-              {hideSmallBalances ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-            </MobileTouchButton>
-          </div>
-        </MobileWalletCardHeader>
-        
-        <MobileWalletCardContent>
-          <div className="space-y-4">
-            <div className="text-center">
-              <div className={cn("font-bold text-white mb-2", getFontSize(isMobile ? '3xl' : '4xl'))}>
-                ${portfolioValue.toLocaleString('fr-FR', { minimumFractionDigits: 2 })}
+  const TokenList = () => (
+    <div className="space-y-3">
+      {mockTokens.map((token) => (
+        <MobileWalletCard key={token.id} interactive className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex-shrink-0"></div>
+              <div>
+                <h4 className={cn("font-medium text-white", getFontSize('base'))}>
+                  {token.symbol}
+                </h4>
+                <p className={cn("text-gray-400", getFontSize('sm'))}>
+                  {token.balance.toLocaleString()}
+                </p>
               </div>
+            </div>
+            <div className="text-right">
+              <p className={cn("font-medium text-white", getFontSize('base'))}>
+                ${token.value.toFixed(2)}
+              </p>
               <Badge
-                variant={portfolioChange >= 0 ? 'default' : 'destructive'}
-                className={cn(
-                  "text-center",
-                  portfolioChange >= 0 
-                    ? 'bg-green-600/20 text-green-400 border-green-500/30' 
-                    : 'bg-red-600/20 text-red-400 border-red-500/30'
-                )}
+                variant={token.change24h >= 0 ? 'default' : 'destructive'}
+                className={getFontSize('xs')}
               >
-                <span className="flex items-center gap-1">
-                  {portfolioChange >= 0 ? 
-                    <TrendingUp className="h-3 w-3" /> : 
-                    <TrendingDown className="h-3 w-3" />
-                  }
-                  {portfolioChange >= 0 ? '+' : ''}{portfolioChange.toFixed(2)}% (24h)
-                </span>
+                {token.change24h >= 0 ? '+' : ''}{token.change24h.toFixed(2)}%
               </Badge>
             </div>
           </div>
-        </MobileWalletCardContent>
-      </MobileWalletCard>
+        </MobileWalletCard>
+      ))}
+    </div>
+  );
 
-      {/* Quick Actions - Mobile Optimized */}
+  const NFTList = () => (
+    <div className="grid grid-cols-2 gap-3">
+      {[1, 2, 3, 4].map((nft) => (
+        <MobileWalletCard key={nft} interactive className="aspect-square">
+          <div className="h-full bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+            <span className={cn("text-white font-bold", getFontSize('lg'))}>
+              NFT #{nft}
+            </span>
+          </div>
+        </MobileWalletCard>
+      ))}
+    </div>
+  );
+
+  const TransactionHistory = () => (
+    <div className="space-y-3">
+      {mockTransactions.map((tx) => (
+        <MobileWalletCard key={tx.id} className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className={cn("font-medium text-white", getFontSize('base'))}>
+                Transaction #{tx.id}
+              </h4>
+              <p className={cn("text-gray-400", getFontSize('sm'))}>
+                {new Date(tx.timestamp).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className={cn(
+                "font-medium",
+                tx.type === 'in' ? 'text-green-400' : 'text-red-400',
+                getFontSize('base')
+              )}>
+                {tx.type === 'in' ? '+' : '-'}${tx.amount.toFixed(2)}
+              </p>
+              <Badge variant="outline" className={getFontSize('xs')}>
+                {tx.status}
+              </Badge>
+            </div>
+          </div>
+        </MobileWalletCard>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className={cn(
+      "min-h-screen space-y-4",
+      isMobile ? "p-4" : isTablet ? "p-6 max-w-6xl mx-auto" : "p-6"
+    )}>
+      <WalletHeader />
+      
       <QuickActions
-        onSend={() => toast.info('Envoyer des tokens')}
-        onReceive={() => toast.info('Recevoir des tokens')}
-        onSwap={() => toast.info('Échanger des tokens')}
-        onBuy={() => toast.info('Acheter des tokens')}
-        onScanQR={() => toast.info('Scanner QR Code')}
-        onStake={() => toast.info('Staking')}
+        onSend={handleSend}
+        onReceive={handleReceive}
+        onSwap={handleSwap}
+        onBuy={handleBuy}
+        onScanQR={handleScanQR}
+        onStake={handleStake}
       />
 
-      {/* Main Content Tabs - Mobile Optimized */}
-      <Tabs defaultValue="tokens" className={`space-y-${isMobile ? '4' : '6'}`}>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className={cn(
-          "grid w-full grid-cols-3 bg-slate-800/50",
+          "grid w-full grid-cols-4 mb-4",
           isMobile ? "h-12" : "h-10"
         )}>
-          <TabsTrigger value="tokens" className={cn(
-            "data-[state=active]:bg-slate-700",
-            getFontSize('sm')
-          )}>
+          <TabsTrigger value="overview" className={getFontSize('sm')}>
+            Vue d'ensemble
+          </TabsTrigger>
+          <TabsTrigger value="tokens" className={getFontSize('sm')}>
             Tokens
           </TabsTrigger>
-          <TabsTrigger value="trading" className={cn(
-            "data-[state=active]:bg-slate-700",
-            getFontSize('sm')
-          )}>
-            Trading
+          <TabsTrigger value="nfts" className={getFontSize('sm')}>
+            NFTs
           </TabsTrigger>
-          <TabsTrigger value="history" className={cn(
-            "data-[state=active]:bg-slate-700",
-            getFontSize('sm')
-          )}>
+          <TabsTrigger value="history" className={getFontSize('sm')}>
             Historique
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="tokens" className={`space-y-${isMobile ? '4' : '6'}`}>
-          <EnhancedTokenList
-            tokens={visibleTokens}
-            onTokenSelect={handleTokenSelect}
-            onToggleFavorite={handleToggleFavorite}
-            onToggleHidden={handleToggleHidden}
-            onQuickSwap={handleQuickSwap}
-          />
-        </TabsContent>
-
-        <TabsContent value="trading" className={`space-y-${isMobile ? '4' : '6'}`}>
-          <TradingInterface
-            tokens={tokens}
-            onSwap={handleSwap}
-          />
-        </TabsContent>
-
-        <TabsContent value="history" className={`space-y-${isMobile ? '4' : '6'}`}>
+        <TabsContent value="overview" className="space-y-4">
+          {/* Overview content */}
           <MobileWalletCard>
-            <MobileWalletCardHeader 
-              title="Historique des Transactions"
-            />
-            <MobileWalletCardContent>
-              <div className="text-center py-8 text-gray-400">
-                <p className={getFontSize('base')}>
-                  Fonctionnalité d'historique en cours de développement
-                </p>
+            <div className="space-y-4">
+              <h3 className={cn("font-semibold text-white", getFontSize('lg'))}>
+                Portefeuille Principal
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <p className={cn("text-gray-400", getFontSize('sm'))}>Tokens</p>
+                  <p className={cn("font-bold text-white", getFontSize('xl'))}>8</p>
+                </div>
+                <div className="text-center">
+                  <p className={cn("text-gray-400", getFontSize('sm'))}>NFTs</p>
+                  <p className={cn("font-bold text-white", getFontSize('xl'))}>12</p>
+                </div>
               </div>
-            </MobileWalletCardContent>
+            </div>
           </MobileWalletCard>
         </TabsContent>
-      </Tabs>
 
-      {/* Notification Center */}
-      <NotificationCenter
-        isOpen={showNotifications}
-        onClose={() => setShowNotifications(false)}
-      />
+        <TabsContent value="tokens" className="space-y-3">
+          {mockTokens.map((token) => (
+            <MobileWalletCard key={token.id} interactive className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex-shrink-0"></div>
+                  <div>
+                    <h4 className={cn("font-medium text-white", getFontSize('base'))}>
+                      {token.symbol}
+                    </h4>
+                    <p className={cn("text-gray-400", getFontSize('sm'))}>
+                      {token.balance.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className={cn("font-medium text-white", getFontSize('base'))}>
+                    ${token.value.toFixed(2)}
+                  </p>
+                  <Badge
+                    variant={token.change24h >= 0 ? 'default' : 'destructive'}
+                    className={getFontSize('xs')}
+                  >
+                    {token.change24h >= 0 ? '+' : ''}{token.change24h.toFixed(2)}%
+                  </Badge>
+                </div>
+              </div>
+            </MobileWalletCard>
+          ))}
+        </TabsContent>
+
+        <TabsContent value="nfts" className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((nft) => (
+              <MobileWalletCard key={nft} interactive className="aspect-square">
+                <div className="h-full bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                  <span className={cn("text-white font-bold", getFontSize('lg'))}>
+                    NFT #{nft}
+                  </span>
+                </div>
+              </MobileWalletCard>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-3">
+          {mockTransactions.map((tx) => (
+            <MobileWalletCard key={tx.id} className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className={cn("font-medium text-white", getFontSize('base'))}>
+                    Transaction #{tx.id}
+                  </h4>
+                  <p className={cn("text-gray-400", getFontSize('sm'))}>
+                    {new Date(tx.timestamp).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className={cn(
+                    "font-medium",
+                    tx.type === 'in' ? 'text-green-400' : 'text-red-400',
+                    getFontSize('base')
+                  )}>
+                    {tx.type === 'in' ? '+' : '-'}${tx.amount.toFixed(2)}
+                  </p>
+                  <Badge variant="outline" className={getFontSize('xs')}>
+                    {tx.status}
+                  </Badge>
+                </div>
+              </div>
+            </MobileWalletCard>
+          ))}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
 
 export default EnhancedWalletDashboard;
-
-// Add missing import
-import { cn } from '@/lib/utils';

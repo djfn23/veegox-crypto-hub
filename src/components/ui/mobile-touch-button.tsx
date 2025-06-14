@@ -26,7 +26,6 @@ export const MobileTouchButton = React.forwardRef<HTMLButtonElement, MobileTouch
     ...props 
   }, ref) => {
     const { isMobile, isTablet } = useResponsiveLayout()
-    const Comp = asChild ? Slot : Button
     
     // Enhanced sizes for better mobile touch experience
     const sizeClasses = {
@@ -46,34 +45,46 @@ export const MobileTouchButton = React.forwardRef<HTMLButtonElement, MobileTouch
       destructive: "bg-red-600 hover:bg-red-700 text-white"
     }
     
+    const buttonProps = {
+      className: cn(
+        // Base styles
+        "font-medium rounded-xl transition-all duration-200 touch-manipulation",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2",
+        "active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed",
+        // Size classes
+        sizeClasses[size],
+        // Variant classes for mobile
+        isMobile ? mobileVariants[variant] : "",
+        // Full width
+        fullWidth && "w-full",
+        // Loading state
+        loading && "cursor-wait opacity-75",
+        // Minimum touch target for mobile
+        isMobile && "min-h-[44px] min-w-[44px]",
+        className
+      ),
+      disabled: disabled || loading,
+      ...props
+    }
+
+    if (asChild) {
+      return (
+        <Slot ref={ref} {...buttonProps}>
+          {loading && (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+          )}
+          {children}
+        </Slot>
+      )
+    }
+    
     return (
-      <Comp
-        ref={ref}
-        className={cn(
-          // Base styles
-          "font-medium rounded-xl transition-all duration-200 touch-manipulation",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2",
-          "active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed",
-          // Size classes
-          sizeClasses[size],
-          // Variant classes for mobile
-          isMobile ? mobileVariants[variant] : "",
-          // Full width
-          fullWidth && "w-full",
-          // Loading state
-          loading && "cursor-wait opacity-75",
-          // Minimum touch target for mobile
-          isMobile && "min-h-[44px] min-w-[44px]",
-          className
-        )}
-        disabled={disabled || loading}
-        {...props}
-      >
+      <Button ref={ref} {...buttonProps}>
         {loading && (
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
         )}
         {children}
-      </Comp>
+      </Button>
     )
   }
 )

@@ -1,11 +1,8 @@
 
-import * as React from 'react';
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-
-console.log('UnifiedAuthProvider: Module loading with React:', !!React);
 
 interface AuthUser {
   id: string;
@@ -43,23 +40,12 @@ interface UnifiedAuthProviderProps {
 }
 
 export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ children }) => {
-  console.log('UnifiedAuthProvider: Component initializing with React hooks');
-  
-  // Ensure React is available before using hooks
-  if (!React || !React.useState) {
-    console.error('UnifiedAuthProvider: React or React.useState is not available');
-    throw new Error('React is not properly initialized');
-  }
-
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  console.log('UnifiedAuthProvider: State initialized successfully');
-
   useEffect(() => {
     let mounted = true;
-    console.log('UnifiedAuthProvider: Setting up auth state listener');
 
     // Set up Supabase auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -190,8 +176,6 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
     signOut,
     isAuthenticated: !!user
   };
-
-  console.log('UnifiedAuthProvider: Rendering context provider');
 
   return (
     <UnifiedAuthContext.Provider value={value}>
