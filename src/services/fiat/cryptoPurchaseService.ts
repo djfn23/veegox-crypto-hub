@@ -1,9 +1,9 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { CryptoPurchase } from "@/types/fiatTypes";
 import { revenueService } from "@/services/revenueService";
 import { coinGeckoService } from "@/services/coinGeckoService";
 import { balanceService } from "./balanceService";
+import { stripeUnifiedService } from "@/services/stripe/StripeUnifiedService";
 
 export class CryptoPurchaseService {
   private static instance: CryptoPurchaseService;
@@ -33,13 +33,13 @@ export class CryptoPurchaseService {
     }
   }
 
-  // Purchase crypto with fiat - Enhanced with automatic fee calculation
+  // Purchase crypto with fiat - Now using Stripe unified system
   async purchaseCrypto(
     userId: string,
     fiatAmount: number,
     cryptoSymbol: string,
     fiatCurrency: string = 'EUR'
-  ): Promise<CryptoPurchase> {
+  ): Promise<{ url?: string; session_id?: string } | null> {
     // Get current rates
     const rates = await this.getCryptoRates();
     const cryptoRate = rates[cryptoSymbol];
@@ -65,7 +65,7 @@ export class CryptoPurchaseService {
     const totalFees = platformFee;
     const cryptoAmount = (fiatAmount - totalFees) / cryptoRate;
 
-    // Create purchase record
+    // Create purchase record first
     const { data: purchase, error: purchaseError } = await supabase
       .from('crypto_purchases')
       .insert({
@@ -84,10 +84,38 @@ export class CryptoPurchaseService {
 
     if (purchaseError) throw purchaseError;
 
-    // Process the purchase
-    await this.processCryptoPurchase(purchase.id);
+    // Use Stripe unified service for payment processing
+    const stripePayment = await stripeUnifiedService.createUnifiedPaymentIntent(
+      fiatAmount,
+      fiatCurrency,
+      {
+        transaction_type: 'crypto_purchase',
+        user_id: userId,
+        reference_id: purchase.id,
+        additional_data: {
+          crypto_symbol: cryptoSymbol,
+          crypto_amount: cryptoAmount,
+          exchange_rate: cryptoRate,
+          fees: totalFees
+        }
+      },
+      `Achat de ${cryptoAmount.toFixed(6)} ${cryptoSymbol}`
+    );
 
-    return purchase as CryptoPurchase;
+    if (stripePayment) {
+      // Update purchase with Stripe session ID
+      await supabase
+        .from('crypto_purchases')
+        .update({ stripe_payment_intent_id: stripePayment.id })
+        .eq('id', purchase.id);
+
+      return {
+        url: stripePayment.client_secret ? undefined : stripePayment.client_secret,
+        session_id: stripePayment.id
+      };
+    }
+
+    return null;
   }
 
   // Process crypto purchase

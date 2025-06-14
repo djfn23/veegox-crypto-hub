@@ -1,4 +1,3 @@
-
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VeegoxTokenCard } from "@/components/veegox/VeegoxTokenCard";
@@ -10,6 +9,7 @@ import { PortfolioAllocationChart } from "@/components/portfolio/PortfolioAlloca
 import { PortfolioPerformanceChart } from "@/components/portfolio/PortfolioPerformanceChart";
 import { TopHoldingsCard } from "@/components/portfolio/TopHoldingsCard";
 import { PortfolioHeader } from "@/components/portfolio/PortfolioHeader";
+import { UnifiedTransactionHistory } from "@/components/stripe/UnifiedTransactionHistory";
 
 const Portfolio = () => {
   const { session } = useUnifiedAuth();
@@ -27,6 +27,9 @@ const Portfolio = () => {
         <TabsList className="bg-slate-800 border-slate-700">
           <TabsTrigger value="portfolio" className="data-[state=active]:bg-slate-700">
             Portfolio
+          </TabsTrigger>
+          <TabsTrigger value="transactions" className="data-[state=active]:bg-slate-700">
+            Transactions Stripe
           </TabsTrigger>
           {isAdmin && (
             <TabsTrigger value="revenue" className="data-[state=active]:bg-slate-700">
@@ -53,6 +56,10 @@ const Portfolio = () => {
 
           {/* Top Holdings */}
           <TopHoldingsCard />
+        </TabsContent>
+
+        <TabsContent value="transactions" className="space-y-6">
+          <UnifiedTransactionHistory />
         </TabsContent>
 
         {isAdmin && (
