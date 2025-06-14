@@ -423,6 +423,57 @@ export type Database = {
         }
         Relationships: []
       }
+      crypto_purchases: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          crypto_amount: number
+          crypto_symbol: string
+          crypto_token_address: string
+          exchange_rate: number
+          fees: number | null
+          fiat_amount: number
+          fiat_currency: string
+          id: string
+          metadata: Json | null
+          status: string
+          stripe_payment_intent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          crypto_amount: number
+          crypto_symbol: string
+          crypto_token_address: string
+          exchange_rate: number
+          fees?: number | null
+          fiat_amount: number
+          fiat_currency?: string
+          id?: string
+          metadata?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          crypto_amount?: number
+          crypto_symbol?: string
+          crypto_token_address?: string
+          exchange_rate?: number
+          fees?: number | null
+          fiat_amount?: number
+          fiat_currency?: string
+          id?: string
+          metadata?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       dao_proposals: {
         Row: {
           created_at: string | null
@@ -580,6 +631,84 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      fiat_balances: {
+        Row: {
+          available_balance: number
+          balance: number
+          created_at: string
+          currency: string
+          id: string
+          pending_balance: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_balance?: number
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          pending_balance?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_balance?: number
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          pending_balance?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fiat_transactions: {
+        Row: {
+          amount: number
+          completed_at: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          reference_id: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          reference_id?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          reference_id?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       forum_categories: {
         Row: {

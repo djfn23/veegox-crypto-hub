@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { VeegoxTokenCard } from "@/components/veegox/VeegoxTokenCard";
+import { FiatBalanceModule } from "@/components/modules/fiat/FiatBalanceModule";
 import { 
   PieChart, 
   Pie, 
@@ -23,7 +24,8 @@ import {
   Target,
   Download,
   Eye,
-  RefreshCw
+  RefreshCw,
+  Euro
 } from "lucide-react";
 
 const portfolioData = [
@@ -64,6 +66,9 @@ const Portfolio = () => {
       }
     >
       <div className="space-y-6">
+        {/* Fiat Balance Module - New Section */}
+        <FiatBalanceModule />
+
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="bg-gradient-to-r from-green-900/40 to-emerald-900/40 border-green-500/30">
