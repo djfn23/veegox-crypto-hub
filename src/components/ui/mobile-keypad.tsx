@@ -1,7 +1,8 @@
+
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Delete } from "lucide-react"
+import { Delete } from "lucide-react" // Only import Delete, not Backspace
 
 interface MobileKeypadProps {
   value: string
