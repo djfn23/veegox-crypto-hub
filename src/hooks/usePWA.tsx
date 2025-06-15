@@ -1,7 +1,5 @@
 
-// Fix: Ensure React object is available when using hooks
 import React from 'react';
-import { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -15,12 +13,12 @@ interface BeforeInstallPromptEvent extends Event {
 export const usePWA = () => {
   const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
   
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
-  const [isOnline, setIsOnline] = useState(() => canUseDOM ? navigator.onLine : true);
+  const [deferredPrompt, setDeferredPrompt] = React.useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstallable, setIsInstallable] = React.useState(false);
+  const [isInstalled, setIsInstalled] = React.useState(false);
+  const [isOnline, setIsOnline] = React.useState(() => canUseDOM ? navigator.onLine : true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!canUseDOM) return;
     
     // Vérifier si l'app est déjà installée
