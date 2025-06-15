@@ -9,23 +9,14 @@ import { SidebarErrorBoundary } from "@/components/ui/error-boundary-sidebar";
 import { texts } from "@/lib/constants/texts";
 import { Badge } from "@/components/ui/badge";
 import { useThemeResponsive } from "@/hooks/useThemeResponsive";
-import { useIsHydrated } from "@/hooks/useIsHydrated";
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
-  // Always call hooks in the same order - no conditional hook calls
-  const isHydrated = useIsHydrated();
-  
-  // Only call useThemeResponsive after hydration to avoid hook order issues
-  const themeData = isHydrated && typeof window !== "undefined" 
-    ? useThemeResponsive() 
-    : null;
-
-  // Show loading state while hydrating, but don't return early to avoid hook violations
-  if (!isHydrated || typeof window === "undefined" || !themeData) {
+  // Complete SSR protection - never call hooks on server
+  if (typeof window === "undefined") {
     return (
       <div style={{
         minHeight: "100vh",
@@ -40,6 +31,11 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     );
   }
 
+  return <AppLayoutClient>{children}</AppLayoutClient>;
+}
+
+// Client-only component that can safely use hooks
+function AppLayoutClient({ children }: AppLayoutProps) {
   const { 
     isMobile, 
     isTablet, 
@@ -48,7 +44,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     getGlassEffect,
     getResponsiveSpacing,
     isDark
-  } = themeData;
+  } = useThemeResponsive();
 
   const glassEffect = getGlassEffect();
   const backgroundGradient = isDark 
