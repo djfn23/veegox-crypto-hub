@@ -1,80 +1,69 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface MobileCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "compact" | "list" | "elevated"
-  padding?: "none" | "sm" | "default" | "lg"
-  interactive?: boolean
-  fullWidth?: boolean
+  variant?: "default" | "glass" | "interactive" | "elevated"
+  size?: "sm" | "default" | "lg"
 }
 
 export const MobileCard = React.forwardRef<HTMLDivElement, MobileCardProps>(
-  ({ className, variant = "default", padding = "default", interactive = false, fullWidth = true, children, ...props }, ref) => {
+  ({ className, variant = "default", size = "default", ...props }, ref) => {
     const variantClasses = {
-      default: "bg-slate-900/50 border-slate-700",
-      compact: "bg-slate-900/30 border-slate-800",
-      list: "bg-slate-900/20 border-slate-800 border-l-4 border-l-purple-500",
-      elevated: "bg-slate-900/70 border-slate-600 shadow-lg"
+      default: "bg-slate-900/60 border-slate-700/60 backdrop-blur-sm",
+      glass: "bg-white/5 border-white/10 backdrop-blur-md",
+      interactive: "bg-slate-900/60 border-slate-700/60 backdrop-blur-sm hover:bg-slate-800/70 hover:border-slate-600/70 active:scale-[0.98] cursor-pointer transition-all duration-200",
+      elevated: "bg-slate-900/80 border-slate-700/80 backdrop-blur-lg shadow-2xl shadow-black/20"
     }
     
-    const paddingClasses = {
-      none: "p-0",
-      sm: "p-3 md:p-4",
-      default: "p-4 md:p-6",
-      lg: "p-6 md:p-8"
+    const sizeClasses = {
+      sm: "p-3 rounded-lg",
+      default: "p-4 rounded-xl", 
+      lg: "p-6 rounded-2xl"
     }
     
     return (
-      <Card
+      <div
         ref={ref}
         className={cn(
-          "rounded-xl border transition-all duration-200",
+          "border transition-all duration-200",
           variantClasses[variant],
-          paddingClasses[padding],
-          fullWidth && "w-full",
-          interactive && "hover:bg-slate-800/60 active:scale-[0.98] cursor-pointer",
+          sizeClasses[size],
           className
         )}
         {...props}
-      >
-        {children}
-      </Card>
+      />
     )
   }
 )
 MobileCard.displayName = "MobileCard"
 
-export const MobileCardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <CardHeader
-      ref={ref}
-      className={cn("pb-3 md:pb-4", className)}
-      {...props}
-    />
-  )
-)
-MobileCardHeader.displayName = "MobileCardHeader"
+interface MobileCardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export const MobileCardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => (
-    <CardTitle
-      ref={ref}
-      className={cn("text-lg md:text-xl lg:text-2xl font-semibold text-white", className)}
-      {...props}
-    />
-  )
-)
-MobileCardTitle.displayName = "MobileCardTitle"
-
-export const MobileCardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <CardContent
-      ref={ref}
-      className={cn("pt-0", className)}
-      {...props}
-    />
-  )
+export const MobileCardContent = React.forwardRef<HTMLDivElement, MobileCardContentProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn("", className)}
+        {...props}
+      />
+    )
+  }
 )
 MobileCardContent.displayName = "MobileCardContent"
+
+interface MobileCardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const MobileCardHeader = React.forwardRef<HTMLDivElement, MobileCardHeaderProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn("mb-4", className)}
+        {...props}
+      />
+    )
+  }
+)
+MobileCardHeader.displayName = "MobileCardHeader"

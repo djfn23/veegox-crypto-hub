@@ -10,24 +10,23 @@ import { SmartSavingsModule } from "./SmartSavingsModule";
 import { EnhancedBankingAnalytics } from "./EnhancedBankingAnalytics";
 import { PaymentQRModule } from "./PaymentQRModule";
 import { MobileCryptoBankModule } from "./MobileCryptoBankModule";
+import { MobileTabs, MobileTabsList, MobileTabsTrigger, MobileTabsContent } from "@/components/ui/mobile-tabs";
 import { Wallet, CreditCard, PiggyBank, QrCode, BarChart3, Send, Shield, Zap, Target } from "lucide-react";
 import { useUnifiedAuth } from "@/components/auth/UnifiedAuthProvider";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
-import { MobileCard, MobileCardContent } from "@/components/ui/mobile-card";
-import { MobileTabs, MobileTabsList, MobileTabsTrigger, MobileTabsContent } from "@/components/ui/mobile-tabs";
+import { useSecureToast } from "@/hooks/useSecureToast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import VeegoxLogo from "@/components/ui/veegox-logo";
-import { useToast } from "@/hooks/use-toast";
 
 export const CryptoBankModule = () => {
   const { user, isAuthenticated } = useUnifiedAuth();
   const { isMobile } = useResponsiveLayout();
   const { isSupported: isBiometricSupported, isEnrolled: isBiometricEnrolled, enrollBiometric } = useBiometricAuth();
   const [activeTab, setActiveTab] = useState("accounts");
-  const { toast } = useToast();
+  const { success: toastSuccess, error: toastError } = useSecureToast();
 
   // Use mobile-optimized version on mobile devices
   if (isMobile) {
@@ -37,28 +36,22 @@ export const CryptoBankModule = () => {
   const handleEnableBiometric = async () => {
     if (!user) return;
     
-    const result = await enrollBiometric(user.id);
-    if (result.success) {
-      toast({
-        title: "Authentification biométrique activée",
-        description: "Votre empreinte digitale a été enregistrée avec succès",
-      });
-    } else {
-      toast({
-        title: "Erreur",
-        description: result.error || "Impossible d'activer l'authentification biométrique",
-        variant: "destructive",
-      });
+    try {
+      const result = await enrollBiometric(user.id);
+      if (result.success) {
+        await toastSuccess("Authentification biométrique activée");
+      } else {
+        await toastError(result.error || "Impossible d'activer l'authentification biométrique");
+      }
+    } catch (error) {
+      await toastError("Erreur lors de l'activation biométrique");
     }
   };
 
   if (!isAuthenticated || !user) {
-    const CardComponent = isMobile ? MobileCard : Card;
-    const CardContentComponent = isMobile ? MobileCardContent : CardContent;
-    
     return (
-      <CardComponent className={`${isMobile ? '' : 'bg-slate-900/50 border-slate-700'} max-w-md mx-auto`}>
-        <CardContentComponent className="p-8 text-center">
+      <Card className="bg-slate-900/50 border-slate-700 max-w-md mx-auto">
+        <CardContent className="p-8 text-center">
           <VeegoxLogo size="xl" className="mx-auto mb-4" />
           <h3 className="text-lg font-medium text-white mb-2">
             Connexion Requise
@@ -69,8 +62,8 @@ export const CryptoBankModule = () => {
           <Button className="bg-purple-600 hover:bg-purple-700 w-full">
             Se Connecter
           </Button>
-        </CardContentComponent>
-      </CardComponent>
+        </CardContent>
+      </Card>
     );
   }
 

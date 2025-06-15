@@ -45,12 +45,12 @@ export const MobileBottomNavigation = () => {
   return (
     <nav className={`
       lg:hidden fixed bottom-0 left-0 right-0 z-30 
-      bg-slate-900/95 backdrop-blur-lg border-t border-slate-700
+      bg-slate-900/95 backdrop-blur-xl border-t border-slate-700/80 shadow-2xl
       ${isLandscapePhone ? 'h-16' : 'h-20'}
     `}>
       <div className={`
-        grid grid-cols-5 h-full px-2
-        ${isLandscapePhone ? 'px-4' : ''}
+        grid grid-cols-5 h-full
+        ${isLandscapePhone ? 'px-4' : 'px-2'}
       `}>
         {navigationItems.map((item) => {
           const Icon = item.icon
@@ -62,30 +62,36 @@ export const MobileBottomNavigation = () => {
               key={item.name}
               to={item.href}
               className={cn(
-                "flex flex-col items-center justify-center space-y-1 transition-all duration-200 rounded-xl mx-1 my-2",
-                "touch-target-xl text-xs font-medium relative",
+                "flex flex-col items-center justify-center space-y-1 transition-all duration-300 rounded-2xl mx-1 my-2",
+                "touch-target-xl text-xs font-semibold relative group",
                 isActive 
-                  ? "text-purple-400 bg-purple-500/20 shadow-lg" 
-                  : "text-gray-400 hover:text-white active:bg-white/10 hover:bg-white/5",
-                isLandscapePhone ? "my-1" : ""
+                  ? "text-purple-400 bg-purple-500/20 shadow-lg scale-105 border border-purple-500/30" 
+                  : "text-gray-400 hover:text-white active:bg-white/10 hover:bg-white/5 hover:scale-105",
+                isLandscapePhone ? "my-1 rounded-xl" : ""
               )}
             >
               <div className={cn(
-                "relative",
-                isActive && "scale-110 transform transition-transform"
+                "relative transition-all duration-300",
+                isActive && "transform scale-110"
               )}>
-                <Icon className={`${isLandscapePhone ? 'h-5 w-5' : 'h-6 w-6'}`} />
+                <Icon className={`${isLandscapePhone ? 'h-5 w-5' : 'h-6 w-6'} transition-all duration-300`} />
                 {isActive && (
-                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-purple-400 rounded-full animate-pulse shadow-lg" />
                 )}
               </div>
               <span className={cn(
-                "leading-none font-medium",
-                isActive ? "text-purple-300" : "text-gray-500",
+                "leading-none font-bold transition-all duration-300",
+                isActive ? "text-purple-300 scale-105" : "text-gray-500",
                 isLandscapePhone ? "text-[9px]" : "text-[10px]"
               )}>
                 {item.name}
               </span>
+              
+              {/* Hover indicator */}
+              <div className={cn(
+                "absolute inset-0 rounded-2xl border transition-all duration-300 opacity-0 group-hover:opacity-100",
+                isActive ? "border-purple-400/50" : "border-white/20"
+              )} />
             </Link>
           )
         })}
