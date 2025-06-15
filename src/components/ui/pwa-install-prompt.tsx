@@ -8,19 +8,17 @@ import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 
 export const PWAInstallPrompt = () => {
   const [isClient, setIsClient] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  
+  // Appeler TOUS les hooks au début du composant - JAMAIS conditionnellement
+  const { isInstallable, isInstalled, installPWA } = usePWA();
+  const { isMobile, isTablet, isLandscapePhone } = useResponsiveLayout();
   
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Only call hooks after client is ready
-  const pwaHookResult = usePWA();
-  const layoutHookResult = useResponsiveLayout();
-  
-  const { isInstallable, isInstalled, installPWA } = pwaHookResult;
-  const { isMobile, isTablet, isLandscapePhone } = layoutHookResult;
-  const [isVisible, setIsVisible] = useState(true);
-
+  // Seul le rendu JSX peut être conditionnel, pas les hooks
   if (!isClient || !isInstallable || isInstalled || !isVisible) {
     return null;
   }
