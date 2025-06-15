@@ -3,10 +3,16 @@ import React from "react";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { UnifiedAuthProvider } from "@/components/auth/UnifiedAuthProvider";
 
-// ClientOnlyProviders : strictement côté client via window
+// Ensure hooks are never run on the server for this component.
 export function ClientOnlyProviders({ children }: { children: React.ReactNode }) {
-  if (typeof window === "undefined") {
-    // Fallback loading SSR
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    // Show loading indicator only during SSR or initial hydration
     return (
       <div style={{
         minHeight: "100vh",
