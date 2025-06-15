@@ -4,21 +4,19 @@ import { Button } from "@/components/ui/button";
 import { usePWA } from "@/hooks/usePWA";
 import { Download, X, Smartphone, Monitor } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
+import { useThemeResponsive } from "@/hooks/useThemeResponsive";
 
 export const PWAInstallPrompt = () => {
   const [isClient, setIsClient] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   
-  // Appeler TOUS les hooks au début du composant - JAMAIS conditionnellement
   const { isInstallable, isInstalled, installPWA } = usePWA();
-  const { isMobile, isTablet, isLandscapePhone } = useResponsiveLayout();
+  const { isMobile, isTablet, isLandscapePhone, getGlassEffect, isDark } = useThemeResponsive();
   
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Seul le rendu JSX peut être conditionnel, pas les hooks
   if (!isClient || !isInstallable || isInstalled || !isVisible) {
     return null;
   }
@@ -29,6 +27,11 @@ export const PWAInstallPrompt = () => {
       setIsVisible(false);
     }
   };
+
+  const glassEffect = getGlassEffect();
+  const gradientBg = isDark 
+    ? 'bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20'
+    : 'bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10';
 
   return (
     <Card className={`
@@ -41,28 +44,27 @@ export const PWAInstallPrompt = () => {
           ? 'bottom-4 right-4 w-96'
           : 'bottom-4 right-4 w-80'
       }
-      bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-lg 
-      border-purple-500/50 shadow-2xl
+      ${glassEffect} ${gradientBg} border-border shadow-2xl
     `}>
       <CardContent className={`p-4 ${isTablet ? 'p-5' : ''}`}>
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0 mt-1">
             {isMobile ? (
-              <Smartphone className="h-5 w-5 text-purple-400" />
+              <Smartphone className="h-5 w-5 text-primary" />
             ) : (
-              <Monitor className="h-5 w-5 text-purple-400" />
+              <Monitor className="h-5 w-5 text-primary" />
             )}
           </div>
           
           <div className="flex-1 min-w-0">
             <h3 className={`
-              font-semibold text-white mb-1
+              font-semibold text-foreground mb-1 font-heading
               ${isTablet ? 'text-base' : 'text-sm'}
             `}>
               Installer Veegox
             </h3>
             <p className={`
-              text-gray-300 mb-3
+              text-muted-foreground mb-3
               ${isTablet ? 'text-sm' : 'text-xs'}
             `}>
               Ajoutez Veegox à votre écran d'accueil pour un accès rapide et une expérience optimisée.
@@ -73,7 +75,7 @@ export const PWAInstallPrompt = () => {
                 onClick={handleInstall}
                 size="sm"
                 className={`
-                  bg-purple-600 hover:bg-purple-700
+                  bg-primary hover:bg-primary/90 text-primary-foreground
                   ${isTablet ? 'text-sm px-4 py-2' : 'text-xs'}
                 `}
               >
@@ -85,7 +87,7 @@ export const PWAInstallPrompt = () => {
                 variant="ghost"
                 size="sm"
                 className={`
-                  text-gray-400 hover:text-white
+                  text-muted-foreground hover:text-foreground hover:bg-muted
                   ${isTablet ? 'text-sm' : 'text-xs'}
                 `}
               >
@@ -98,7 +100,7 @@ export const PWAInstallPrompt = () => {
             onClick={() => setIsVisible(false)}
             variant="ghost"
             size="sm"
-            className="flex-shrink-0 p-1 h-auto text-gray-400 hover:text-white"
+            className="flex-shrink-0 p-1 h-auto text-muted-foreground hover:text-foreground hover:bg-muted"
           >
             <X className="h-4 w-4" />
           </Button>

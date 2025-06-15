@@ -8,7 +8,7 @@ import { PWAInstallPrompt } from "@/components/ui/pwa-install-prompt";
 import { SidebarErrorBoundary } from "@/components/ui/error-boundary-sidebar";
 import { texts } from "@/lib/constants/texts";
 import { Badge } from "@/components/ui/badge";
-import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
+import { useThemeResponsive } from "@/hooks/useThemeResponsive";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -16,7 +16,15 @@ interface AppLayoutProps {
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const [isClient, setIsClient] = useState(false);
-  const { isMobile, isTablet, isDesktop, isLandscapePhone } = useResponsiveLayout();
+  const { 
+    isMobile, 
+    isTablet, 
+    isDesktop, 
+    isLandscapePhone,
+    getGlassEffect,
+    getResponsiveSpacing,
+    isDark
+  } = useThemeResponsive();
 
   useEffect(() => {
     setIsClient(true);
@@ -24,16 +32,21 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   if (!isClient) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-        <div className="text-white text-lg animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-foreground text-lg animate-pulse">
           Chargement de l'interface Veegox...
         </div>
       </div>
     );
   }
 
+  const glassEffect = getGlassEffect();
+  const backgroundGradient = isDark 
+    ? "bg-gradient-to-br from-background via-muted/50 to-background"
+    : "bg-gradient-to-br from-background via-muted/30 to-background";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+    <div className={`min-h-screen ${backgroundGradient}`}>
       <PWAInstallPrompt />
 
       {!isDesktop && <MobileHeader />}
@@ -41,11 +54,11 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       {isDesktop && (
         <div className="flex min-h-screen">
           <SidebarErrorBoundary>
-            <div className="w-64 bg-slate-900/50 backdrop-blur-sm border-r border-slate-700 min-h-screen flex-shrink-0">
-              <div className="p-4 border-b border-slate-700">
+            <div className={`w-64 ${glassEffect} border-r border-border min-h-screen flex-shrink-0`}>
+              <div className="p-4 border-b border-border">
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex-shrink-0"></div>
-                  <span className="text-lg font-bold text-white">{texts.app.name}</span>
+                  <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-lg flex-shrink-0"></div>
+                  <span className="text-lg font-bold text-foreground font-heading">{texts.app.name}</span>
                   <Badge variant="secondary" className="text-xs">{texts.app.beta}</Badge>
                 </div>
               </div>
@@ -56,7 +69,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           </SidebarErrorBoundary>
 
           <div className="flex-1 flex flex-col min-w-0">
-            <header className="bg-slate-900/50 backdrop-blur-sm border-b border-slate-700 px-6 py-4 flex-shrink-0">
+            <header className={`${glassEffect} border-b border-border px-6 py-4 flex-shrink-0`}>
               <div className="flex items-center justify-end">
                 <UserMenu />
               </div>
@@ -72,7 +85,10 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       {!isDesktop && (
         <div className="flex flex-col min-h-screen">
           <main className={`flex-1 ${isMobile ? 'pb-20' : 'pb-4'} ${isLandscapePhone ? 'pb-16' : ''}`}>
-            <div className={`px-4 py-4 ${isTablet ? 'px-6 py-6 max-w-6xl mx-auto' : ''}`}>
+            <div 
+              className={`py-4 ${isTablet ? 'px-6 py-6 max-w-6xl mx-auto' : ''}`}
+              style={{ paddingLeft: getResponsiveSpacing(isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop') }}
+            >
               {children}
             </div>
           </main>
