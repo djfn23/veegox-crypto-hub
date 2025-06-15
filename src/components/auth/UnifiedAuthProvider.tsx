@@ -40,13 +40,13 @@ interface UnifiedAuthProviderProps {
 }
 
 export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ children }) => {
-  // Safety checks with fallback rendering
-  if (typeof React === 'undefined' || !React.useState || !React.useEffect || !React.useContext) {
-    console.error('React hooks are not available in UnifiedAuthProvider');
+  // Early safety check - ensure React is available
+  if (!React || typeof React.useState !== 'function') {
+    console.error('React is not properly loaded in UnifiedAuthProvider');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
         <div className="text-white text-lg animate-pulse">
-          Chargement de l'authentification...
+          Initialisation de React...
         </div>
       </div>
     );
@@ -111,8 +111,8 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
       }
     };
 
-    // Add delay to ensure React is fully ready
-    const timer = setTimeout(initializeAuth, 100);
+    // Ensure React is ready before initializing
+    const timer = setTimeout(initializeAuth, 50);
 
     return () => {
       console.log('UnifiedAuthProvider: Cleanup');

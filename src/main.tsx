@@ -14,7 +14,12 @@ import PaymentCanceled from './pages/PaymentCanceled.tsx'
 
 console.log('Main: Application starting...');
 
-// Ensure DOM is ready and React is fully initialized
+// Ensure React is properly initialized
+if (typeof React === 'undefined' || !React.createElement) {
+  console.error('React is not properly loaded');
+  throw new Error('React initialization failed');
+}
+
 const initializeApp = () => {
   const rootElement = document.getElementById('root');
   if (!rootElement) {
@@ -22,8 +27,14 @@ const initializeApp = () => {
     return;
   }
 
-  // Add a small delay to ensure all modules are loaded
-  setTimeout(() => {
+  // Ensure React and ReactDOM are ready
+  if (!React || !ReactDOM || !ReactDOM.createRoot) {
+    console.error('React or ReactDOM not properly initialized');
+    setTimeout(initializeApp, 100);
+    return;
+  }
+
+  try {
     ReactDOM.createRoot(rootElement).render(
       <React.StrictMode>
         <BrowserRouter>
@@ -39,12 +50,27 @@ const initializeApp = () => {
         </BrowserRouter>
       </React.StrictMode>,
     );
-  }, 50);
+  } catch (error) {
+    console.error('Failed to render React app:', error);
+    // Show error message instead of blank screen
+    rootElement.innerHTML = `
+      <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e293b, #7c3aed, #3b82f6); color: white; font-family: system-ui;">
+        <div style="text-align: center;">
+          <h1 style="font-size: 24px; margin-bottom: 16px;">Erreur de chargement</h1>
+          <p style="margin-bottom: 16px;">L'application n'a pas pu se charger correctement.</p>
+          <button onclick="window.location.reload()" style="padding: 12px 24px; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            Recharger la page
+          </button>
+        </div>
+      </div>
+    `;
+  }
 };
 
 // Wait for DOM to be fully loaded
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeApp);
 } else {
-  initializeApp();
+  // Add a small delay to ensure all modules are loaded
+  setTimeout(initializeApp, 10);
 }
