@@ -6,9 +6,11 @@ const loadToast = async () => {
   if (toastFunction || isLoading) return toastFunction;
   isLoading = true;
   try {
+    // Dynamically import sonner's toast function only on the client
     const sonnerModule = await import('sonner');
     toastFunction = sonnerModule.toast;
   } catch (error) {
+    // Fallback: provide no-op toast for SSR or error
     console.warn('Toast function not available:', error);
     const mockToast = () => {};
     mockToast.success = () => {};
@@ -23,8 +25,9 @@ const loadToast = async () => {
   return toastFunction;
 };
 
-// Version SSR-safe (0 hooks !)
+// SSR-safe: ZERO React hooks
 export const useSecureToast = () => {
+  // Just always return a new object of async functions – no hooks at all
   return {
     toast: async (...args: any[]) => {
       const toast = await loadToast();
@@ -57,6 +60,7 @@ export const useSecureToast = () => {
   };
 };
 
+// Static async toast object for non-hook use
 export const secureToast = {
   success: async (...args: any[]) => {
     const toast = await loadToast();
