@@ -11,13 +11,26 @@ function ThemeSyncClient() {
   return null;
 }
 
-// SSR-safe: ne pas exécuter de hooks côté serveur
+// SSR-safe: *never* run Zustand or hooks on server, or during pre-hydration
 export function ThemeProvider({ children }: ThemeProviderProps) {
+  // SSR guard part 1: never render hooks on server
   if (typeof window === "undefined") {
-    // SSR: rendu minimal
     return <div style={{ minHeight: "100vh", background: "#111" }} />;
   }
 
+  // SSR guard part 2: Make sure we only run after client hydration
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    // Render minimal fallback during hydration only
+    return <div style={{ minHeight: "100vh", background: "#111" }} />;
+  }
+
+  // Safe: hooks only run after we're surely on client
   return (
     <>
       <ThemeSyncClient />
