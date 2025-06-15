@@ -1,4 +1,6 @@
 
+// Fix: Ensure React object is available when using hooks
+import React from 'react';
 import { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
