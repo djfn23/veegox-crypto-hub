@@ -40,7 +40,8 @@ interface UnifiedAuthProviderProps {
   children: React.ReactNode;
 }
 
-export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
+// Move all hook logic in an inner component
+function UnifiedAuthProviderInner({ children }: UnifiedAuthProviderProps) {
   const [user, setUser] = React.useState<AuthUser | null>(null);
   const [session, setSession] = React.useState<Session | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -52,12 +53,10 @@ export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
 
     const initializeAuth = async () => {
       try {
-        console.log('UnifiedAuthProvider: Starting auth initialization');
         // Set up auth state listener
         const { data } = supabase.auth.onAuthStateChange(
           (event, session) => {
             if (!mounted) return;
-            console.log('UnifiedAuthProvider: Auth event:', event, 'Session exists:', !!session);
             setSession(session);
             if (session?.user) {
               setUser({
@@ -77,7 +76,6 @@ export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
         // Check existing session
         const { data: { session } } = await supabase.auth.getSession();
         if (!mounted) return;
-        console.log('UnifiedAuthProvider: Initial session check:', !!session);
         setSession(session);
         if (session?.user) {
           setUser({
@@ -89,7 +87,6 @@ export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
         }
         setLoading(false);
       } catch (error) {
-        console.error('UnifiedAuthProvider: Auth initialization error:', error);
         if (mounted) {
           setLoading(false);
         }
@@ -125,7 +122,6 @@ export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
       }
       await toastSuccess('Connexion réussie!');
     } catch (error) {
-      console.error('UnifiedAuthProvider: Sign in error:', error);
       throw error;
     }
   };
@@ -145,7 +141,6 @@ export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
       }
       await toastSuccess('Inscription réussie! Vérifiez votre email.');
     } catch (error) {
-      console.error('UnifiedAuthProvider: Sign up error:', error);
       throw error;
     }
   };
@@ -154,7 +149,6 @@ export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
     try {
       await toastSuccess('Connexion wallet en cours...');
     } catch (error) {
-      console.error('UnifiedAuthProvider: Wallet sign in error:', error);
       await toastError('Erreur de connexion wallet');
     }
   };
@@ -167,9 +161,7 @@ export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
       setUser(null);
       setSession(null);
       await toastSuccess('Déconnexion réussie');
-    } catch (error) {
-      console.error('UnifiedAuthProvider: Sign out error:', error);
-    }
+    } catch (error) {}
   };
 
   const value: UnifiedAuthContextType = {
@@ -188,4 +180,12 @@ export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
       {children}
     </UnifiedAuthContext.Provider>
   );
+}
+
+export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
+  // Only render on client
+  if (typeof window === "undefined") {
+    return null;
+  }
+  return <UnifiedAuthProviderInner>{children}</UnifiedAuthProviderInner>;
 }
