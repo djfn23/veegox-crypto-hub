@@ -51,12 +51,14 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
 
     const initializeAuth = async () => {
       try {
-        // Set up Supabase auth state listener
+        console.log('UnifiedAuthProvider: Starting auth initialization');
+        
+        // Set up auth state listener first
         const { data } = supabase.auth.onAuthStateChange(
           (event, session) => {
             if (!mounted) return;
             
-            console.log('UnifiedAuthProvider: Auth event:', event, 'Session:', session?.user?.email);
+            console.log('UnifiedAuthProvider: Auth event:', event, 'Session exists:', !!session);
             setSession(session);
             
             if (session?.user) {
@@ -80,7 +82,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
         const { data: { session } } = await supabase.auth.getSession();
         if (!mounted) return;
         
-        console.log('UnifiedAuthProvider: Retrieved existing session:', !!session);
+        console.log('UnifiedAuthProvider: Initial session check:', !!session);
         setSession(session);
         if (session?.user) {
           setUser({
@@ -92,7 +94,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
         }
         setLoading(false);
       } catch (error) {
-        console.error('UnifiedAuthProvider: Error initializing auth:', error);
+        console.error('UnifiedAuthProvider: Auth initialization error:', error);
         if (mounted) {
           setLoading(false);
         }

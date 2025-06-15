@@ -20,34 +20,18 @@ if (!rootElement) {
   throw new Error('Root element not found');
 }
 
-try {
-  ReactDOM.createRoot(rootElement).render(
-    <React.StrictMode>
-      <BrowserRouter>
-        <UnifiedAuthProvider>
-          <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/payment-canceled" element={<PaymentCanceled />} />
-          </Routes>
-          <Toaster />
-        </UnifiedAuthProvider>
-      </BrowserRouter>
-    </React.StrictMode>,
-  );
-} catch (error) {
-  console.error('Failed to render React app:', error);
-  // Show error message instead of blank screen
-  rootElement.innerHTML = `
-    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e293b, #7c3aed, #3b82f6); color: white; font-family: system-ui;">
-      <div style="text-align: center;">
-        <h1 style="font-size: 24px; margin-bottom: 16px;">Erreur de chargement</h1>
-        <p style="margin-bottom: 16px;">L'application n'a pas pu se charger correctement.</p>
-        <button onclick="window.location.reload()" style="padding: 12px 24px; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer;">
-          Recharger la page
-        </button>
-      </div>
-    </div>
-  `;
-}
+ReactDOM.createRoot(rootElement).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <UnifiedAuthProvider>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/payment-canceled" element={<PaymentCanceled />} />
+        </Routes>
+        <Toaster />
+      </UnifiedAuthProvider>
+    </BrowserRouter>
+  </React.StrictMode>,
+);
