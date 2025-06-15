@@ -67,3 +67,18 @@ export const MobileCardHeader = React.forwardRef<HTMLDivElement, MobileCardHeade
   }
 )
 MobileCardHeader.displayName = "MobileCardHeader"
+
+interface MobileCardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+
+export const MobileCardTitle = React.forwardRef<HTMLParagraphElement, MobileCardTitleProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <h3
+        ref={ref}
+        className={cn("text-lg font-semibold leading-none tracking-tight text-white", className)}
+        {...props}
+      />
+    )
+  }
+)
+MobileCardTitle.displayName = "MobileCardTitle"
