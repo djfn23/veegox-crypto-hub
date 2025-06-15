@@ -15,17 +15,6 @@ interface BeforeInstallPromptEvent extends Event {
 export const usePWA = () => {
   const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
   
-  // Check if React hooks are available
-  if (typeof useState === 'undefined' || typeof useEffect === 'undefined') {
-    console.error('React hooks are not available in usePWA');
-    return {
-      isInstallable: false,
-      isInstalled: false,
-      isOnline: true,
-      installPWA: async () => false,
-    };
-  }
-  
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
