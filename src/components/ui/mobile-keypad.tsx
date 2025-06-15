@@ -1,7 +1,7 @@
-
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+// Make sure we ONLY import Delete
 import { Delete } from "lucide-react"
 
 interface MobileKeypadProps {
