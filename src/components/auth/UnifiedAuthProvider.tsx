@@ -1,5 +1,6 @@
 
-import React, { useState, useEffect, useContext, createContext } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useContext, createContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useSecureToast } from '@/hooks/useSecureToast';
@@ -40,12 +41,12 @@ interface UnifiedAuthProviderProps {
 }
 
 export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = React.useState<AuthUser | null>(null);
+  const [session, setSession] = React.useState<Session | null>(null);
+  const [loading, setLoading] = React.useState(true);
   const { success: toastSuccess, error: toastError } = useSecureToast();
 
-  useEffect(() => {
+  React.useEffect(() => {
     let mounted = true;
     let subscription: any = null;
 
