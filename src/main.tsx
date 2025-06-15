@@ -5,7 +5,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
 import { UnifiedAuthProvider } from './components/auth/UnifiedAuthProvider.tsx';
-import { Toaster } from "@/components/ui/sonner"
 
 // Import pages
 import Portfolio from './pages/Portfolio.tsx'
@@ -30,12 +29,12 @@ const initializeApp = () => {
   // Ensure React and ReactDOM are ready
   if (!React || !ReactDOM || !ReactDOM.createRoot) {
     console.error('React or ReactDOM not properly initialized');
-    setTimeout(initializeApp, 100);
+    setTimeout(initializeApp, 200);
     return;
   }
 
   try {
-    // Add a small delay before rendering to ensure everything is stable
+    // Add a longer delay before rendering to ensure everything is stable
     setTimeout(() => {
       ReactDOM.createRoot(rootElement).render(
         <React.StrictMode>
@@ -47,12 +46,29 @@ const initializeApp = () => {
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/payment-canceled" element={<PaymentCanceled />} />
               </Routes>
-              <Toaster />
+              {/* Toaster will be loaded after a delay */}
             </UnifiedAuthProvider>
           </BrowserRouter>
         </React.StrictMode>,
       );
-    }, 100);
+      
+      // Load Toaster after the main app is rendered and stable
+      setTimeout(() => {
+        import('@/components/ui/sonner').then((module) => {
+          const ToasterComponent = module.Toaster;
+          if (ToasterComponent && typeof React !== 'undefined' && React.createElement) {
+            const toasterContainer = document.createElement('div');
+            document.body.appendChild(toasterContainer);
+            
+            const toasterRoot = ReactDOM.createRoot(toasterContainer);
+            toasterRoot.render(React.createElement(ToasterComponent));
+          }
+        }).catch((error) => {
+          console.warn('Failed to load Toaster:', error);
+        });
+      }, 1000);
+      
+    }, 200);
   } catch (error) {
     console.error('Failed to render React app:', error);
     // Show error message instead of blank screen
@@ -74,6 +90,6 @@ const initializeApp = () => {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeApp);
 } else {
-  // Add a delay to ensure all modules are loaded
-  setTimeout(initializeApp, 100);
+  // Add a longer delay to ensure all modules are loaded
+  setTimeout(initializeApp, 200);
 }

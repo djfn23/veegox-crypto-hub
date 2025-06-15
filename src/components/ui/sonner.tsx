@@ -8,7 +8,12 @@ type ToasterProps = {
 } & Record<string, any>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  // Multiple layers of React safety checks
+  // Extremely defensive React checks
+  if (typeof window === 'undefined') {
+    console.warn('Window not available, skipping Sonner component');
+    return null;
+  }
+
   if (typeof React === 'undefined' || React === null) {
     console.warn('React not available, skipping Sonner component');
     return null;
@@ -24,7 +29,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
   const [sonnerToaster, setSonnerToaster] = React.useState<any>(null);
 
   React.useEffect(() => {
-    // Double check React is still available after mount
+    // Quadruple check React is still available after mount
     if (typeof React === 'undefined' || React === null || typeof React.useState !== 'function') {
       console.warn('React became unavailable during Sonner effect');
       return;
@@ -32,18 +37,23 @@ const Toaster = ({ ...props }: ToasterProps) => {
 
     const loadSonner = async () => {
       try {
-        // Add a small delay to ensure React is fully initialized
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Add a longer delay to ensure React is fully initialized
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Triple check React is still available
+        // Final check React is still available
         if (typeof React === 'undefined' || React === null || typeof React.useState !== 'function') {
           console.warn('React not available during Sonner loading');
           return;
         }
 
         const sonnerModule = await import('sonner');
-        setSonnerToaster(() => sonnerModule.Toaster);
-        setIsReady(true);
+        if (sonnerModule && sonnerModule.Toaster) {
+          setSonnerToaster(() => sonnerModule.Toaster);
+          setIsReady(true);
+        } else {
+          console.warn('Sonner module or Toaster not found');
+          setIsReady(true);
+        }
       } catch (error) {
         console.warn('Failed to load Sonner:', error);
         setIsReady(true); // Still set ready to prevent loading state
