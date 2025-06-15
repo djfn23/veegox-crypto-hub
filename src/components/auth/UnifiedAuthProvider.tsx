@@ -52,15 +52,12 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
     const initializeAuth = async () => {
       try {
         console.log('UnifiedAuthProvider: Starting auth initialization');
-        
-        // Set up auth state listener first
+        // Mettre en place l'écouteur d'état d'auth
         const { data } = supabase.auth.onAuthStateChange(
           (event, session) => {
             if (!mounted) return;
-            
             console.log('UnifiedAuthProvider: Auth event:', event, 'Session exists:', !!session);
             setSession(session);
-            
             if (session?.user) {
               setUser({
                 id: session.user.id,
@@ -71,17 +68,14 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
             } else {
               setUser(null);
             }
-            
             setLoading(false);
           }
         );
-
         subscription = data.subscription;
 
-        // Check for existing session
+        // Vérifie session existante
         const { data: { session } } = await supabase.auth.getSession();
         if (!mounted) return;
-        
         console.log('UnifiedAuthProvider: Initial session check:', !!session);
         setSession(session);
         if (session?.user) {
@@ -102,9 +96,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
     };
 
     initializeAuth();
-
     return () => {
-      console.log('UnifiedAuthProvider: Cleanup');
       mounted = false;
       if (subscription) {
         subscription.unsubscribe();
@@ -112,19 +104,24 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
     };
   }, []);
 
+  // Fallback de chargement global
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+        <div className="text-white text-base animate-pulse">
+          Connexion sécurisée à votre compte...
+        </div>
+      </div>
+    );
+  }
+
   const signInWithEmail = async (email: string, password: string) => {
     try {
-      console.log('UnifiedAuthProvider: Signing in with email:', email);
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         await toastError('Erreur de connexion: ' + error.message);
         throw error;
       }
-
       await toastSuccess('Connexion réussie!');
     } catch (error) {
       console.error('UnifiedAuthProvider: Sign in error:', error);
@@ -134,7 +131,6 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
 
   const signUpWithEmail = async (email: string, password: string) => {
     try {
-      console.log('UnifiedAuthProvider: Signing up with email:', email);
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -142,12 +138,10 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
           emailRedirectTo: `${window.location.origin}/`
         }
       });
-
       if (error) {
         await toastError('Erreur d\'inscription: ' + error.message);
         throw error;
       }
-
       await toastSuccess('Inscription réussie! Vérifiez votre email.');
     } catch (error) {
       console.error('UnifiedAuthProvider: Sign up error:', error);
@@ -157,7 +151,6 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
 
   const signInWithWallet = async (walletId: string) => {
     try {
-      console.log('UnifiedAuthProvider: Wallet sign in requested for:', walletId);
       await toastSuccess('Connexion wallet en cours...');
     } catch (error) {
       console.error('UnifiedAuthProvider: Wallet sign in error:', error);
@@ -167,7 +160,6 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
 
   const signOut = async () => {
     try {
-      console.log('UnifiedAuthProvider: Signing out');
       if (session) {
         await supabase.auth.signOut();
       }

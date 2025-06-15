@@ -1,17 +1,14 @@
 
 import React from 'react';
-import { PageLayout } from '@/components/layout/PageLayout';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { XCircle } from 'lucide-react';
 
-const PaymentCanceled = () => {
-  return (
-    <PageLayout 
-      title="Paiement Annulé" 
-      subtitle="Votre paiement a été annulé"
-    >
-      <Card className="bg-yellow-900/20 border-yellow-500/30">
+const PaymentCanceled = () => (
+  <AppLayout>
+    <div className="flex flex-col items-center justify-center min-h-[60vh]">
+      <Card className="bg-yellow-900/20 border-yellow-500/30 w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-yellow-400 flex items-center gap-2">
             <XCircle className="h-5 w-5" />
@@ -40,8 +37,8 @@ const PaymentCanceled = () => {
           </div>
         </CardContent>
       </Card>
-    </PageLayout>
-  );
-};
+    </div>
+  </AppLayout>
+);
 
 export default PaymentCanceled;

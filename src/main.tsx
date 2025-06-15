@@ -2,22 +2,18 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import App from './App.tsx'
-import './index.css'
-import { UnifiedAuthProvider } from './components/auth/UnifiedAuthProvider.tsx';
-import { Toaster } from '@/components/ui/sonner';
+import { UnifiedAuthProvider } from './components/auth/UnifiedAuthProvider'
+import { Toaster } from '@/components/ui/sonner'
 
-// Import pages
-import Portfolio from './pages/Portfolio.tsx'
-import Analytics from './pages/Analytics.tsx'
-import PaymentCanceled from './pages/PaymentCanceled.tsx'
+// Import pages (pas App ici! On n’utilise App que comme wrapper)
+import Index from './pages/Index'
+import Portfolio from './pages/Portfolio'
+import Analytics from './pages/Analytics'
+import PaymentCanceled from './pages/PaymentCanceled'
 
-console.log('Main: Application starting...');
-
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById('root')
 if (!rootElement) {
-  console.error('Root element not found');
-  throw new Error('Root element not found');
+  throw new Error('Root element not found')
 }
 
 ReactDOM.createRoot(rootElement).render(
@@ -25,7 +21,7 @@ ReactDOM.createRoot(rootElement).render(
     <BrowserRouter>
       <UnifiedAuthProvider>
         <Routes>
-          <Route path="/" element={<App />} />
+          <Route path="/" element={<Index />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
@@ -33,5 +29,5 @@ ReactDOM.createRoot(rootElement).render(
         <Toaster />
       </UnifiedAuthProvider>
     </BrowserRouter>
-  </React.StrictMode>,
-);
+  </React.StrictMode>
+)
