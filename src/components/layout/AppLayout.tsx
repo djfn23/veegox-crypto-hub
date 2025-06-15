@@ -15,13 +15,13 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
-  // Safety check for React hooks availability
-  if (typeof useState === 'undefined' || typeof useEffect === 'undefined') {
+  // Early safety check - ensure React is available before using any hooks
+  if (typeof React === 'undefined' || React === null || typeof useState === 'undefined' || typeof useEffect === 'undefined') {
     console.error('React hooks are not available in AppLayout');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
         <div className="text-white text-lg animate-pulse">
-          Chargement de l'interface Veegox...
+          Initialisation de React...
         </div>
       </div>
     );

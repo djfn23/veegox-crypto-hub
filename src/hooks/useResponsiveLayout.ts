@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 export type BreakpointKey = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
@@ -22,8 +23,10 @@ export const useResponsiveLayout = () => {
   // Guard anti SSR/absence de window
   const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
 
-  // Safety check for React hooks availability
-  if (typeof useState === 'undefined' || typeof useEffect === 'undefined') {
+  // CRITICAL: Check React availability BEFORE calling any hooks
+  const isReactAvailable = typeof React !== 'undefined' && React !== null && typeof useState === 'function' && typeof useEffect === 'function';
+
+  if (!isReactAvailable) {
     console.error('React hooks are not available in useResponsiveLayout');
     return {
       windowSize: defaultWindowSize,
@@ -51,7 +54,7 @@ export const useResponsiveLayout = () => {
     };
   }
 
-  // TOUJOURS appeler useState - pas conditionnellement
+  // Now safely call useState - React is available
   const [windowSize, setWindowSize] = useState(() =>
     canUseDOM
       ? { width: window.innerWidth, height: window.innerHeight }
