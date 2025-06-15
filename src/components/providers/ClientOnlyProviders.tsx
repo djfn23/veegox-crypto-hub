@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { UnifiedAuthProvider } from "@/components/auth/UnifiedAuthProvider";
 
-// Ce composant n'est monté que côté client et encapsule tous les providers 
-// dépendant de hooks React, Zustand, localStorage, etc.
+// Ce composant N'EST MONTE que côté client et encapsule tous les providers 
+// qui dépendent de hooks React, Zustand, localStorage, etc.
 export function ClientOnlyProviders({ children }: { children: React.ReactNode }) {
   const [isClient, setIsClient] = useState(false);
 
