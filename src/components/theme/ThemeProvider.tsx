@@ -1,45 +1,48 @@
 
-import React from "react";
+import React, { Suspense } from "react";
+import { useIsHydrated } from "@/hooks/useIsHydrated";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
 }
 
-// SSR-safe: *never* run Zustand or hooks on server, or during pre-hydration
+// Lazy loading du composant ThemeSync
+const ThemeSync = React.lazy(() => 
+  import("./ThemeSync").then(module => ({ default: module.ThemeSync }))
+);
+
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  // SSR guard part 1: never render hooks on server
+  // Protection SSR : ne jamais rendre sur le serveur
   if (typeof window === "undefined") {
-    return <div style={{ minHeight: "100vh", background: "#111" }} />;
+    return (
+      <div style={{ minHeight: "100vh", background: "#111", color: "#fff" }}>
+        {children}
+      </div>
+    );
   }
 
-  // SSR guard part 2: Make sure we only run after client hydration
-  const [isClient, setIsClient] = React.useState(false);
+  return <ThemeProviderClient>{children}</ThemeProviderClient>;
+}
 
-  React.useEffect(() => {
-    setIsClient(true);
-  }, []);
+// Composant client séparé pour éviter les problèmes d'hydratation
+function ThemeProviderClient({ children }: ThemeProviderProps) {
+  const isHydrated = useIsHydrated();
 
-  // Define ThemeSyncClient inline so no hooks or Zustand are imported until we're sure it's client
-  const ThemeSyncClient = React.useMemo(() => {
-    if (!isClient) return () => null;
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { useThemeSync } = require("@/hooks/useThemeSync");
-    return function InnerThemeSyncClient() {
-      useThemeSync();
-      return null;
-    }
-  }, [isClient]);
-
-  if (!isClient) {
-    // Render minimal fallback during hydration only
-    return <div style={{ minHeight: "100vh", background: "#111" }} />;
+  if (!isHydrated) {
+    // Fallback pendant l'hydratation
+    return (
+      <div style={{ minHeight: "100vh", background: "#111", color: "#fff" }}>
+        {children}
+      </div>
+    );
   }
 
-  // Safe: hooks only run after we're surely on client
-  const ClientComponent = ThemeSyncClient;
+  // Une fois hydraté, on peut charger le système de thème
   return (
     <>
-      <ClientComponent />
+      <Suspense fallback={null}>
+        <ThemeSync />
+      </Suspense>
       {children}
     </>
   );

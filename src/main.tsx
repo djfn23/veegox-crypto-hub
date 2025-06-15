@@ -10,25 +10,29 @@ import Portfolio from './pages/Portfolio';
 import Analytics from './pages/Analytics';
 import PaymentCanceled from './pages/PaymentCanceled';
 
-// Client-only Toaster using React.lazy and Suspense
-const SonnerToaster = React.lazy(() =>
+// Toaster avec lazy loading sécurisé
+const LazyToaster = React.lazy(() =>
   import('@/components/ui/sonner').then(module => ({ default: module.Toaster }))
 );
 
-function ClientOnlyToaster() {
-  const [isClient, setIsClient] = React.useState(false);
+// Composant Toaster sécurisé qui ne charge qu'après l'hydratation
+function SafeToaster() {
+  const [canRender, setCanRender] = React.useState(false);
 
   React.useEffect(() => {
-    // Always wait until we're on the client before rendering Toaster.
-    setIsClient(true);
+    // S'assure que l'hydratation est complète avant de charger Sonner
+    const timer = setTimeout(() => {
+      setCanRender(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
-  if (!isClient) return null;
+  if (!canRender) return null;
 
-  // Only render Toaster *after* client hydration.
   return (
     <React.Suspense fallback={null}>
-      <SonnerToaster />
+      <LazyToaster />
     </React.Suspense>
   );
 }
@@ -48,7 +52,7 @@ ReactDOM.createRoot(rootElement).render(
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
         </Routes>
-        <ClientOnlyToaster />
+        <SafeToaster />
       </ClientOnlyProviders>
     </BrowserRouter>
   </React.StrictMode>

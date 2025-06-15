@@ -2,12 +2,11 @@
 import React from "react";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { UnifiedAuthProvider } from "@/components/auth/UnifiedAuthProvider";
+import { useIsHydrated } from "@/hooks/useIsHydrated";
 
-// This component ensures *no hooks* are run on the server.
 export function ClientOnlyProviders({ children }: { children: React.ReactNode }) {
-  // Prevent *all* hooks when rendering on the server.
+  // Protection SSR complète
   if (typeof window === "undefined") {
-    // SSR fallback: no hooks, minimal UI only.
     return (
       <div style={{
         minHeight: "100vh",
@@ -17,20 +16,19 @@ export function ClientOnlyProviders({ children }: { children: React.ReactNode })
         alignItems: "center",
         justifyContent: "center"
       }}>
-        Chargement de l’application...
+        Chargement de l'application...
       </div>
     );
   }
 
-  // Safe to run hooks on the client.
-  const [isClient, setIsClient] = React.useState(false);
+  return <ClientProvidersInner>{children}</ClientProvidersInner>;
+}
 
-  React.useEffect(() => {
-    setIsClient(true);
-  }, []);
+// Composant interne qui utilise les hooks uniquement côté client
+function ClientProvidersInner({ children }: { children: React.ReactNode }) {
+  const isHydrated = useIsHydrated();
 
-  if (!isClient) {
-    // Still on initial client-side hydration: show loading
+  if (!isHydrated) {
     return (
       <div style={{
         minHeight: "100vh",
@@ -40,7 +38,7 @@ export function ClientOnlyProviders({ children }: { children: React.ReactNode })
         alignItems: "center",
         justifyContent: "center"
       }}>
-        Chargement de l’application...
+        Initialisation sécurisée...
       </div>
     );
   }

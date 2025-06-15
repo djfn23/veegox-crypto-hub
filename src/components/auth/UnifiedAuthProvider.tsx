@@ -1,9 +1,8 @@
 
 import * as React from 'react';
-import { useState, useEffect, useContext, createContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useSecureToast } from '@/hooks/useSecureToast';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 
 interface AuthUser {
   id: string;
@@ -26,10 +25,10 @@ interface UnifiedAuthContextType {
   isAuthenticated: boolean;
 }
 
-const UnifiedAuthContext = createContext<UnifiedAuthContextType | undefined>(undefined);
+const UnifiedAuthContext = React.createContext<UnifiedAuthContextType | undefined>(undefined);
 
 export const useUnifiedAuth = () => {
-  const context = useContext(UnifiedAuthContext);
+  const context = React.useContext(UnifiedAuthContext);
   if (!context) {
     throw new Error('useUnifiedAuth must be used within UnifiedAuthProvider');
   }
@@ -40,14 +39,52 @@ interface UnifiedAuthProviderProps {
   children: React.ReactNode;
 }
 
-// Move all hook logic in an inner component
-function UnifiedAuthProviderInner({ children }: UnifiedAuthProviderProps) {
+export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
+  // Protection SSR absolue
+  if (typeof window === "undefined") {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: "#111",
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        Authentification sécurisée...
+      </div>
+    );
+  }
+
+  return <UnifiedAuthProviderClient>{children}</UnifiedAuthProviderClient>;
+}
+
+// Composant client qui utilise les hooks uniquement après hydratation
+function UnifiedAuthProviderClient({ children }: UnifiedAuthProviderProps) {
+  const isHydrated = useIsHydrated();
   const [user, setUser] = React.useState<AuthUser | null>(null);
   const [session, setSession] = React.useState<Session | null>(null);
   const [loading, setLoading] = React.useState(true);
-  const { success: toastSuccess, error: toastError } = useSecureToast();
+
+  // Toast sécurisé qui ne s'exécute qu'après hydratation
+  const showToast = React.useCallback(async (message: string, type: 'success' | 'error' = 'success') => {
+    if (!isHydrated) return;
+    
+    try {
+      const { toast } = await import('sonner');
+      if (type === 'success') {
+        toast.success(message);
+      } else {
+        toast.error(message);
+      }
+    } catch (error) {
+      console.log(`Toast: ${message}`);
+    }
+  }, [isHydrated]);
 
   React.useEffect(() => {
+    if (!isHydrated) return;
+    
     let mounted = true;
     let subscription: any = null;
 
@@ -100,15 +137,20 @@ function UnifiedAuthProviderInner({ children }: UnifiedAuthProviderProps) {
         subscription.unsubscribe();
       }
     };
-  }, []);
+  }, [isHydrated]);
 
-  // Loading fallback
-  if (loading) {
+  // Loading pendant l'hydratation ou l'initialisation auth
+  if (!isHydrated || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-        <div className="text-white text-base animate-pulse">
-          Connexion sécurisée à votre compte...
-        </div>
+      <div style={{
+        minHeight: "100vh",
+        background: "#111",
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        Connexion sécurisée à votre compte...
       </div>
     );
   }
@@ -117,10 +159,10 @@ function UnifiedAuthProviderInner({ children }: UnifiedAuthProviderProps) {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        await toastError('Erreur de connexion: ' + error.message);
+        await showToast('Erreur de connexion: ' + error.message, 'error');
         throw error;
       }
-      await toastSuccess('Connexion réussie!');
+      await showToast('Connexion réussie!');
     } catch (error) {
       throw error;
     }
@@ -136,10 +178,10 @@ function UnifiedAuthProviderInner({ children }: UnifiedAuthProviderProps) {
         }
       });
       if (error) {
-        await toastError('Erreur d\'inscription: ' + error.message);
+        await showToast('Erreur d\'inscription: ' + error.message, 'error');
         throw error;
       }
-      await toastSuccess('Inscription réussie! Vérifiez votre email.');
+      await showToast('Inscription réussie! Vérifiez votre email.');
     } catch (error) {
       throw error;
     }
@@ -147,9 +189,9 @@ function UnifiedAuthProviderInner({ children }: UnifiedAuthProviderProps) {
 
   const signInWithWallet = async (walletId: string) => {
     try {
-      await toastSuccess('Connexion wallet en cours...');
+      await showToast('Connexion wallet en cours...');
     } catch (error) {
-      await toastError('Erreur de connexion wallet');
+      await showToast('Erreur de connexion wallet', 'error');
     }
   };
 
@@ -160,14 +202,14 @@ function UnifiedAuthProviderInner({ children }: UnifiedAuthProviderProps) {
       }
       setUser(null);
       setSession(null);
-      await toastSuccess('Déconnexion réussie');
+      await showToast('Déconnexion réussie');
     } catch (error) {}
   };
 
   const value: UnifiedAuthContextType = {
     user,
     session,
-    loading,
+    loading: false,
     signInWithEmail,
     signUpWithEmail,
     signInWithWallet,
@@ -180,12 +222,4 @@ function UnifiedAuthProviderInner({ children }: UnifiedAuthProviderProps) {
       {children}
     </UnifiedAuthContext.Provider>
   );
-}
-
-export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
-  // Only render on client
-  if (typeof window === "undefined") {
-    return null;
-  }
-  return <UnifiedAuthProviderInner>{children}</UnifiedAuthProviderInner>;
 }

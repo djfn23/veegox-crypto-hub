@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -39,6 +40,9 @@ interface AppState {
     assets: boolean;
   };
   
+  // Hydration state
+  isHydrated: boolean;
+  
   // Actions
   setSidebarOpen: (open: boolean) => void;
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
@@ -47,6 +51,7 @@ interface AppState {
   clearNotifications: () => void;
   updateUserPreferences: (preferences: Partial<UserPreferences>) => void;
   setLoading: (key: keyof AppState['isLoading'], loading: boolean) => void;
+  setHydrated: (hydrated: boolean) => void;
 }
 
 const defaultPreferences: UserPreferences = {
@@ -64,18 +69,27 @@ const defaultPreferences: UserPreferences = {
   },
 };
 
-// SSR: Noop Storage (évite l'accès à localStorage côté serveur)
+// Protection SSR améliorée
 const isClient = typeof window !== "undefined" && typeof window.localStorage !== "undefined";
-const safeCreateJSONStorage = (getter: () => Storage) => {
+
+const createSafeStorage = () => {
   if (!isClient) {
-    // Fake/noop storage backend
     return {
       getItem: () => null,
       setItem: () => {},
       removeItem: () => {},
     };
   }
-  return getter();
+  
+  try {
+    return localStorage;
+  } catch {
+    return {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    };
+  }
 };
 
 export const useAppStore = create<AppState>()(
@@ -90,12 +104,16 @@ export const useAppStore = create<AppState>()(
         transactions: false,
         assets: false,
       },
+      isHydrated: false,
 
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       
       setTheme: (theme) => {
+        // Ne met à jour que si le store est hydraté
+        const state = get();
+        if (!state.isHydrated && isClient) return;
+        
         set({ theme });
-        // Update user preferences as well
         get().updateUserPreferences({ theme });
       },
       
@@ -107,7 +125,7 @@ export const useAppStore = create<AppState>()(
           read: false,
         };
         set((state) => ({
-          notifications: [newNotification, ...state.notifications].slice(0, 50), // Keep last 50
+          notifications: [newNotification, ...state.notifications].slice(0, 50),
         }));
       },
       
@@ -132,15 +150,27 @@ export const useAppStore = create<AppState>()(
           isLoading: { ...state.isLoading, [key]: loading },
         }));
       },
+      
+      setHydrated: (hydrated) => set({ isHydrated: hydrated }),
     }),
     {
       name: 'veegox-app-store',
-      storage: createJSONStorage(() => safeCreateJSONStorage(() => localStorage)),
+      storage: createJSONStorage(() => createSafeStorage()),
       partialize: (state) => ({
         theme: state.theme,
         userPreferences: state.userPreferences,
         notifications: state.notifications.slice(0, 10),
       }),
+      // Évite les problèmes d'hydratation
+      skipHydration: !isClient,
     }
   )
 );
+
+// Initialise l'hydratation côté client
+if (isClient) {
+  // Délai pour s'assurer que React est prêt
+  setTimeout(() => {
+    useAppStore.getState().setHydrated(true);
+  }, 0);
+}
