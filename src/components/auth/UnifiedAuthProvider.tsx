@@ -59,17 +59,37 @@ export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
   return <UnifiedAuthProviderClient>{children}</UnifiedAuthProviderClient>;
 }
 
-// Composant client qui utilise les hooks uniquement après hydratation
+// Wrapper: Do not call hooks except useIsHydrated
 function UnifiedAuthProviderClient({ children }: UnifiedAuthProviderProps) {
   const isHydrated = useIsHydrated();
+
+  // Only render the real provider after hydration, avoiding rule-of-hooks violation
+  if (!isHydrated) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: "#111",
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        Connexion sécurisée à votre compte...
+      </div>
+    );
+  }
+
+  return <UnifiedAuthProviderInner>{children}</UnifiedAuthProviderInner>;
+}
+
+// All hooks & state moved here, this is only rendered after hydration!
+function UnifiedAuthProviderInner({ children }: UnifiedAuthProviderProps) {
   const [user, setUser] = React.useState<AuthUser | null>(null);
   const [session, setSession] = React.useState<Session | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   // Toast sécurisé qui ne s'exécute qu'après hydratation
   const showToast = React.useCallback(async (message: string, type: 'success' | 'error' = 'success') => {
-    if (!isHydrated) return;
-    
     try {
       const { toast } = await import('sonner');
       if (type === 'success') {
@@ -80,14 +100,11 @@ function UnifiedAuthProviderClient({ children }: UnifiedAuthProviderProps) {
     } catch (error) {
       console.log(`Toast: ${message}`);
     }
-  }, [isHydrated]);
+  }, []);
 
   React.useEffect(() => {
-    if (!isHydrated) return;
-    
     let mounted = true;
     let subscription: any = null;
-
     const initializeAuth = async () => {
       try {
         // Set up auth state listener
@@ -137,10 +154,10 @@ function UnifiedAuthProviderClient({ children }: UnifiedAuthProviderProps) {
         subscription.unsubscribe();
       }
     };
-  }, [isHydrated]);
+  }, []);
 
-  // Loading pendant l'hydratation ou l'initialisation auth
-  if (!isHydrated || loading) {
+  // Loading pendant l'initialisation auth
+  if (loading) {
     return (
       <div style={{
         minHeight: "100vh",
