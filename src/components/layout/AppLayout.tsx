@@ -16,10 +16,16 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
+  // Always call hooks in the same order - no conditional hook calls
   const isHydrated = useIsHydrated();
+  
+  // Only call useThemeResponsive after hydration to avoid hook order issues
+  const themeData = isHydrated && typeof window !== "undefined" 
+    ? useThemeResponsive() 
+    : null;
 
-  // Block all hook usage if not hydrated to avoid SSR useState error
-  if (!isHydrated || typeof window === "undefined") {
+  // Show loading state while hydrating, but don't return early to avoid hook violations
+  if (!isHydrated || typeof window === "undefined" || !themeData) {
     return (
       <div style={{
         minHeight: "100vh",
@@ -34,7 +40,6 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     );
   }
 
-  // Hooks are safe to use after hydration
   const { 
     isMobile, 
     isTablet, 
@@ -43,7 +48,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     getGlassEffect,
     getResponsiveSpacing,
     isDark
-  } = useThemeResponsive();
+  } = themeData;
 
   const glassEffect = getGlassEffect();
   const backgroundGradient = isDark 
