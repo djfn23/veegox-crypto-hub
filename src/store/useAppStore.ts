@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -65,6 +64,20 @@ const defaultPreferences: UserPreferences = {
   },
 };
 
+// SSR: Noop Storage (évite l'accès à localStorage côté serveur)
+const isClient = typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+const safeCreateJSONStorage = (getter: () => Storage) => {
+  if (!isClient) {
+    // Fake/noop storage backend
+    return {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    };
+  }
+  return getter();
+};
+
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -122,11 +135,11 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'veegox-app-store',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => safeCreateJSONStorage(() => localStorage)),
       partialize: (state) => ({
         theme: state.theme,
         userPreferences: state.userPreferences,
-        notifications: state.notifications.slice(0, 10), // Persist only last 10 notifications
+        notifications: state.notifications.slice(0, 10),
       }),
     }
   )

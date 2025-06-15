@@ -8,18 +8,27 @@ import { UnifiedAuthProvider } from "@/components/auth/UnifiedAuthProvider";
 export function ClientOnlyProviders({ children }: { children: React.ReactNode }) {
   const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => setIsClient(true), []);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-  if (!isClient) {
+  if (!isClient || typeof window === "undefined") {
     // Fallback loading pour éviter tout appel de hook côté serveur
     return (
-      <div style={{minHeight: "100vh", background: "#111", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center"}}>
+      <div style={{
+        minHeight: "100vh",
+        background: "#111",
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
         Chargement de l’application...
       </div>
     );
   }
 
-  // Important : TOUS les providers dépendant du client doivent être imbriqués ici
+  // Important : TOUS les providers dépendant du client doivent être imbriqués ici
   return (
     <ThemeProvider>
       <UnifiedAuthProvider>
