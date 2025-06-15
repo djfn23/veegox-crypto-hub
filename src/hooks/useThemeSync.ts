@@ -19,10 +19,11 @@ export function useThemeSync() {
       const { theme: storeTheme } = useAppStore.getState();
       setTheme(storeTheme);
 
-      // Subscribe aux changements du store
+      // Subscribe aux changements du store - fixed signature
       const unsubscribe = useAppStore.subscribe(
-        (state) => state.theme,
-        (newTheme) => setTheme(newTheme)
+        (state) => {
+          setTheme(state.theme);
+        }
       );
 
       return unsubscribe;

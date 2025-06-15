@@ -2,28 +2,32 @@
 import { useResponsiveLayout } from './useResponsiveLayout';
 import { useAppStore } from '@/store/useAppStore';
 import { themeTokens } from '@/components/ui/theme-tokens';
+import { useIsHydrated } from './useIsHydrated';
 
 export const useThemeResponsive = () => {
-  const { theme } = useAppStore();
   const responsive = useResponsiveLayout();
+  const isHydrated = useIsHydrated();
+  
+  // Always call useAppStore unconditionally to avoid hook order issues
+  const { theme } = useAppStore();
 
   // Sécurisation d'accès à window pour SSR
   const isDarkMode = 
-    typeof window !== "undefined" && 
+    isHydrated && typeof window !== "undefined" && 
     (
       theme === 'dark' || 
       (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
     );
 
   const isLightMode =
-    typeof window !== "undefined" && 
+    isHydrated && typeof window !== "undefined" && 
     (
       theme === 'light' ||
       (theme === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches)
     );
   
   const getThemeValue = (lightValue: string, darkValue: string) => {
-    if (typeof window === "undefined") return lightValue;
+    if (!isHydrated || typeof window === "undefined") return lightValue;
     if (theme === 'system') {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? darkValue : lightValue;
     }
