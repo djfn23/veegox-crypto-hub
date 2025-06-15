@@ -2,7 +2,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Trash2 } from "lucide-react"
+import { Delete } from "lucide-react"
 
 interface MobileKeypadProps {
   value: string
@@ -63,7 +63,7 @@ export const MobileKeypad = React.forwardRef<HTMLDivElement, MobileKeypadProps>(
               )}
             >
               {key === 'delete' ? (
-                <Trash2 className="h-6 w-6" aria-label="Delete" />
+                <Delete className="h-6 w-6" aria-label="Delete" />
               ) : (
                 key
               )}
