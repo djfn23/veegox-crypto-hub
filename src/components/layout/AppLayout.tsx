@@ -1,4 +1,3 @@
-
 import React, { ReactNode, useState, useEffect } from "react";
 import { SimplifiedNavigation } from "./SimplifiedNavigation";
 import { MobileHeader } from "./MobileHeader";
@@ -15,7 +14,25 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
+  // Wait for client before rendering anything that uses hooks.
   const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    // Minimal SSR-friendly fallback
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-foreground text-lg animate-pulse">
+          Chargement de l'interface Veegox...
+        </div>
+      </div>
+    );
+  }
+
+  // Only after isClient=true, use client-only hooks
   const { 
     isMobile, 
     isTablet, 
@@ -25,20 +42,6 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     getResponsiveSpacing,
     isDark
   } = useThemeResponsive();
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-foreground text-lg animate-pulse">
-          Chargement de l'interface Veegox...
-        </div>
-      </div>
-    );
-  }
 
   const glassEffect = getGlassEffect();
   const backgroundGradient = isDark 
