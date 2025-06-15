@@ -1,14 +1,8 @@
 
 import React from "react";
-import { useThemeSync } from "@/hooks/useThemeSync";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
-}
-
-function ThemeSyncClient() {
-  useThemeSync();
-  return null;
 }
 
 // SSR-safe: *never* run Zustand or hooks on server, or during pre-hydration
@@ -25,15 +19,27 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setIsClient(true);
   }, []);
 
+  // Define ThemeSyncClient inline so no hooks or Zustand are imported until we're sure it's client
+  const ThemeSyncClient = React.useMemo(() => {
+    if (!isClient) return () => null;
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { useThemeSync } = require("@/hooks/useThemeSync");
+    return function InnerThemeSyncClient() {
+      useThemeSync();
+      return null;
+    }
+  }, [isClient]);
+
   if (!isClient) {
     // Render minimal fallback during hydration only
     return <div style={{ minHeight: "100vh", background: "#111" }} />;
   }
 
   // Safe: hooks only run after we're surely on client
+  const ClientComponent = ThemeSyncClient;
   return (
     <>
-      <ThemeSyncClient />
+      <ClientComponent />
       {children}
     </>
   );
