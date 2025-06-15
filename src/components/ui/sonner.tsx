@@ -8,44 +8,53 @@ type ToasterProps = {
 } & Record<string, any>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  // Early safety check - if React is not available, return null immediately
-  if (typeof React === 'undefined' || React === null || typeof React.useState === 'undefined') {
+  // Multiple layers of React safety checks
+  if (typeof React === 'undefined' || React === null) {
+    console.warn('React not available, skipping Sonner component');
+    return null;
+  }
+
+  if (typeof React.useState !== 'function' || typeof React.useEffect !== 'function') {
     console.warn('React hooks not available, skipping Sonner component');
     return null;
   }
 
-  // Use state to track if Sonner is loaded and ready
+  // Use state to track if we're ready to render Sonner
+  const [isReady, setIsReady] = React.useState(false);
   const [sonnerToaster, setSonnerToaster] = React.useState<any>(null);
-  const [isLoaded, setIsLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    // Only load Sonner after component mount when React is definitely ready
+    // Double check React is still available after mount
+    if (typeof React === 'undefined' || React === null || typeof React.useState !== 'function') {
+      console.warn('React became unavailable during Sonner effect');
+      return;
+    }
+
     const loadSonner = async () => {
       try {
-        // Double check React is still available
-        if (typeof React === 'undefined' || React === null || typeof React.useState === 'undefined') {
-          console.warn('React became unavailable during Sonner loading');
+        // Add a small delay to ensure React is fully initialized
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Triple check React is still available
+        if (typeof React === 'undefined' || React === null || typeof React.useState !== 'function') {
+          console.warn('React not available during Sonner loading');
           return;
         }
 
-        // Dynamic import to avoid any synchronous loading issues
         const sonnerModule = await import('sonner');
         setSonnerToaster(() => sonnerModule.Toaster);
-        setIsLoaded(true);
+        setIsReady(true);
       } catch (error) {
         console.warn('Failed to load Sonner:', error);
-        setIsLoaded(true); // Still set loaded to prevent infinite loading
+        setIsReady(true); // Still set ready to prevent loading state
       }
     };
 
-    // Add delay to ensure React is fully initialized
-    const timer = setTimeout(loadSonner, 300);
-    
-    return () => clearTimeout(timer);
+    loadSonner();
   }, []);
 
-  // Don't render anything until we've attempted to load Sonner
-  if (!isLoaded) {
+  // Don't render anything until we're ready
+  if (!isReady) {
     return null;
   }
 
@@ -72,7 +81,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       ...props,
     });
   } catch (error) {
-    console.warn('Error in Sonner component:', error);
+    console.warn('Error rendering Sonner component:', error);
     return null;
   }
 };

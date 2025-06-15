@@ -35,21 +35,24 @@ const initializeApp = () => {
   }
 
   try {
-    ReactDOM.createRoot(rootElement).render(
-      <React.StrictMode>
-        <BrowserRouter>
-          <UnifiedAuthProvider>
-            <Routes>
-              <Route path="/" element={<App />} />
-              <Route path="/portfolio" element={<Portfolio />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/payment-canceled" element={<PaymentCanceled />} />
-            </Routes>
-            <Toaster />
-          </UnifiedAuthProvider>
-        </BrowserRouter>
-      </React.StrictMode>,
-    );
+    // Add a small delay before rendering to ensure everything is stable
+    setTimeout(() => {
+      ReactDOM.createRoot(rootElement).render(
+        <React.StrictMode>
+          <BrowserRouter>
+            <UnifiedAuthProvider>
+              <Routes>
+                <Route path="/" element={<App />} />
+                <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/payment-canceled" element={<PaymentCanceled />} />
+              </Routes>
+              <Toaster />
+            </UnifiedAuthProvider>
+          </BrowserRouter>
+        </React.StrictMode>,
+      );
+    }, 100);
   } catch (error) {
     console.error('Failed to render React app:', error);
     // Show error message instead of blank screen
@@ -71,6 +74,6 @@ const initializeApp = () => {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeApp);
 } else {
-  // Add a small delay to ensure all modules are loaded
-  setTimeout(initializeApp, 10);
+  // Add a delay to ensure all modules are loaded
+  setTimeout(initializeApp, 100);
 }
