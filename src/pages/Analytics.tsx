@@ -1,7 +1,7 @@
 
 import React from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
-import RealTimeMarketData from "@/components/analytics/RealTimeMarketData";
+import { RealTimeMarketData } from "@/components/analytics/RealTimeMarketData";
 
 const Analytics = () => (
   <AppLayout>
