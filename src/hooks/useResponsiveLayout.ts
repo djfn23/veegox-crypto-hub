@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export type BreakpointKey = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 export type DeviceType = 'mobile' | 'tablet' | 'desktop'
@@ -23,38 +23,6 @@ export const useResponsiveLayout = () => {
   // Guard anti SSR/absence de window
   const canUseDOM = typeof window !== 'undefined' && !!window.document && !!window.document.createElement;
 
-  // CRITICAL: Check React availability BEFORE calling any hooks
-  const isReactAvailable = typeof React !== 'undefined' && React !== null && typeof useState === 'function' && typeof useEffect === 'function';
-
-  if (!isReactAvailable) {
-    console.error('React hooks are not available in useResponsiveLayout');
-    return {
-      windowSize: defaultWindowSize,
-      orientation: defaultOrientation,
-      currentBreakpoint: 'lg' as BreakpointKey,
-      deviceType: 'desktop' as DeviceType,
-      isMobile: false,
-      isTablet: false,
-      isDesktop: true,
-      isPortrait: false,
-      isLandscape: true,
-      isBreakpoint: () => false,
-      isBetweenBreakpoints: () => false,
-      getColumns: () => 1,
-      getSpacing: () => '16px',
-      isSmallMobile: () => false,
-      isLargeMobile: () => false,
-      isSmallTablet: () => false,
-      isLandscapePhone: () => false,
-      isExtraSmall: () => false,
-      isCompact: () => false,
-      canUseColumns: () => false,
-      getDynamicSpacing: () => '16px',
-      getFontSize: () => 'text-base',
-    };
-  }
-
-  // Now safely call useState - React is available
   const [windowSize, setWindowSize] = useState(() =>
     canUseDOM
       ? { width: window.innerWidth, height: window.innerHeight }

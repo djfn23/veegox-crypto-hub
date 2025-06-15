@@ -1,83 +1,15 @@
 
 import * as React from "react";
+import { Toaster as SonnerToaster } from "sonner";
 
-type ToasterProps = {
-  theme?: "light" | "dark" | "system";
-  className?: string;
-  toastOptions?: any;
-} & Record<string, any>;
+type ToasterProps = React.ComponentProps<typeof SonnerToaster>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  // Extremely defensive React checks
-  if (typeof window === 'undefined') {
-    console.warn('Window not available, skipping Sonner component');
-    return null;
-  }
-
-  if (typeof React === 'undefined' || React === null) {
-    console.warn('React not available, skipping Sonner component');
-    return null;
-  }
-
-  if (typeof React.useState !== 'function' || typeof React.useEffect !== 'function') {
-    console.warn('React hooks not available, skipping Sonner component');
-    return null;
-  }
-
-  // Use state to track if we're ready to render Sonner
-  const [isReady, setIsReady] = React.useState(false);
-  const [sonnerToaster, setSonnerToaster] = React.useState<any>(null);
-
-  React.useEffect(() => {
-    // Quadruple check React is still available after mount
-    if (typeof React === 'undefined' || React === null || typeof React.useState !== 'function') {
-      console.warn('React became unavailable during Sonner effect');
-      return;
-    }
-
-    const loadSonner = async () => {
-      try {
-        // Add a longer delay to ensure React is fully initialized
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Final check React is still available
-        if (typeof React === 'undefined' || React === null || typeof React.useState !== 'function') {
-          console.warn('React not available during Sonner loading');
-          return;
-        }
-
-        const sonnerModule = await import('sonner');
-        if (sonnerModule && sonnerModule.Toaster) {
-          setSonnerToaster(() => sonnerModule.Toaster);
-          setIsReady(true);
-        } else {
-          console.warn('Sonner module or Toaster not found');
-          setIsReady(true);
-        }
-      } catch (error) {
-        console.warn('Failed to load Sonner:', error);
-        setIsReady(true); // Still set ready to prevent loading state
-      }
-    };
-
-    loadSonner();
-  }, []);
-
-  // Don't render anything until we're ready
-  if (!isReady) {
-    return null;
-  }
-
-  // If Sonner failed to load, return null silently
-  if (!sonnerToaster) {
-    return null;
-  }
-
-  try {
-    return React.createElement(sonnerToaster, {
-      theme: "dark",
-      className: "toaster group",
-      toastOptions: {
+  return (
+    <SonnerToaster
+      theme="dark"
+      className="toaster group"
+      toastOptions={{
         classNames: {
           toast:
             "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
@@ -87,13 +19,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
           cancelButton:
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
         },
-      },
-      ...props,
-    });
-  } catch (error) {
-    console.warn('Error rendering Sonner component:', error);
-    return null;
-  }
+      }}
+      {...props}
+    />
+  );
 };
 
 export { Toaster };

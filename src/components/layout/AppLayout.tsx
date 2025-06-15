@@ -1,5 +1,5 @@
 
-import { ReactNode, useState, useEffect } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import { SimplifiedNavigation } from "./SimplifiedNavigation";
 import { MobileHeader } from "./MobileHeader";
 import { MobileBottomNavigation } from "./MobileBottomNavigation";
@@ -15,18 +15,6 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
-  // Early safety check - ensure React is available before using any hooks
-  if (typeof React === 'undefined' || React === null || typeof useState === 'undefined' || typeof useEffect === 'undefined') {
-    console.error('React hooks are not available in AppLayout');
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-        <div className="text-white text-lg animate-pulse">
-          Initialisation de React...
-        </div>
-      </div>
-    );
-  }
-
   const [isClient, setIsClient] = useState(false);
   const { isMobile, isTablet, isDesktop, isLandscapePhone } = useResponsiveLayout();
 

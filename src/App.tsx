@@ -22,72 +22,22 @@ const queryClient = new QueryClient({
 function App() {
   console.log('App: Rendering main application component');
   
-  const [isReactReady, setIsReactReady] = React.useState(false);
-
-  React.useEffect(() => {
-    console.log('App: Component mounted successfully');
-    
-    // Ensure React is fully ready
-    const timer = setTimeout(() => {
-      setIsReactReady(true);
-    }, 100);
-    
-    const handleUnhandledError = (event: ErrorEvent) => {
-      console.error('App: Unhandled error caught:', event.error);
-    };
-
-    window.addEventListener('error', handleUnhandledError);
-    
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('error', handleUnhandledError);
-    };
-  }, []);
-  
-  if (!isReactReady) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-        <div className="text-white text-lg animate-pulse">
-          Chargement de Veegox...
-        </div>
-      </div>
-    );
-  }
-  
-  try {
-    return (
-      <EnhancedErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <AppLayout>
-              <div className="p-6">
-                <h1 className="text-2xl font-bold text-white mb-4">Welcome to Veegox</h1>
-                <p className="text-gray-300">Your decentralized finance platform</p>
-              </div>
-            </AppLayout>
-            
-            <AlchemySignerContainer />
-          </ThemeProvider>
-        </QueryClientProvider>
-      </EnhancedErrorBoundary>
-    );
-  } catch (error) {
-    console.error('App: Critical error in App component render:', error);
-    return (
-      <div className="min-h-screen bg-red-900 flex items-center justify-center">
-        <div className="text-white text-center">
-          <h1 className="text-2xl font-bold mb-4">Application Error</h1>
-          <p>A critical error occurred while loading the application.</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded"
-          >
-            Reload Application
-          </button>
-        </div>
-      </div>
-    );
-  }
+  return (
+    <EnhancedErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <AppLayout>
+            <div className="p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">Welcome to Veegox</h1>
+              <p className="text-gray-300">Your decentralized finance platform</p>
+            </div>
+          </AppLayout>
+          
+          <AlchemySignerContainer />
+        </ThemeProvider>
+      </QueryClientProvider>
+    </EnhancedErrorBoundary>
+  );
 }
 
 export default App;

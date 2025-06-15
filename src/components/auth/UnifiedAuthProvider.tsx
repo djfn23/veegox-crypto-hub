@@ -40,18 +40,6 @@ interface UnifiedAuthProviderProps {
 }
 
 export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ children }) => {
-  // Early safety check - ensure React is available
-  if (!React || typeof React.useState !== 'function') {
-    console.error('React is not properly loaded in UnifiedAuthProvider');
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-        <div className="text-white text-lg animate-pulse">
-          Initialisation de React...
-        </div>
-      </div>
-    );
-  }
-
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -111,13 +99,11 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
       }
     };
 
-    // Ensure React is ready before initializing
-    const timer = setTimeout(initializeAuth, 50);
+    initializeAuth();
 
     return () => {
       console.log('UnifiedAuthProvider: Cleanup');
       mounted = false;
-      clearTimeout(timer);
       if (subscription) {
         subscription.unsubscribe();
       }
