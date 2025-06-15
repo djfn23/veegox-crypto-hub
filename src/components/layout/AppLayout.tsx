@@ -9,13 +9,32 @@ import { SidebarErrorBoundary } from "@/components/ui/error-boundary-sidebar";
 import { texts } from "@/lib/constants/texts";
 import { Badge } from "@/components/ui/badge";
 import { useThemeResponsive } from "@/hooks/useThemeResponsive";
+import { useIsHydrated } from "@/hooks/useIsHydrated";
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
-  // Use theme responsive hook directly - ClientOnlyProviders handles SSR protection
+  const isHydrated = useIsHydrated();
+
+  // Block all hook usage if not hydrated to avoid SSR useState error
+  if (!isHydrated || typeof window === "undefined") {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: "#111",
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}>
+        Chargement de l'application...
+      </div>
+    );
+  }
+
+  // Hooks are safe to use after hydration
   const { 
     isMobile, 
     isTablet, 
