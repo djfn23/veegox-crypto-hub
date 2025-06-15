@@ -1,25 +1,31 @@
 
 import React, { useEffect, useState } from 'react';
-import { useAppStore } from '@/store/useAppStore';
 
 interface ThemeProviderProps {
   children: React.ReactNode;
 }
 
-// Ajout d'une détection client/serveur pour éviter les crashs d'accès à window/document côté SSR
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const { theme } = useAppStore();
+  // Phase 1 : empêcher tout hook Zustand côté SSR
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  // Early return pour éviter hooks + Zustand côté SSR
+  if (!isClient) {
+    return <div style={{ minHeight: '100vh', background: '#111' }} />;
+  }
+
+  // On est sur le client, c’est safe d’appeler Zustand maintenant !
+  // (hook importé ici pour éviter qu’il tourne sur le serveur)
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { useAppStore } = require('@/store/useAppStore');
+  const { theme } = useAppStore();
+
   useEffect(() => {
-    if (!isClient) return;
     const root = window.document.documentElement;
-    
-    // Remove existing theme classes
     root.classList.remove('light', 'dark');
     if (theme === 'system') {
       const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -29,10 +35,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     } else {
       root.classList.add(theme);
     }
-  }, [theme, isClient]);
+  }, [theme]);
 
   useEffect(() => {
-    if (!isClient) return;
     if (theme === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const handleChange = () => {
@@ -43,12 +48,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       mediaQuery.addEventListener('change', handleChange);
       return () => mediaQuery.removeEventListener('change', handleChange);
     }
-  }, [theme, isClient]);
-
-  // Affiche un fallback minimal côté serveur pour éviter l'écran blanc
-  if (!isClient) {
-    return <div style={{ minHeight: '100vh', background: '#111' }} />;
-  }
+  }, [theme]);
 
   return <>{children}</>;
 }
