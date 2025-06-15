@@ -1,27 +1,28 @@
 
 import React, { useEffect, useState } from 'react';
+import { useAppStore } from '@/store/useAppStore';
 
 interface ThemeProviderProps {
   children: React.ReactNode;
 }
 
+// Sépare la logique de "client only" (ThemeProvider) et la logique de thème (ThemeUpdater)
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  // Phase 1 : empêcher tout hook Zustand côté SSR
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Early return pour éviter hooks + Zustand côté SSR
   if (!isClient) {
     return <div style={{ minHeight: '100vh', background: '#111' }} />;
   }
 
-  // On est sur le client, c’est safe d’appeler Zustand maintenant !
-  // (hook importé ici pour éviter qu’il tourne sur le serveur)
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { useAppStore } = require('@/store/useAppStore');
+  return <ThemeUpdater>{children}</ThemeUpdater>;
+}
+
+// Ce composant doit être appelé uniquement côté client
+function ThemeUpdater({ children }: { children: React.ReactNode }) {
   const { theme } = useAppStore();
 
   useEffect(() => {
