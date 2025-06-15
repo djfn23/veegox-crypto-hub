@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useThemeSync } from "@/hooks/useThemeSync";
 
 interface ThemeProviderProps {
@@ -16,17 +16,7 @@ function ThemeSyncClient() {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Rendu précoce vide côté serveur (préviens les erreurs hydratation et hooks Zustand)
-  if (!isClient || typeof window === "undefined") {
-    return <div style={{ minHeight: "100vh", background: "#111" }} />;
-  }
-
+  // On considère que ce provider sera désormais TOUJOURS monté côté client via ClientOnlyProviders
   return (
     <>
       <ThemeSyncClient />
