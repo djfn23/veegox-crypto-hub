@@ -10,7 +10,11 @@ import Portfolio from './pages/Portfolio';
 import Analytics from './pages/Analytics';
 import PaymentCanceled from './pages/PaymentCanceled';
 
-// Custom client-only Toaster wrapper
+// Client-only Toaster using React.lazy and Suspense
+const SonnerToaster = React.lazy(() =>
+  import('@/components/ui/sonner').then(module => ({ default: module.Toaster }))
+);
+
 function ClientOnlyToaster() {
   const [isClient, setIsClient] = React.useState(false);
 
@@ -20,9 +24,11 @@ function ClientOnlyToaster() {
 
   if (!isClient) return null;
 
-  // Import here to avoid requiring Toaster during SSR bundle
-  const { Toaster } = require('@/components/ui/sonner');
-  return <Toaster />;
+  return (
+    <React.Suspense fallback={null}>
+      <SonnerToaster />
+    </React.Suspense>
+  );
 }
 
 const rootElement = document.getElementById('root');
@@ -45,4 +51,3 @@ ReactDOM.createRoot(rootElement).render(
     </BrowserRouter>
   </React.StrictMode>
 );
-
