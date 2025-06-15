@@ -2,7 +2,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Toaster } from '@/components/ui/sonner';
 import { ClientOnlyProviders } from "@/components/providers/ClientOnlyProviders";
 
 // Import pages
@@ -10,6 +9,21 @@ import Index from './pages/Index';
 import Portfolio from './pages/Portfolio';
 import Analytics from './pages/Analytics';
 import PaymentCanceled from './pages/PaymentCanceled';
+
+// Custom client-only Toaster wrapper
+function ClientOnlyToaster() {
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) return null;
+
+  // Import here to avoid requiring Toaster during SSR bundle
+  const { Toaster } = require('@/components/ui/sonner');
+  return <Toaster />;
+}
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -26,8 +40,9 @@ ReactDOM.createRoot(rootElement).render(
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
         </Routes>
-        <Toaster />
+        <ClientOnlyToaster />
       </ClientOnlyProviders>
     </BrowserRouter>
   </React.StrictMode>
 );
+
