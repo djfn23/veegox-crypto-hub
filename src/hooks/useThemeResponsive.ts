@@ -11,7 +11,7 @@ export const useThemeResponsive = () => {
   // Always call useAppStore unconditionally to avoid hook order issues
   const { theme } = useAppStore();
 
-  // Sécurisation d'accès à window pour SSR
+  // Safe access to window for SSR protection
   const isDarkMode = 
     isHydrated && typeof window !== "undefined" && 
     (

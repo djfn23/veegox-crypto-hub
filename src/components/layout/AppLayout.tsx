@@ -1,4 +1,5 @@
-import React, { ReactNode, useState, useEffect } from "react";
+
+import React, { ReactNode } from "react";
 import { SimplifiedNavigation } from "./SimplifiedNavigation";
 import { MobileHeader } from "./MobileHeader";
 import { MobileBottomNavigation } from "./MobileBottomNavigation";
@@ -14,25 +15,7 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
-  // Wait for client before rendering anything that uses hooks.
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    // Minimal SSR-friendly fallback
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-foreground text-lg animate-pulse">
-          Chargement de l'interface Veegox...
-        </div>
-      </div>
-    );
-  }
-
-  // Only after isClient=true, use client-only hooks
+  // Use theme responsive hook directly - ClientOnlyProviders handles SSR protection
   const { 
     isMobile, 
     isTablet, 
