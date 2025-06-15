@@ -6,8 +6,24 @@ import { themeTokens } from '@/components/ui/theme-tokens';
 export const useThemeResponsive = () => {
   const { theme } = useAppStore();
   const responsive = useResponsiveLayout();
+
+  // Sécurisation d'accès à window pour SSR
+  const isDarkMode = 
+    typeof window !== "undefined" && 
+    (
+      theme === 'dark' || 
+      (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    );
+
+  const isLightMode =
+    typeof window !== "undefined" && 
+    (
+      theme === 'light' ||
+      (theme === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches)
+    );
   
   const getThemeValue = (lightValue: string, darkValue: string) => {
+    if (typeof window === "undefined") return lightValue;
     if (theme === 'system') {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? darkValue : lightValue;
     }
@@ -38,7 +54,7 @@ export const useThemeResponsive = () => {
     getShadowEffect,
     getResponsiveSpacing,
     getResponsiveFont,
-    isDark: theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches),
-    isLight: theme === 'light' || (theme === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches),
+    isDark: isDarkMode,
+    isLight: isLightMode,
   };
 };
