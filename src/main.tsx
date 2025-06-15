@@ -19,11 +19,13 @@ function ClientOnlyToaster() {
   const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
+    // Always wait until we're on the client before rendering Toaster.
     setIsClient(true);
   }, []);
 
   if (!isClient) return null;
 
+  // Only render Toaster *after* client hydration.
   return (
     <React.Suspense fallback={null}>
       <SonnerToaster />
