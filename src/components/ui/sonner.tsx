@@ -39,7 +39,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
     };
 
     // Add delay to ensure React is fully initialized
-    const timer = setTimeout(loadSonner, 200);
+    const timer = setTimeout(loadSonner, 300);
     
     return () => clearTimeout(timer);
   }, []);
@@ -77,52 +77,4 @@ const Toaster = ({ ...props }: ToasterProps) => {
   }
 };
 
-// Safe toast function that loads dynamically
-const createSafeToast = () => {
-  let toastFunction: any = null;
-  
-  const loadToast = async () => {
-    if (!toastFunction) {
-      try {
-        const sonnerModule = await import('sonner');
-        toastFunction = sonnerModule.toast;
-      } catch (error) {
-        console.warn('Toast function not available:', error);
-        // Create mock function
-        const mockToast = () => {};
-        mockToast.success = () => {};
-        mockToast.error = () => {};
-        mockToast.info = () => {};
-        mockToast.warning = () => {};
-        toastFunction = mockToast;
-      }
-    }
-    return toastFunction;
-  };
-
-  const safeToast = (...args: any[]) => {
-    loadToast().then(toast => toast(...args));
-  };
-
-  safeToast.success = (...args: any[]) => {
-    loadToast().then(toast => toast.success(...args));
-  };
-
-  safeToast.error = (...args: any[]) => {
-    loadToast().then(toast => toast.error(...args));
-  };
-
-  safeToast.info = (...args: any[]) => {
-    loadToast().then(toast => toast.info(...args));
-  };
-
-  safeToast.warning = (...args: any[]) => {
-    loadToast().then(toast => toast.warning(...args));
-  };
-
-  return safeToast;
-};
-
-const toast = createSafeToast();
-
-export { Toaster, toast };
+export { Toaster };

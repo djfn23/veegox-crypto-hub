@@ -3,7 +3,6 @@ import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from "next-themes";
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { AlchemySignerContainer } from "@/components/wallet/AlchemySignerContainer";
 import { AppLayout } from "@/components/layout/AppLayout";
 
@@ -28,7 +27,7 @@ function App() {
   React.useEffect(() => {
     console.log('App: Component mounted successfully');
     
-    // Ensure React is fully ready before enabling toasters
+    // Ensure React is fully ready
     const timer = setTimeout(() => {
       setIsReactReady(true);
     }, 100);
@@ -45,6 +44,16 @@ function App() {
     };
   }, []);
   
+  if (!isReactReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+        <div className="text-white text-lg animate-pulse">
+          Chargement de Veegox...
+        </div>
+      </div>
+    );
+  }
+  
   try {
     return (
       <EnhancedErrorBoundary>
@@ -57,7 +66,6 @@ function App() {
               </div>
             </AppLayout>
             
-            {isReactReady && <Sonner />}
             <AlchemySignerContainer />
           </ThemeProvider>
         </QueryClientProvider>

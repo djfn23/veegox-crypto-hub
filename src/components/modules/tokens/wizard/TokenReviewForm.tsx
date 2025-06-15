@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle, AlertCircle, ExternalLink, Copy } from "lucide-react";
-import { toast } from "sonner";
+import { useSecureToast } from "@/hooks/useSecureToast";
 
 interface TokenReviewFormProps {
   tokenData: any;
@@ -18,6 +18,7 @@ export default function TokenReviewForm({
   templates
 }: TokenReviewFormProps) {
   const selectedTemplateData = templates.find(t => t.id === selectedTemplate);
+  const { success: toastSuccess } = useSecureToast();
   
   const chainNames = {
     ethereum: "Ethereum Mainnet",
@@ -33,9 +34,9 @@ export default function TokenReviewForm({
     arbitrum: "~0.002 ETH"
   };
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = async (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copié dans le presse-papier");
+    await toastSuccess("Copié dans le presse-papier");
   };
 
   const enabledFeatures = [

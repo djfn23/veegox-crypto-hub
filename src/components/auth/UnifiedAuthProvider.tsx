@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useSecureToast } from '@/hooks/useSecureToast';
 
 interface AuthUser {
   id: string;
@@ -40,8 +40,8 @@ interface UnifiedAuthProviderProps {
 }
 
 export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ children }) => {
-  // Early return with fallback if React hooks are not available
-  if (typeof useState === 'undefined' || typeof useEffect === 'undefined' || typeof useContext === 'undefined') {
+  // Safety checks with fallback rendering
+  if (typeof React === 'undefined' || !React.useState || !React.useEffect || !React.useContext) {
     console.error('React hooks are not available in UnifiedAuthProvider');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
@@ -55,18 +55,45 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const { success: toastSuccess, error: toastError } = useSecureToast();
 
   useEffect(() => {
     let mounted = true;
+    let subscription: any = null;
 
-    // Set up Supabase auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+    const initializeAuth = async () => {
+      try {
+        // Set up Supabase auth state listener
+        const { data } = supabase.auth.onAuthStateChange(
+          (event, session) => {
+            if (!mounted) return;
+            
+            console.log('UnifiedAuthProvider: Auth event:', event, 'Session:', session?.user?.email);
+            setSession(session);
+            
+            if (session?.user) {
+              setUser({
+                id: session.user.id,
+                email: session.user.email,
+                name: session.user.user_metadata?.full_name,
+                provider: 'supabase'
+              });
+            } else {
+              setUser(null);
+            }
+            
+            setLoading(false);
+          }
+        );
+
+        subscription = data.subscription;
+
+        // Check for existing session
+        const { data: { session } } = await supabase.auth.getSession();
         if (!mounted) return;
         
-        console.log('UnifiedAuthProvider: Auth event:', event, 'Session:', session?.user?.email);
+        console.log('UnifiedAuthProvider: Retrieved existing session:', !!session);
         setSession(session);
-        
         if (session?.user) {
           setUser({
             id: session.user.id,
@@ -74,40 +101,26 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
             name: session.user.user_metadata?.full_name,
             provider: 'supabase'
           });
-        } else {
-          setUser(null);
         }
-        
         setLoading(false);
+      } catch (error) {
+        console.error('UnifiedAuthProvider: Error initializing auth:', error);
+        if (mounted) {
+          setLoading(false);
+        }
       }
-    );
+    };
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      
-      console.log('UnifiedAuthProvider: Retrieved existing session:', !!session);
-      setSession(session);
-      if (session?.user) {
-        setUser({
-          id: session.user.id,
-          email: session.user.email,
-          name: session.user.user_metadata?.full_name,
-          provider: 'supabase'
-        });
-      }
-      setLoading(false);
-    }).catch((error) => {
-      console.error('UnifiedAuthProvider: Error getting session:', error);
-      if (mounted) {
-        setLoading(false);
-      }
-    });
+    // Add delay to ensure React is fully ready
+    const timer = setTimeout(initializeAuth, 100);
 
     return () => {
       console.log('UnifiedAuthProvider: Cleanup');
       mounted = false;
-      subscription.unsubscribe();
+      clearTimeout(timer);
+      if (subscription) {
+        subscription.unsubscribe();
+      }
     };
   }, []);
 
@@ -120,11 +133,11 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
       });
 
       if (error) {
-        toast.error('Erreur de connexion: ' + error.message);
+        await toastError('Erreur de connexion: ' + error.message);
         throw error;
       }
 
-      toast.success('Connexion réussie!');
+      await toastSuccess('Connexion réussie!');
     } catch (error) {
       console.error('UnifiedAuthProvider: Sign in error:', error);
       throw error;
@@ -143,11 +156,11 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
       });
 
       if (error) {
-        toast.error('Erreur d\'inscription: ' + error.message);
+        await toastError('Erreur d\'inscription: ' + error.message);
         throw error;
       }
 
-      toast.success('Inscription réussie! Vérifiez votre email.');
+      await toastSuccess('Inscription réussie! Vérifiez votre email.');
     } catch (error) {
       console.error('UnifiedAuthProvider: Sign up error:', error);
       throw error;
@@ -157,10 +170,10 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
   const signInWithWallet = async (walletId: string) => {
     try {
       console.log('UnifiedAuthProvider: Wallet sign in requested for:', walletId);
-      toast.success('Connexion wallet en cours...');
+      await toastSuccess('Connexion wallet en cours...');
     } catch (error) {
       console.error('UnifiedAuthProvider: Wallet sign in error:', error);
-      toast.error('Erreur de connexion wallet');
+      await toastError('Erreur de connexion wallet');
     }
   };
 
@@ -172,7 +185,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
       }
       setUser(null);
       setSession(null);
-      toast.success('Déconnexion réussie');
+      await toastSuccess('Déconnexion réussie');
     } catch (error) {
       console.error('UnifiedAuthProvider: Sign out error:', error);
     }
