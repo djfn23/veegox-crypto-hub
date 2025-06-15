@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useContext, createContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,7 +39,7 @@ interface UnifiedAuthProviderProps {
   children: React.ReactNode;
 }
 
-export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ children }) => {
+export const UnifiedAuthProvider = ({ children }: UnifiedAuthProviderProps) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,7 +52,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
     const initializeAuth = async () => {
       try {
         console.log('UnifiedAuthProvider: Starting auth initialization');
-        // Mettre en place l'écouteur d'état d'auth
+        // Set up auth state listener
         const { data } = supabase.auth.onAuthStateChange(
           (event, session) => {
             if (!mounted) return;
@@ -72,7 +73,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
         );
         subscription = data.subscription;
 
-        // Vérifie session existante
+        // Check existing session
         const { data: { session } } = await supabase.auth.getSession();
         if (!mounted) return;
         console.log('UnifiedAuthProvider: Initial session check:', !!session);
@@ -103,7 +104,7 @@ export const UnifiedAuthProvider: React.FC<UnifiedAuthProviderProps> = ({ childr
     };
   }, []);
 
-  // Fallback de chargement global
+  // Loading fallback
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
