@@ -39,7 +39,7 @@ interface UnifiedAuthProviderProps {
   children: React.ReactNode;
 }
 
-export const UnifiedAuthProvider = ({ children }: UnifiedAuthProviderProps) => {
+export function UnifiedAuthProvider({ children }: UnifiedAuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -187,4 +187,4 @@ export const UnifiedAuthProvider = ({ children }: UnifiedAuthProviderProps) => {
       {children}
     </UnifiedAuthContext.Provider>
   );
-};
+}
