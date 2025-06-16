@@ -5,6 +5,7 @@ import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { MobileWalletCard, MobileWalletCardHeader, MobileWalletCardContent } from '@/components/ui/mobile-wallet-card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface PriceDataPoint {
   timestamp: string;
@@ -134,6 +135,3 @@ export const MobilePriceChart: React.FC<MobilePriceChartProps> = ({
     </MobileWalletCard>
   );
 };
-
-// Add missing cn import
-import { cn } from '@/lib/utils';
