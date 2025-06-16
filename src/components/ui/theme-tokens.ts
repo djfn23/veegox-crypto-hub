@@ -58,12 +58,19 @@ export const themeTokens = {
   },
   effects: {
     glass: {
-      light: 'backdrop-blur-md bg-white/10 border-white/20',
-      dark: 'backdrop-blur-md bg-white/5 border-white/10',
+      light: 'backdrop-blur-md bg-white/80 border-white/20 shadow-lg',
+      dark: 'backdrop-blur-md bg-slate-900/80 border-white/10 shadow-xl',
     },
     shadow: {
-      light: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-      dark: '0 4px 6px -1px rgb(0 0 0 / 0.3)',
+      light: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06)',
+      dark: '0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -2px rgb(0 0 0 / 0.1)',
     },
+  },
+  zIndex: {
+    dropdown: 60,
+    modal: 70,
+    overlay: 80,
+    toast: 90,
+    tooltip: 100,
   },
 } as const;
