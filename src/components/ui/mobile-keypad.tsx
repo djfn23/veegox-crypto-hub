@@ -1,78 +1,92 @@
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Delete } from "lucide-react"
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Delete } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface MobileKeypadProps {
-  value: string
-  onChange: (value: string) => void
-  maxLength?: number
-  allowDecimal?: boolean
-  className?: string
+  onNumberPress: (number: string) => void;
+  onBackspace: () => void;
+  onAction?: (action: string) => void;
+  className?: string;
+  showDecimal?: boolean;
+  showActions?: boolean;
+  actionButtons?: { label: string; action: string; variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' }[];
 }
 
-export const MobileKeypad = React.forwardRef<HTMLDivElement, MobileKeypadProps>(
-  ({ value, onChange, maxLength = 10, allowDecimal = true, className, ...props }, ref) => {
-    const handleKeyPress = React.useCallback((key: string) => {
-      if (key === 'delete') {
-        const newValue = value.slice(0, -1);
-        onChange(newValue);
-        return;
-      }
+export const MobileKeypad: React.FC<MobileKeypadProps> = ({
+  onNumberPress,
+  onBackspace,
+  onAction,
+  className = '',
+  showDecimal = true,
+  showActions = false,
+  actionButtons = []
+}) => {
+  const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
-      if (key === '.' && (!allowDecimal || value.includes('.'))) {
-        return;
-      }
+  return (
+    <div className={cn(
+      'grid grid-cols-3 gap-3 p-4 bg-card rounded-lg border',
+      className
+    )}>
+      {/* Numbers 1-9 */}
+      {numbers.slice(0, 9).map((num) => (
+        <Button
+          key={num}
+          variant="outline"
+          size="lg"
+          className="h-14 text-lg font-semibold touch-target-lg"
+          onClick={() => onNumberPress(num)}
+        >
+          {num}
+        </Button>
+      ))}
 
-      if (value.length >= maxLength) {
-        return;
-      }
+      {/* Bottom row */}
+      {showDecimal && (
+        <Button
+          variant="outline"
+          size="lg"
+          className="h-14 text-lg font-semibold touch-target-lg"
+          onClick={() => onNumberPress('.')}
+        >
+          .
+        </Button>
+      )}
 
-      const newValue = value + key;
-      onChange(newValue);
-    }, [value, onChange, maxLength, allowDecimal]);
-
-    const keypadLayout = React.useMemo(() => [
-      ['1', '2', '3'],
-      ['4', '5', '6'],
-      ['7', '8', '9'],
-      [allowDecimal ? '.' : '', '0', 'delete']
-    ], [allowDecimal]);
-
-    return (
-      <div
-        ref={ref}
-        className={cn("grid grid-cols-3 gap-3 p-4 bg-slate-900/50 rounded-xl", className)}
-        {...props}
+      {/* Zero */}
+      <Button
+        variant="outline"
+        size="lg"
+        className="h-14 text-lg font-semibold touch-target-lg"
+        onClick={() => onNumberPress('0')}
       >
-        {keypadLayout.flat().map((key, index) => {
-          if (!key) {
-            return <div key={`empty-${index}`} className="h-14" />;
-          }
-          
-          return (
-            <Button
-              key={key}
-              variant="outline"
-              size="lg"
-              onClick={() => handleKeyPress(key)}
-              className={cn(
-                "h-14 text-xl font-semibold border-slate-600 bg-slate-800/50 hover:bg-slate-700/50 text-white",
-                "touch-target-lg active:scale-95 transition-transform duration-150"
-              )}
-            >
-              {key === 'delete' ? (
-                <Delete className="h-6 w-6" aria-label="Delete" />
-              ) : (
-                key
-              )}
-            </Button>
-          );
-        })}
-      </div>
-    );
-  }
-);
+        0
+      </Button>
 
-MobileKeypad.displayName = "MobileKeypad";
+      {/* Backspace */}
+      <Button
+        variant="outline"
+        size="lg"
+        className="h-14 touch-target-lg"
+        onClick={onBackspace}
+      >
+        <Delete className="h-6 w-6" />
+      </Button>
+
+      {/* Action buttons if enabled */}
+      {showActions && actionButtons.map((button, index) => (
+        <Button
+          key={index}
+          variant={button.variant || 'default'}
+          size="lg"
+          className="h-14 text-lg font-semibold touch-target-lg col-span-3"
+          onClick={() => onAction?.(button.action)}
+        >
+          {button.label}
+        </Button>
+      ))}
+    </div>
+  );
+};
