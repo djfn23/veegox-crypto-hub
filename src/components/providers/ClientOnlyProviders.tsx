@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { UnifiedAuthProvider } from "@/components/auth/UnifiedAuthProvider";
 
@@ -15,9 +15,9 @@ export function ClientOnlyProviders({ children }: { children: React.ReactNode })
 
 // Inner component that only runs on client side
 function ClientProvidersInner({ children }: { children: React.ReactNode }) {
-  const [isHydrated, setIsHydrated] = React.useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsHydrated(true);
   }, []);
 
