@@ -22,13 +22,13 @@ const navigationItems = [
     icon: TrendingUp,
   },
   {
-    name: "Banque",
-    href: "/crypto-bank",
+    name: "Portefeuille",
+    href: "/wallet",
     icon: Wallet,
   },
   {
-    name: "Exchange",
-    href: "/exchange",
+    name: "Banque",
+    href: "/crypto-bank",
     icon: ArrowRightLeft,
   },
   {

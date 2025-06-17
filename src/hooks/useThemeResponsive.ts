@@ -1,64 +1,46 @@
 
 import { useResponsiveLayout } from './useResponsiveLayout';
-import { useAppStore } from '@/store/useAppStore';
-import { themeTokens } from '@/components/ui/theme-tokens';
-import { useIsHydrated } from './useIsHydrated';
+import { useTheme } from './useTheme';
 
 export const useThemeResponsive = () => {
+  const { theme } = useTheme();
   const responsive = useResponsiveLayout();
-  const isHydrated = useIsHydrated();
   
-  // Always call useAppStore unconditionally to avoid hook order issues
-  const { theme } = useAppStore();
-
-  // Safe access to window for SSR protection
-  const isDarkMode = 
-    isHydrated && typeof window !== "undefined" && 
-    (
-      theme === 'dark' || 
-      (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    );
-
-  const isLightMode =
-    isHydrated && typeof window !== "undefined" && 
-    (
-      theme === 'light' ||
-      (theme === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches)
-    );
-  
-  const getThemeValue = (lightValue: string, darkValue: string) => {
-    if (!isHydrated || typeof window === "undefined") return lightValue;
-    if (theme === 'system') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? darkValue : lightValue;
-    }
-    return theme === 'dark' ? darkValue : lightValue;
-  };
+  const isDark = theme === 'dark';
+  const isLight = theme === 'light';
 
   const getGlassEffect = () => {
-    return getThemeValue(themeTokens.effects.glass.light, themeTokens.effects.glass.dark);
+    return isDark 
+      ? 'backdrop-blur-md bg-slate-900/80 border-white/10 shadow-xl' 
+      : 'backdrop-blur-md bg-white/80 border-white/20 shadow-lg';
   };
 
-  const getShadowEffect = () => {
-    return getThemeValue(themeTokens.effects.shadow.light, themeTokens.effects.shadow.dark);
+  const getResponsiveSpacing = (device: 'mobile' | 'tablet' | 'desktop') => {
+    switch (device) {
+      case 'mobile':
+        return '1rem';
+      case 'tablet':
+        return '1.5rem';
+      case 'desktop':
+        return '2rem';
+      default:
+        return '1rem';
+    }
   };
 
-  const getResponsiveSpacing = (size: keyof typeof themeTokens.spacing.container) => {
-    return themeTokens.spacing.container[size];
-  };
-
-  const getResponsiveFont = (size: keyof typeof themeTokens.typography.responsive) => {
-    return themeTokens.typography.responsive[size];
+  const getAdaptiveBackground = () => {
+    return isDark
+      ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
+      : 'bg-gradient-to-br from-white via-gray-50 to-white';
   };
 
   return {
     ...responsive,
+    isDark,
+    isLight,
     theme,
-    getThemeValue,
     getGlassEffect,
-    getShadowEffect,
     getResponsiveSpacing,
-    getResponsiveFont,
-    isDark: isDarkMode,
-    isLight: isLightMode,
+    getAdaptiveBackground,
   };
 };

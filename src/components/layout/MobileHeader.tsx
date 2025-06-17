@@ -1,18 +1,19 @@
 
 import { useState } from "react";
-import { Menu, Bell, Search, Settings } from "lucide-react";
+import { Menu, Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SidebarNavigation } from "./SidebarNavigation";
 import { UserMenu } from "./UserMenu";
 import { SidebarErrorBoundary } from "@/components/ui/error-boundary-sidebar";
 import { texts } from "@/lib/constants/texts";
-import {  } from "@/components/ui/badge";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 
 export const MobileHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { isTablet, isSmallMobile, isLandscapePhone } = useResponsiveLayout();
+  const { isTablet, isLandscapePhone } = useResponsiveLayout();
+  const isSmallMobile = window.innerWidth < 375;
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -55,9 +56,9 @@ export const MobileHeader = () => {
                       <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex-shrink-0 shadow-lg"></div>
                       <div>
                         <span className="text-xl font-bold text-white block">{texts.app.name}</span>
-                        <div className="inline-flex items-center px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-semibold mt-1 border border-blue-500/30">
+                        <Badge variant="secondary" className="text-xs mt-1">
                           {texts.app.beta}
-                        </div>
+                        </Badge>
                       </div>
                     </div>
                   </div>
