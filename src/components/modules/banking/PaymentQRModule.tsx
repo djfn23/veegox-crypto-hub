@@ -103,6 +103,19 @@ export const PaymentQRModule = ({ userId, userAccounts }: PaymentQRModuleProps) 
     }
   };
 
+  const handleNumberPress = (number: string) => {
+    if (number === '.') {
+      if (amount.includes('.')) return; // Prevent multiple decimals
+      setAmount(amount + number);
+    } else {
+      setAmount(amount + number);
+    }
+  };
+
+  const handleBackspace = () => {
+    setAmount(amount.slice(0, -1));
+  };
+
   const CardComponent = isMobile ? MobileCard : Card;
   const CardContentComponent = isMobile ? MobileCardContent : CardContent;
   const CardHeaderComponent = isMobile ? MobileCardHeader : CardHeader;
@@ -308,10 +321,9 @@ export const PaymentQRModule = ({ userId, userAccounts }: PaymentQRModuleProps) 
             </div>
 
             <MobileKeypad
-              value={amount}
-              onChange={setAmount}
-              maxLength={10}
-              allowDecimal={true}
+              onNumberPress={handleNumberPress}
+              onBackspace={handleBackspace}
+              showDecimal={true}
             />
           </div>
         </div>
