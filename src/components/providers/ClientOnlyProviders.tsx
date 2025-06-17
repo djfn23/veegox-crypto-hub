@@ -4,32 +4,52 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { UnifiedAuthProvider } from "@/components/auth/UnifiedAuthProvider";
 
 export function ClientOnlyProviders({ children }: { children: React.ReactNode }) {
-  // Complete SSR protection - never render anything on server
+  // Protection SSR complète - ne jamais rendre quoi que ce soit sur le serveur
   if (typeof window === "undefined") {
-    return null;
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: "hsl(222 47% 11%)",
+        color: "hsl(210 40% 98%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "16px",
+        fontFamily: "system-ui, sans-serif"
+      }}>
+        Chargement de l'application...
+      </div>
+    );
   }
 
-  // Now we're guaranteed to be on client, safe to use hooks in inner component
+  // Maintenant nous sommes garantis d'être côté client, on peut utiliser les hooks
   return <ClientProvidersInner>{children}</ClientProvidersInner>;
 }
 
-// Inner component that only runs on client side
+// Composant interne qui s'exécute uniquement côté client
 function ClientProvidersInner({ children }: { children: React.ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    setIsHydrated(true);
+    // Délai pour s'assurer que React est complètement prêt
+    const timer = setTimeout(() => {
+      setIsHydrated(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   if (!isHydrated) {
     return (
       <div style={{
         minHeight: "100vh",
-        background: "#111",
-        color: "#fff",
+        background: "hsl(222 47% 11%)",
+        color: "hsl(210 40% 98%)",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        fontSize: "16px",
+        fontFamily: "system-ui, sans-serif"
       }}>
         Initialisation sécurisée...
       </div>
