@@ -21,6 +21,7 @@ import {
   Vote,
   Wallet
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const navigationItems = [
   { name: "Accueil", href: "/", icon: Home },
@@ -57,14 +58,23 @@ export const SimplifiedNavigation = () => {
           <Link key={item.name} to={item.href}>
             <Button
               variant="ghost"
-              className={`w-full justify-start ${
+              className={cn(
+                "w-full justify-start h-11 px-3 transition-all duration-300 group",
                 isActive 
-                  ? "bg-purple-600 text-white hover:bg-purple-700" 
-                  : "text-gray-300 hover:bg-slate-700 hover:text-white"
-              }`}
+                  ? "bg-gradient-to-r from-primary/20 to-accent/20 text-primary hover:from-primary/30 hover:to-accent/30 shadow-lg scale-105 border-l-2 border-primary" 
+                  : "text-muted-foreground hover:bg-muted/80 hover:text-foreground hover:scale-105"
+              )}
             >
-              <Icon className="mr-3 h-4 w-4" />
-              {item.name}
+              <Icon className={cn(
+                "mr-3 h-4 w-4 transition-all duration-300",
+                isActive ? "text-primary scale-110" : "group-hover:scale-110"
+              )} />
+              <span className="truncate">{item.name}</span>
+              {isActive && (
+                <div className="ml-auto">
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                </div>
+              )}
             </Button>
           </Link>
         );
