@@ -68,7 +68,7 @@ const defaultPreferences: UserPreferences = {
   },
 };
 
-// Protection SSR améliorée
+// Protection SSR simplifiée
 const isClient = typeof window !== "undefined" && typeof window.localStorage !== "undefined";
 
 const createSafeStorage = () => {
@@ -108,10 +108,6 @@ export const useAppStore = create<AppState>()(
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       
       setTheme: (theme) => {
-        // Ne met à jour que si le store est hydraté
-        const state = get();
-        if (!state.isHydrated && isClient) return;
-        
         set({ theme });
         get().updateUserPreferences({ theme });
       },
@@ -160,16 +156,15 @@ export const useAppStore = create<AppState>()(
         userPreferences: state.userPreferences,
         notifications: state.notifications.slice(0, 10),
       }),
-      // Évite les problèmes d'hydratation
       skipHydration: !isClient,
     }
   )
 );
 
-// Initialise l'hydratation côté client avec un timing aligné
+// Initialisation simplifiée côté client
 if (isClient) {
-  // Délai aligné avec ThemeProvider (150ms) pour éviter les conflits
+  // Délai réduit pour une initialisation plus rapide
   setTimeout(() => {
     useAppStore.getState().setHydrated(true);
-  }, 150);
+  }, 100);
 }

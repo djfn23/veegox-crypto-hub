@@ -3,10 +3,10 @@ import React from "react";
 import { useThemeSync } from "@/hooks/useThemeSync";
 
 export const ThemeSync = React.memo(() => {
-  // Synchronise le thème - toute la logique est dans useThemeSync
+  // Synchronisation simple du thème
   useThemeSync();
   
-  // Ne rend rien - composant invisible de synchronisation
+  // Composant invisible
   return null;
 });
 

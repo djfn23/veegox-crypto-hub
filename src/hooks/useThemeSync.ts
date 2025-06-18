@@ -1,40 +1,21 @@
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAppStore } from "@/store/useAppStore";
-import { useIsHydrated } from "./useIsHydrated";
 
 /**
- * Synchronise la classe de thème du document root avec la valeur dans le store Zustand.
- * Optimisé pour éviter les conflits de timing et les anciens thèmes.
+ * Hook simplifié pour synchroniser le thème avec le DOM
+ * Élimine tous les conflits de timing et problèmes d'hydratation
  */
 export function useThemeSync() {
-  const isHydrated = useIsHydrated();
-  
-  // Accès direct au store une fois hydraté (pas d'import dynamique)
-  const { theme: storeTheme } = useAppStore(
-    (state) => ({ theme: state.theme }),
-    // Ne pas s'abonner avant l'hydratation
-    isHydrated ? undefined : () => true
-  );
+  const { theme, isHydrated } = useAppStore();
 
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
-    // Initialisation avec le thème du store si disponible, sinon 'dark'
-    return isHydrated ? storeTheme : 'dark';
-  });
-
-  // Synchronise avec le store dès que possible
-  useEffect(() => {
-    if (!isHydrated) return;
-    setTheme(storeTheme);
-  }, [storeTheme, isHydrated]);
-
-  // Applique le thème au DOM avec nettoyage des anciennes classes
+  // Applique le thème au DOM une fois hydraté
   useEffect(() => {
     if (!isHydrated || typeof window === "undefined") return;
     
     const root = window.document.documentElement;
     
-    // Nettoyage complet des anciennes classes de thème
+    // Nettoyage complet des anciennes classes
     root.classList.remove("light", "dark");
     
     if (theme === "system") {
@@ -45,11 +26,12 @@ export function useThemeSync() {
     }
   }, [theme, isHydrated]);
 
-  // Écoute le changement du système quand 'system' est sélectionné
+  // Écoute les changements du système pour le thème 'system'
   useEffect(() => {
     if (!isHydrated || typeof window === "undefined" || theme !== "system") return;
     
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    
     const handleChange = () => {
       const root = window.document.documentElement;
       root.classList.remove("light", "dark");

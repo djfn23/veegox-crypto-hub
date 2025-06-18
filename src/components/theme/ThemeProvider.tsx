@@ -1,28 +1,24 @@
 
 import * as React from "react";
+import { useAppStore } from "@/store/useAppStore";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
 }
 
-// Lazy loading du composant ThemeSync
+// Lazy loading simplifié
 const ThemeSync = React.lazy(() => 
   import("./ThemeSync").then(module => ({ default: module.ThemeSync }))
 );
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  // Protection SSR complète - ne jamais rendre quoi que ce soit sur le serveur
+  // Protection SSR - fallback sombre pendant le chargement
   if (typeof window === "undefined") {
     return (
       <div style={{ 
         minHeight: "100vh", 
         background: "hsl(222 47% 11%)", 
-        color: "hsl(210 40% 98%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "16px",
-        fontFamily: "system-ui, sans-serif"
+        color: "hsl(210 40% 98%)"
       }}>
         {children}
       </div>
@@ -32,56 +28,21 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   return <ThemeProviderClient>{children}</ThemeProviderClient>;
 }
 
-// Composant client séparé pour éviter les problèmes d'hydratation
 function ThemeProviderClient({ children }: ThemeProviderProps) {
-  // Vérification de sécurité pour React
-  if (!React || !React.useState || !React.useEffect || !React.Suspense) {
-    return (
-      <div style={{ 
-        minHeight: "100vh", 
-        background: "hsl(222 47% 11%)", 
-        color: "hsl(210 40% 98%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "16px",
-        fontFamily: "system-ui, sans-serif"
-      }}>
-        {children}
-      </div>
-    );
-  }
-
-  const [isHydrated, setIsHydrated] = React.useState(false);
-
-  React.useEffect(() => {
-    // Délai aligné avec le store pour éviter les conflits de timing
-    const timer = setTimeout(() => {
-      setIsHydrated(true);
-    }, 150); // Timing synchronisé avec useAppStore
-
-    return () => clearTimeout(timer);
-  }, []);
+  const { isHydrated } = useAppStore();
 
   if (!isHydrated) {
-    // Fallback pendant l'hydratation - ne pas utiliser de hooks
     return (
       <div style={{ 
         minHeight: "100vh", 
         background: "hsl(222 47% 11%)", 
-        color: "hsl(210 40% 98%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "16px",
-        fontFamily: "system-ui, sans-serif"
+        color: "hsl(210 40% 98%)"
       }}>
         {children}
       </div>
     );
   }
 
-  // Une fois hydraté, on peut charger le système de thème
   return (
     <>
       <React.Suspense fallback={null}>
