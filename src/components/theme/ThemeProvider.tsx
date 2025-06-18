@@ -1,6 +1,5 @@
 
-import React, { Suspense } from "react";
-import { useIsHydrated } from "@/hooks/useIsHydrated";
+import * as React from "react";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -12,10 +11,19 @@ const ThemeSync = React.lazy(() =>
 );
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  // Protection SSR : ne jamais rendre sur le serveur
+  // Protection SSR complète - ne jamais rendre quoi que ce soit sur le serveur
   if (typeof window === "undefined") {
     return (
-      <div style={{ minHeight: "100vh", background: "#111", color: "#fff" }}>
+      <div style={{ 
+        minHeight: "100vh", 
+        background: "hsl(222 47% 11%)", 
+        color: "hsl(210 40% 98%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "16px",
+        fontFamily: "system-ui, sans-serif"
+      }}>
         {children}
       </div>
     );
@@ -26,12 +34,48 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
 // Composant client séparé pour éviter les problèmes d'hydratation
 function ThemeProviderClient({ children }: ThemeProviderProps) {
-  const isHydrated = useIsHydrated();
+  // Vérification de sécurité pour React
+  if (!React || !React.useState || !React.useEffect || !React.Suspense) {
+    return (
+      <div style={{ 
+        minHeight: "100vh", 
+        background: "hsl(222 47% 11%)", 
+        color: "hsl(210 40% 98%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "16px",
+        fontFamily: "system-ui, sans-serif"
+      }}>
+        {children}
+      </div>
+    );
+  }
+
+  const [isHydrated, setIsHydrated] = React.useState(false);
+
+  React.useEffect(() => {
+    // Délai pour s'assurer que React et Zustand sont complètement prêts
+    const timer = setTimeout(() => {
+      setIsHydrated(true);
+    }, 150); // Un peu plus de délai pour Zustand
+
+    return () => clearTimeout(timer);
+  }, []);
 
   if (!isHydrated) {
-    // Fallback pendant l'hydratation
+    // Fallback pendant l'hydratation - ne pas utiliser de hooks
     return (
-      <div style={{ minHeight: "100vh", background: "#111", color: "#fff" }}>
+      <div style={{ 
+        minHeight: "100vh", 
+        background: "hsl(222 47% 11%)", 
+        color: "hsl(210 40% 98%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "16px",
+        fontFamily: "system-ui, sans-serif"
+      }}>
         {children}
       </div>
     );
@@ -40,9 +84,9 @@ function ThemeProviderClient({ children }: ThemeProviderProps) {
   // Une fois hydraté, on peut charger le système de thème
   return (
     <>
-      <Suspense fallback={null}>
+      <React.Suspense fallback={null}>
         <ThemeSync />
-      </Suspense>
+      </React.Suspense>
       {children}
     </>
   );
