@@ -65,7 +65,7 @@ export const MobileKeypad: React.FC<MobileKeypadProps> = ({
         0
       </Button>
 
-      {/* Delete button (was Backspace) */}
+      {/* Delete button */}
       <Button
         variant="outline"
         size="lg"
