@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -167,10 +166,10 @@ export const useAppStore = create<AppState>()(
   )
 );
 
-// Initialise l'hydratation côté client
+// Initialise l'hydratation côté client avec un timing aligné
 if (isClient) {
-  // Délai pour s'assurer que React est prêt
+  // Délai aligné avec ThemeProvider (150ms) pour éviter les conflits
   setTimeout(() => {
     useAppStore.getState().setHydrated(true);
-  }, 0);
+  }, 150);
 }

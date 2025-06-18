@@ -1,40 +1,40 @@
 
 import { useEffect, useState } from "react";
+import { useAppStore } from "@/store/useAppStore";
 import { useIsHydrated } from "./useIsHydrated";
 
 /**
  * Synchronise la classe de thème du document root avec la valeur dans le store Zustand.
- * Complètement sécurisé contre l'utilisation SSR et les problèmes d'hydratation.
+ * Optimisé pour éviter les conflits de timing et les anciens thèmes.
  */
 export function useThemeSync() {
   const isHydrated = useIsHydrated();
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('dark');
+  
+  // Accès direct au store une fois hydraté (pas d'import dynamique)
+  const { theme: storeTheme } = useAppStore(
+    (state) => ({ theme: state.theme }),
+    // Ne pas s'abonner avant l'hydratation
+    isHydrated ? undefined : () => true
+  );
 
-  // Ne charge le store qu'après l'hydratation complète
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
+    // Initialisation avec le thème du store si disponible, sinon 'dark'
+    return isHydrated ? storeTheme : 'dark';
+  });
+
+  // Synchronise avec le store dès que possible
   useEffect(() => {
-    if (!isHydrated || typeof window === "undefined") return;
+    if (!isHydrated) return;
+    setTheme(storeTheme);
+  }, [storeTheme, isHydrated]);
 
-    // Import dynamique du store après hydratation
-    import("@/store/useAppStore").then(({ useAppStore }) => {
-      const { theme: storeTheme } = useAppStore.getState();
-      setTheme(storeTheme);
-
-      // Subscribe aux changements du store - fixed signature
-      const unsubscribe = useAppStore.subscribe(
-        (state) => {
-          setTheme(state.theme);
-        }
-      );
-
-      return unsubscribe;
-    });
-  }, [isHydrated]);
-
-  // Applique le thème au DOM
+  // Applique le thème au DOM avec nettoyage des anciennes classes
   useEffect(() => {
     if (!isHydrated || typeof window === "undefined") return;
     
     const root = window.document.documentElement;
+    
+    // Nettoyage complet des anciennes classes de thème
     root.classList.remove("light", "dark");
     
     if (theme === "system") {
@@ -45,7 +45,7 @@ export function useThemeSync() {
     }
   }, [theme, isHydrated]);
 
-  // Écoute le changement du système quand 'system'
+  // Écoute le changement du système quand 'system' est sélectionné
   useEffect(() => {
     if (!isHydrated || typeof window === "undefined" || theme !== "system") return;
     

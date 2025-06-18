@@ -55,10 +55,10 @@ function ThemeProviderClient({ children }: ThemeProviderProps) {
   const [isHydrated, setIsHydrated] = React.useState(false);
 
   React.useEffect(() => {
-    // Délai pour s'assurer que React et Zustand sont complètement prêts
+    // Délai aligné avec le store pour éviter les conflits de timing
     const timer = setTimeout(() => {
       setIsHydrated(true);
-    }, 150); // Un peu plus de délai pour Zustand
+    }, 150); // Timing synchronisé avec useAppStore
 
     return () => clearTimeout(timer);
   }, []);

@@ -1,12 +1,9 @@
 
 import React from "react";
 import { useThemeSync } from "@/hooks/useThemeSync";
-import { useIsHydrated } from "@/hooks/useIsHydrated";
 
 export const ThemeSync = React.memo(() => {
-  const isHydrated = useIsHydrated();
-  
-  // Ne synchronise le thème qu'après hydratation complète
+  // Synchronise le thème - toute la logique est dans useThemeSync
   useThemeSync();
   
   // Ne rend rien - composant invisible de synchronisation
