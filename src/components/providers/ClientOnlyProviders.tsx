@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { UnifiedAuthProvider } from "@/components/auth/UnifiedAuthProvider";
 
@@ -28,9 +28,27 @@ export function ClientOnlyProviders({ children }: { children: React.ReactNode })
 
 // Composant interne qui s'exécute uniquement côté client
 function ClientProvidersInner({ children }: { children: React.ReactNode }) {
-  const [isHydrated, setIsHydrated] = useState(false);
+  // Vérification de sécurité pour React
+  if (!React || !React.useState || !React.useEffect) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: "hsl(222 47% 11%)",
+        color: "hsl(210 40% 98%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "16px",
+        fontFamily: "system-ui, sans-serif"
+      }}>
+        Chargement de React...
+      </div>
+    );
+  }
 
-  useEffect(() => {
+  const [isHydrated, setIsHydrated] = React.useState(false);
+
+  React.useEffect(() => {
     // Délai pour s'assurer que React est complètement prêt
     const timer = setTimeout(() => {
       setIsHydrated(true);
