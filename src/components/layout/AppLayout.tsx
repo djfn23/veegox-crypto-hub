@@ -15,7 +15,7 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
-  // Complete SSR protection - never call hooks on server
+  // Protection SSR complète - ne jamais appeler de hooks sur le serveur
   if (typeof window === "undefined") {
     return (
       <div style={{
@@ -26,7 +26,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         alignItems: "center",
         justifyContent: "center",
       }}>
-        Chargement de l'application...
+        Chargement...
       </div>
     );
   }
@@ -34,7 +34,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   return <AppLayoutClient>{children}</AppLayoutClient>;
 }
 
-// Client-only component that can safely use hooks
+// Composant client qui peut utiliser les hooks en sécurité
 function AppLayoutClient({ children }: AppLayoutProps) {
   const { 
     isMobile, 
@@ -42,7 +42,6 @@ function AppLayoutClient({ children }: AppLayoutProps) {
     isDesktop, 
     isLandscapePhone,
     getGlassEffect,
-    getResponsiveSpacing,
     isDark
   } = useThemeResponsive();
 

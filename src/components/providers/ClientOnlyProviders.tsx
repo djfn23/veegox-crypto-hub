@@ -22,37 +22,19 @@ export function ClientOnlyProviders({ children }: { children: React.ReactNode })
     );
   }
 
-  // Maintenant nous sommes garantis d'être côté client, on peut utiliser les hooks
+  // Maintenant nous sommes garantis d'être côté client
   return <ClientProvidersInner>{children}</ClientProvidersInner>;
 }
 
 // Composant interne qui s'exécute uniquement côté client
 function ClientProvidersInner({ children }: { children: React.ReactNode }) {
-  // Vérification de sécurité pour React
-  if (!React || !React.useState || !React.useEffect) {
-    return (
-      <div style={{
-        minHeight: "100vh",
-        background: "hsl(222 47% 11%)",
-        color: "hsl(210 40% 98%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "16px",
-        fontFamily: "system-ui, sans-serif"
-      }}>
-        Chargement de React...
-      </div>
-    );
-  }
-
   const [isHydrated, setIsHydrated] = React.useState(false);
 
   React.useEffect(() => {
     // Délai pour s'assurer que React est complètement prêt
     const timer = setTimeout(() => {
       setIsHydrated(true);
-    }, 100);
+    }, 50);
 
     return () => clearTimeout(timer);
   }, []);
@@ -69,7 +51,7 @@ function ClientProvidersInner({ children }: { children: React.ReactNode }) {
         fontSize: "16px",
         fontFamily: "system-ui, sans-serif"
       }}>
-        Initialisation sécurisée...
+        Initialisation...
       </div>
     );
   }

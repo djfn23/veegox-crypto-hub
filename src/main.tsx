@@ -4,6 +4,8 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ClientOnlyProviders } from "@/components/providers/ClientOnlyProviders";
 
+console.log('🚀 Main.tsx: Starting application initialization');
+
 // Import pages principales
 import Index from './pages/Index';
 import Portfolio from './pages/Portfolio';
@@ -76,9 +78,17 @@ import CreateNFT from './pages/CreateNFT';
 import MyNFTs from './pages/MyNFTs';
 import NotFound from './pages/NotFound';
 
+console.log('✅ Main.tsx: All imports loaded successfully');
+
 // Toaster avec lazy loading sécurisé
 const LazyToaster = React.lazy(() =>
-  import('@/components/ui/sonner').then(module => ({ default: module.Toaster }))
+  import('@/components/ui/sonner').then(module => {
+    console.log('✅ Toaster loaded successfully');
+    return { default: module.Toaster };
+  }).catch(error => {
+    console.error('❌ Error loading Toaster:', error);
+    return { default: () => null };
+  })
 );
 
 // Composant Toaster sécurisé qui ne charge qu'après l'hydratation
@@ -86,15 +96,19 @@ function SafeToaster() {
   const [canRender, setCanRender] = React.useState(false);
 
   React.useEffect(() => {
-    // S'assure que l'hydratation est complète avant de charger Sonner
+    console.log('🔄 SafeToaster: Starting hydration timer');
     const timer = setTimeout(() => {
+      console.log('✅ SafeToaster: Hydration complete, enabling toaster');
       setCanRender(true);
     }, 100);
 
     return () => clearTimeout(timer);
   }, []);
 
-  if (!canRender) return null;
+  if (!canRender) {
+    console.log('⏳ SafeToaster: Not ready yet, returning null');
+    return null;
+  }
 
   return (
     <React.Suspense fallback={null}>
@@ -105,8 +119,11 @@ function SafeToaster() {
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
+  console.error('❌ Root element not found!');
   throw new Error('Root element not found');
 }
+
+console.log('🎯 Main.tsx: Root element found, starting React render');
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
@@ -202,3 +219,5 @@ ReactDOM.createRoot(rootElement).render(
     </BrowserRouter>
   </React.StrictMode>
 );
+
+console.log('🎉 Main.tsx: Application rendered successfully');
